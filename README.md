@@ -162,25 +162,60 @@ Where:
 ```
 ceras/
 ├── data_loader.py
+├── preprocess/                      
+│   ├── __init__.py
+│   ├── context_enrichment.py      
+│   ├── signal_fusion.py            
+│   └── auditor.py                  
+│       
+│
 ├── features/
 │   ├── featurize.py
 │   └── feature_quality.py
+│
 ├── models/
 │   ├── cepm.py
 │   ├── anfis.py
 │   └── ann.py
+│
+├── postprocess/                     
+│   ├── __init__.py
+│   ├── calibrator.py               
+│   ├── insights.py               
+│   └── model_monitor.py      
+│
+├── infra/                          
+│   ├── __init__.py
+│   ├── experiment_tracking.py       
+│   └── llm_queue.py                 
+│
 ├── reasoning/
 │   ├── llm_utils.py
 │   ├── decomposer.py
 │   ├── verifier.py
 │   └── camre_edu.py
+│
 ├── inference/
-│   └── engine.py
+│   ├── engine.py
+│   └── fusion.py                  
+│
 ├── interface/
 │   ├── streamlit_app.py
 │   └── fastapi_app.py
-└── experiments/
-    └── run_experiment.py
+│
+├── experiments/
+│   ├── run_experiment.py
+│   └── synthetic_benchmarks.py     
+│
+├── monitoring/                       
+│   ├── __init__.py
+│   ├── alerts.py                    
+│   └── reports.py                  
+│
+└── tests/
+    ├── test_preprocess.py           
+    ├── test_postprocess.py        
+    └── test_synthetic_benchmarks.py
 ```
 
 ---
