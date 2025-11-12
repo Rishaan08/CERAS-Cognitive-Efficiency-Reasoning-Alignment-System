@@ -1,0 +1,27 @@
+{
+  "behavioral": [
+    "oulad_avg_clicks",
+    "engagement_intensity"
+  ],
+  "cognitive": [
+    "has_scores",
+    "oulad_avg_assessment_score"
+  ],
+  "keystroke": [
+    "Hold .",
+    "Hold 5",
+    "Hold Caps",
+    "Hold Enter",
+    "Hold Shift",
+    "Hold Shift.1",
+    "Hold a",
+    "Hold e",
+    "Hold i",
+    "Hold l",
+    "Hold n",
+    "Hold o",
+    "Hold r",
+    "Hold t",
+    "typing_consistency"
+  ]
+}
