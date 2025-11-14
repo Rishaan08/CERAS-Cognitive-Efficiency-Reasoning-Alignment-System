@@ -1,0 +1,1042 @@
+{
+  "tree_id": "3ddefa3e-1809-409d-9686-3b8f5fe541ed",
+  "root_id": "aa9a3635-a580-4845-adf6-0f165c645525",
+  "nodes": {
+    "aa9a3635-a580-4845-adf6-0f165c645525": {
+      "id": "aa9a3635-a580-4845-adf6-0f165c645525",
+      "parent_id": null,
+      "text": "what are trignometric identities and how can we solve the question (51^2 - 49^2) effeciently using them?",
+      "role": "root",
+      "scores": {},
+      "metadata": {
+        "source": "user_prompt",
+        "ts": 1763132867.712115,
+        "reasoning_diagnostic": {
+          "reasoning_score": 0.8152602134774567,
+          "components": {
+            "goal_alignment": 0.724165067076683,
+            "stepwise_coherence": 0.7787513062357903,
+            "coverage": 1.0,
+            "granularity": 0.5332286679550429,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.7896188497543335,
+              0.7017873525619507,
+              0.7338561117649078,
+              0.889742910861969
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 2,
+            "average_step_length": 11.6,
+            "unique_clusters": 1.0,
+            "num_steps": 5,
+            "verifier_notes": "Consider discussing the relevance of trigonometric identities in general and not just limited to this specific problem."
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        }
+      },
+      "children": [
+        "52a60a25-50a9-4d68-af2e-aa03e564a0c2",
+        "17200615-29d5-441d-86eb-62d6a5e81eff",
+        "a48d1a94-bf4e-4c4f-8007-61e7f7a121d4",
+        "fb47e6fe-2b66-4a50-8af0-72884ecb2c54",
+        "5c6abf7a-f6d2-4da6-8972-1802e97229a6"
+      ],
+      "created_at": 1763132867.712115,
+      "embedding": null
+    },
+    "52a60a25-50a9-4d68-af2e-aa03e564a0c2": {
+      "id": "52a60a25-50a9-4d68-af2e-aa03e564a0c2",
+      "parent_id": "aa9a3635-a580-4845-adf6-0f165c645525",
+      "text": "Research the definition of trigonometric identities.",
+      "role": "final_subtask",
+      "scores": {
+        "combined_score": 0.7555969121397691
+      },
+      "metadata": {
+        "id": "b1e4a712-a7ed-4d0b-b2f4-f90f79ab1b4a",
+        "input": "",
+        "output": "Research the definition of trigonometric identities.",
+        "reasoning_snapshot_for_candidate": {
+          "reasoning_score": 0.7555969121397691,
+          "components": {
+            "goal_alignment": 0.8946793973445892,
+            "stepwise_coherence": 0.6868605961402258,
+            "coverage": 0.6,
+            "granularity": 0.6547794390133592,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.609781876206398,
+              0.5859932005405426,
+              0.8648067116737366
+            ],
+            "missing_concepts": [
+              "specific examples of trigonometric identities",
+              "relationship between trigonometric identities and angles"
+            ],
+            "expected_concepts": 5,
+            "average_step_length": 14.0,
+            "unique_clusters": 1.0,
+            "num_steps": 4,
+            "verifier_notes": "Verify information with multiple sources to ensure accuracy."
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "source": "pipeline",
+        "added_at": 1763133009.7530572
+      },
+      "children": [
+        "eec662fe-4edf-4ffe-8419-fa0017f95938",
+        "f1e01b32-203c-4cf9-9292-65808fead10c",
+        "3f6bf1c7-6ca0-4456-b40f-287f807bed27"
+      ],
+      "created_at": 1763133009.7530572,
+      "embedding": null
+    },
+    "17200615-29d5-441d-86eb-62d6a5e81eff": {
+      "id": "17200615-29d5-441d-86eb-62d6a5e81eff",
+      "parent_id": "aa9a3635-a580-4845-adf6-0f165c645525",
+      "text": "Identify a suitable trigonometric identity to apply in solving the expression 51^2 - 49^2.",
+      "role": "final_subtask",
+      "scores": {
+        "combined_score": 0.76976111476255
+      },
+      "metadata": {
+        "id": "fb6571e0-55ca-4dd7-a499-8b6739d8bb03",
+        "input": "",
+        "output": "Identify a suitable trigonometric identity to apply in solving the expression 51^2 - 49^2.",
+        "reasoning_snapshot_for_candidate": {
+          "reasoning_score": 0.76976111476255,
+          "components": {
+            "goal_alignment": 0.6770032644271851,
+            "stepwise_coherence": 0.7278801649808884,
+            "coverage": 1.0,
+            "granularity": 0.3469009418917251,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.8087097704410553,
+              0.6470505595207214
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 1,
+            "average_step_length": 7.333333333333333,
+            "unique_clusters": 1.0,
+            "num_steps": 3,
+            "verifier_notes": "Formula application is correct, but no consideration of possible simplifications or further factorization."
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "source": "pipeline",
+        "added_at": 1763133009.7530572
+      },
+      "children": [
+        "dc341b2f-5353-4c14-9748-b48a3037f080",
+        "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+        "f3ccb292-2a89-4075-85c8-354a81aa5b51"
+      ],
+      "created_at": 1763133009.7530572,
+      "embedding": null
+    },
+    "a48d1a94-bf4e-4c4f-8007-61e7f7a121d4": {
+      "id": "a48d1a94-bf4e-4c4f-8007-61e7f7a121d4",
+      "parent_id": "aa9a3635-a580-4845-adf6-0f165c645525",
+      "text": "Recall and apply the difference of squares formula (a^2 - b^2 = (a + b)(a - b)) to factorize the expression.",
+      "role": "final_subtask",
+      "scores": {
+        "combined_score": 0.55959026693667
+      },
+      "metadata": {
+        "id": "b03b2ec9-04e2-499c-b2fe-b254e8ac9f42",
+        "input": "",
+        "output": "Recall and apply the difference of squares formula (a^2 - b^2 = (a + b)(a - b)) to factorize the expression.",
+        "reasoning_snapshot_for_candidate": {
+          "reasoning_score": 0.55959026693667,
+          "components": {
+            "goal_alignment": 0.742206871509552,
+            "stepwise_coherence": 0.6958982050418854,
+            "coverage": 0.0,
+            "granularity": 0.629536542233331,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.7206414341926575,
+              0.6433242559432983,
+              0.7237289249897003
+            ],
+            "missing_concepts": [
+              "Notes on how to verify the formula are missing"
+            ],
+            "expected_concepts": 1,
+            "average_step_length": 13.5,
+            "unique_clusters": 1.0,
+            "num_steps": 4,
+            "verifier_notes": "Verify the formula is correctly applied and check for common mistakes like forgetting to include the 'ab' terms."
+          },
+          "verdict": "Reasoning is partially coherent; some gaps or inconsistencies."
+        },
+        "source": "pipeline",
+        "added_at": 1763133009.7530572
+      },
+      "children": [],
+      "created_at": 1763133009.7530572,
+      "embedding": null
+    },
+    "fb47e6fe-2b66-4a50-8af0-72884ecb2c54": {
+      "id": "fb47e6fe-2b66-4a50-8af0-72884ecb2c54",
+      "parent_id": "aa9a3635-a580-4845-adf6-0f165c645525",
+      "text": "Simplify the resulting expression using basic arithmetic operations.",
+      "role": "final_subtask",
+      "scores": {
+        "combined_score": 0.7875759774664134
+      },
+      "metadata": {
+        "id": "6bd42dee-5a19-4b36-8139-a6bc9834c225",
+        "input": "",
+        "output": "Simplify the resulting expression using basic arithmetic operations.",
+        "reasoning_snapshot_for_candidate": {
+          "reasoning_score": 0.7875759774664134,
+          "components": {
+            "goal_alignment": 0.7596736550331116,
+            "stepwise_coherence": 0.7229113668203354,
+            "coverage": 1.0,
+            "granularity": 0.28946039251396005,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.6538699120283127,
+              0.665775328874588,
+              0.7285376787185669,
+              0.7022871673107147,
+              0.8640867471694946
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 6,
+            "average_step_length": 6.0,
+            "unique_clusters": 1.0,
+            "num_steps": 6,
+            "verifier_notes": "Check if inverse operations are applied correctly in Step 3."
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "source": "pipeline",
+        "added_at": 1763133009.7530572
+      },
+      "children": [
+        "58a735fb-e5b0-4dc6-974b-a134648a0930"
+      ],
+      "created_at": 1763133009.7530572,
+      "embedding": null
+    },
+    "5c6abf7a-f6d2-4da6-8972-1802e97229a6": {
+      "id": "5c6abf7a-f6d2-4da6-8972-1802e97229a6",
+      "parent_id": "aa9a3635-a580-4845-adf6-0f165c645525",
+      "text": "Evaluate the simplified expression to obtain the final answer.",
+      "role": "final_subtask",
+      "scores": {
+        "combined_score": 0.7946871877260737
+      },
+      "metadata": {
+        "id": "8954a7e7-b5f5-44f1-98b5-d13d6eed2e7c",
+        "input": "",
+        "output": "Evaluate the simplified expression to obtain the final answer.",
+        "reasoning_snapshot_for_candidate": {
+          "reasoning_score": 0.7946871877260737,
+          "components": {
+            "goal_alignment": 0.7874129414558411,
+            "stepwise_coherence": 0.7111062208811442,
+            "coverage": 1.0,
+            "granularity": 0.3068675006903542,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.6646400541067123,
+              0.6906602829694748,
+              0.7780183255672455
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 4,
+            "average_step_length": 6.25,
+            "unique_clusters": 1.0,
+            "num_steps": 4,
+            "verifier_notes": "Define the parsing and evaluation functions to ensure completeness."
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "source": "pipeline",
+        "added_at": 1763133009.7530572
+      },
+      "children": [],
+      "created_at": 1763133009.7530572,
+      "embedding": null
+    },
+    "eec662fe-4edf-4ffe-8419-fa0017f95938": {
+      "id": "eec662fe-4edf-4ffe-8419-fa0017f95938",
+      "parent_id": "52a60a25-50a9-4d68-af2e-aa03e564a0c2",
+      "text": "Check multiple sources to cross-verify the definition",
+      "role": "suggestion",
+      "scores": {
+        "combined_score": 0.5573649142286351
+      },
+      "metadata": {
+        "orig": "Check multiple sources to cross-verify the definition",
+        "reasoning_snapshot": {
+          "reasoning_score": 0.5573649142286351,
+          "components": {
+            "goal_alignment": 0.6173730045557022,
+            "stepwise_coherence": 0.5554452519863844,
+            "coverage": 0.4,
+            "granularity": 0.3329169986532838,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.5714685469865799,
+              0.5394219569861889
+            ],
+            "missing_concepts": [
+              "Types of trigonometric identities",
+              "Examples of specific trigonometric identities (e.g. Pythagorean identity, sum and difference formulas)",
+              "Proofs or explanations for common trigonometric identities"
+            ],
+            "expected_concepts": 5,
+            "average_step_length": 7.0,
+            "unique_clusters": 1.0,
+            "num_steps": 3,
+            "verifier_notes": "Search filters can help refine results to specific topics within 'trigonometric identities'. Consider looking into fundamental concepts such as the Pythagorean theorem or sum-to-product identities."
+          },
+          "verdict": "Reasoning is partially coherent; some gaps or inconsistencies."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Open an online encyclopedia or dictionary website.\n 2. Search for \"trigonometric identities\".\n 3. Read the first relevant definition that appears in search results.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Open an online encyclopedia or dictionary website.', 'Search for \"trigonometric identities\".', 'Read the first relevant definition that appears in search results.']\n",
+        "source": "expansion",
+        "parent_node": "52a60a25-50a9-4d68-af2e-aa03e564a0c2",
+        "added_at": 1763133037.8242798
+      },
+      "children": [],
+      "created_at": 1763133037.8242798,
+      "embedding": null
+    },
+    "f1e01b32-203c-4cf9-9292-65808fead10c": {
+      "id": "f1e01b32-203c-4cf9-9292-65808fead10c",
+      "parent_id": "52a60a25-50a9-4d68-af2e-aa03e564a0c2",
+      "text": "",
+      "role": "merged",
+      "scores": {
+        "combined_score": 0.0
+      },
+      "metadata": {
+        "orig": "insufficient",
+        "reasoning_snapshot": {
+          "reasoning_score": 0.5573649142286351,
+          "components": {
+            "goal_alignment": 0.6173730045557022,
+            "stepwise_coherence": 0.5554452519863844,
+            "coverage": 0.4,
+            "granularity": 0.3329169986532838,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.5714685469865799,
+              0.5394219569861889
+            ],
+            "missing_concepts": [
+              "Types of trigonometric identities",
+              "Examples of specific trigonometric identities (e.g. Pythagorean identity, sum and difference formulas)",
+              "Proofs or explanations for common trigonometric identities"
+            ],
+            "expected_concepts": 5,
+            "average_step_length": 7.0,
+            "unique_clusters": 1.0,
+            "num_steps": 3,
+            "verifier_notes": "Search filters can help refine results to specific topics within 'trigonometric identities'. Consider looking into fundamental concepts such as the Pythagorean theorem or sum-to-product identities."
+          },
+          "verdict": "Reasoning is partially coherent; some gaps or inconsistencies."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Open an online encyclopedia or dictionary website.\n 2. Search for \"trigonometric identities\".\n 3. Read the first relevant definition that appears in search results.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Open an online encyclopedia or dictionary website.', 'Search for \"trigonometric identities\".', 'Read the first relevant definition that appears in search results.']\n",
+        "source": "expansion",
+        "parent_node": "52a60a25-50a9-4d68-af2e-aa03e564a0c2",
+        "added_at": 1763133037.8242798,
+        "merged_into": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+        "was_score": 0.5573649142286351
+      },
+      "children": [
+        "78159571-6d2c-4c20-9203-ea75a3d53d82",
+        "c7a0bf2a-e344-417b-a8a3-af0aa20a4e75",
+        "dd54944a-9058-41d6-89c5-5c76332beea0"
+      ],
+      "created_at": 1763133037.8242798,
+      "embedding": null
+    },
+    "3f6bf1c7-6ca0-4456-b40f-287f807bed27": {
+      "id": "3f6bf1c7-6ca0-4456-b40f-287f807bed27",
+      "parent_id": "52a60a25-50a9-4d68-af2e-aa03e564a0c2",
+      "text": "Verify the accuracy of the definition Check multiple sources to cross-verify the definition",
+      "role": "field:raw_verifier",
+      "scores": {
+        "combined_score": 0.5573649142286351
+      },
+      "metadata": {
+        "accept_all": false,
+        "missing": [
+          "Verify the accuracy of the definition"
+        ],
+        "suggestions": [
+          "Check multiple sources to cross-verify the definition"
+        ],
+        "reasoning_snapshot": {
+          "reasoning_score": 0.5573649142286351,
+          "components": {
+            "goal_alignment": 0.6173730045557022,
+            "stepwise_coherence": 0.5554452519863844,
+            "coverage": 0.4,
+            "granularity": 0.3329169986532838,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.5714685469865799,
+              0.5394219569861889
+            ],
+            "missing_concepts": [
+              "Types of trigonometric identities",
+              "Examples of specific trigonometric identities (e.g. Pythagorean identity, sum and difference formulas)",
+              "Proofs or explanations for common trigonometric identities"
+            ],
+            "expected_concepts": 5,
+            "average_step_length": 7.0,
+            "unique_clusters": 1.0,
+            "num_steps": 3,
+            "verifier_notes": "Search filters can help refine results to specific topics within 'trigonometric identities'. Consider looking into fundamental concepts such as the Pythagorean theorem or sum-to-product identities."
+          },
+          "verdict": "Reasoning is partially coherent; some gaps or inconsistencies."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Open an online encyclopedia or dictionary website.\n 2. Search for \"trigonometric identities\".\n 3. Read the first relevant definition that appears in search results.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Open an online encyclopedia or dictionary website.', 'Search for \"trigonometric identities\".', 'Read the first relevant definition that appears in search results.']\n",
+        "source": "expansion",
+        "parent_node": "52a60a25-50a9-4d68-af2e-aa03e564a0c2",
+        "added_at": 1763133037.8242798
+      },
+      "children": [],
+      "created_at": 1763133037.8242798,
+      "embedding": null
+    },
+    "dc341b2f-5353-4c14-9748-b48a3037f080": {
+      "id": "dc341b2f-5353-4c14-9748-b48a3037f080",
+      "parent_id": "17200615-29d5-441d-86eb-62d6a5e81eff",
+      "text": "Factorize the given expression using the difference of squares formula, and then use Pythagorean theorem to convert it into a trigonometric form.",
+      "role": "suggestion",
+      "scores": {
+        "combined_score": 0.8399179217612365
+      },
+      "metadata": {
+        "orig": "Factorize the given expression using the difference of squares formula, and then use Pythagorean theorem to convert it into a trigonometric form.",
+        "reasoning_snapshot": {
+          "reasoning_score": 0.8399179217612365,
+          "components": {
+            "goal_alignment": 0.7863869369029999,
+            "stepwise_coherence": 0.766723558306694,
+            "coverage": 1.0,
+            "granularity": 0.62320951113663,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.7165101766586304,
+              0.8169369399547577
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 1,
+            "average_step_length": 13.333333333333334,
+            "unique_clusters": 1.0,
+            "num_steps": 3,
+            "verifier_notes": "Recall difference of squares formula and consider if (a^2 - b^2) matches any known trig identities."
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Factorize the given expression using the difference of squares formula.\n 2. Identify the pattern in the factorized form to determine if it matches any known trigonometric identities.\n 3. If a match is found, recall or derive the corresponding trigonometric identity to apply.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Factorize the given expression using the difference of squares formula.', 'Identify the pattern in the factorized form to determine if it matches any known trigonometric identities.', 'If a match is found, recall or derive the corresponding trigonometric identity to apply.']\n",
+        "source": "expansion",
+        "parent_node": "17200615-29d5-441d-86eb-62d6a5e81eff",
+        "added_at": 1763133069.6895447
+      },
+      "children": [],
+      "created_at": 1763133069.6895447,
+      "embedding": null
+    },
+    "b057f139-3643-4930-9fb4-6be6d7ffaa8b": {
+      "id": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+      "parent_id": "17200615-29d5-441d-86eb-62d6a5e81eff",
+      "text": "insufficient",
+      "role": "field:status",
+      "scores": {
+        "combined_score": 0.8399179217612365
+      },
+      "metadata": {
+        "orig": "insufficient",
+        "reasoning_snapshot": {
+          "reasoning_score": 0.8399179217612365,
+          "components": {
+            "goal_alignment": 0.7863869369029999,
+            "stepwise_coherence": 0.766723558306694,
+            "coverage": 1.0,
+            "granularity": 0.62320951113663,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.7165101766586304,
+              0.8169369399547577
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 1,
+            "average_step_length": 13.333333333333334,
+            "unique_clusters": 1.0,
+            "num_steps": 3,
+            "verifier_notes": "Recall difference of squares formula and consider if (a^2 - b^2) matches any known trig identities."
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Factorize the given expression using the difference of squares formula.\n 2. Identify the pattern in the factorized form to determine if it matches any known trigonometric identities.\n 3. If a match is found, recall or derive the corresponding trigonometric identity to apply.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Factorize the given expression using the difference of squares formula.', 'Identify the pattern in the factorized form to determine if it matches any known trigonometric identities.', 'If a match is found, recall or derive the corresponding trigonometric identity to apply.']\n",
+        "source": "expansion",
+        "parent_node": "17200615-29d5-441d-86eb-62d6a5e81eff",
+        "added_at": 1763133069.6895447
+      },
+      "children": [
+        "0a9c0495-8ede-42f4-b5c5-bbbf547b66db",
+        "5096fce9-3bfb-4ad2-96d9-4cb05813fe4a",
+        "48ebc93e-2daa-442d-8544-b70184343bef",
+        "78159571-6d2c-4c20-9203-ea75a3d53d82",
+        "c7a0bf2a-e344-417b-a8a3-af0aa20a4e75",
+        "dd54944a-9058-41d6-89c5-5c76332beea0"
+      ],
+      "created_at": 1763133069.6895447,
+      "embedding": null
+    },
+    "f3ccb292-2a89-4075-85c8-354a81aa5b51": {
+      "id": "f3ccb292-2a89-4075-85c8-354a81aa5b51",
+      "parent_id": "17200615-29d5-441d-86eb-62d6a5e81eff",
+      "text": "The difference of squares formula is not a trigonometric identity. Factorize the given expression using the difference of squares formula, and then use Pythagorean theorem to convert it into a trigonometric form.",
+      "role": "field:raw_verifier",
+      "scores": {
+        "combined_score": 0.8399179217612365
+      },
+      "metadata": {
+        "accept_all": false,
+        "missing": [
+          "The difference of squares formula is not a trigonometric identity."
+        ],
+        "suggestions": [
+          "Factorize the given expression using the difference of squares formula, and then use Pythagorean theorem to convert it into a trigonometric form."
+        ],
+        "reasoning_snapshot": {
+          "reasoning_score": 0.8399179217612365,
+          "components": {
+            "goal_alignment": 0.7863869369029999,
+            "stepwise_coherence": 0.766723558306694,
+            "coverage": 1.0,
+            "granularity": 0.62320951113663,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.7165101766586304,
+              0.8169369399547577
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 1,
+            "average_step_length": 13.333333333333334,
+            "unique_clusters": 1.0,
+            "num_steps": 3,
+            "verifier_notes": "Recall difference of squares formula and consider if (a^2 - b^2) matches any known trig identities."
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Factorize the given expression using the difference of squares formula.\n 2. Identify the pattern in the factorized form to determine if it matches any known trigonometric identities.\n 3. If a match is found, recall or derive the corresponding trigonometric identity to apply.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Factorize the given expression using the difference of squares formula.', 'Identify the pattern in the factorized form to determine if it matches any known trigonometric identities.', 'If a match is found, recall or derive the corresponding trigonometric identity to apply.']\n",
+        "source": "expansion",
+        "parent_node": "17200615-29d5-441d-86eb-62d6a5e81eff",
+        "added_at": 1763133069.6895447
+      },
+      "children": [
+        "954ffe5f-3f9b-4f0e-989e-102af43899a0",
+        "98ca8b9c-2571-4245-8044-b0d182a6bf2c",
+        "aa74ec1b-4279-476a-8894-c97432654aa4"
+      ],
+      "created_at": 1763133069.6895447,
+      "embedding": null
+    },
+    "58a735fb-e5b0-4dc6-974b-a134648a0930": {
+      "id": "58a735fb-e5b0-4dc6-974b-a134648a0930",
+      "parent_id": "fb47e6fe-2b66-4a50-8af0-72884ecb2c54",
+      "text": "Check for the presence of trigonometric or logarithmic expressions, if present, these should be simplified as well.",
+      "role": "suggestion",
+      "scores": {
+        "combined_score": 0.6300279385517651
+      },
+      "metadata": {
+        "orig": "Check for the presence of trigonometric or logarithmic expressions, if present, these should be simplified as well.",
+        "reasoning_snapshot": {
+          "reasoning_score": 0.6300279385517651,
+          "components": {
+            "goal_alignment": 0.7651677429676056,
+            "stepwise_coherence": 0.7896269212166468,
+            "coverage": 0.25,
+            "granularity": 0.4057088535732175,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.688800260424614,
+              0.7763475775718689,
+              0.9037329256534576
+            ],
+            "missing_concepts": [
+              "exponential expressions",
+              "fractions or mixed numbers",
+              "multiplication and division operations"
+            ],
+            "expected_concepts": 4,
+            "average_step_length": 8.75,
+            "unique_clusters": 1.0,
+            "num_steps": 4,
+            "verifier_notes": "Ensure all special number types are handled correctly."
+          },
+          "verdict": "Reasoning is partially coherent; some gaps or inconsistencies."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Evaluate any exponential expressions in the input.\n 2. Simplify any fractions or mixed numbers.\n 3. Perform any necessary multiplication and division operations from left to right.\n 4. Perform any necessary addition and subtraction operations from left to right.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Evaluate any exponential expressions in the input.', 'Simplify any fractions or mixed numbers.', 'Perform any necessary multiplication and division operations from left to right.', 'Perform any necessary addition and subtraction operations from left to right.']\n",
+        "source": "expansion",
+        "parent_node": "fb47e6fe-2b66-4a50-8af0-72884ecb2c54",
+        "added_at": 1763133122.5526474
+      },
+      "children": [],
+      "created_at": 1763133122.5526474,
+      "embedding": null
+    },
+    "78159571-6d2c-4c20-9203-ea75a3d53d82": {
+      "id": "78159571-6d2c-4c20-9203-ea75a3d53d82",
+      "parent_id": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+      "text": "Define the main task",
+      "role": "suggestion",
+      "scores": {
+        "combined_score": 0.7715664794247737
+      },
+      "metadata": {
+        "orig": "Define the main task",
+        "reasoning_snapshot": {
+          "reasoning_score": 0.7715664794247737,
+          "components": {
+            "goal_alignment": 0.5917866826057434,
+            "stepwise_coherence": 0.8133411854505539,
+            "coverage": 1.0,
+            "granularity": 0.4069517828041224,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.9037348330020905,
+              0.8453992903232574,
+              0.6908894330263138
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 1,
+            "average_step_length": 8.75,
+            "unique_clusters": 1.0,
+            "num_steps": 4,
+            "verifier_notes": "Define the specific aspect of 'insufficient' being addressed (e.g. lack of resources, information, etc.)"
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Identify the context in which \"insufficient\" is being used.\n 2. Determine if \"insufficient\" refers to a lack of resources, information, or something else.\n 3. Clarify what aspect of \"insufficient\" needs improvement.\n 4. Provide suggestions for addressing the issue.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Identify the context in which \"insufficient\" is being used.', 'Determine if \"insufficient\" refers to a lack of resources, information, or something else.', 'Clarify what aspect of \"insufficient\" needs improvement.', 'Provide suggestions for addressing the issue.']\n",
+        "source": "expansion",
+        "parent_node": "f1e01b32-203c-4cf9-9292-65808fead10c",
+        "added_at": 1763133340.921606
+      },
+      "children": [],
+      "created_at": 1763133340.921606,
+      "embedding": null
+    },
+    "c7a0bf2a-e344-417b-a8a3-af0aa20a4e75": {
+      "id": "c7a0bf2a-e344-417b-a8a3-af0aa20a4e75",
+      "parent_id": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+      "text": "",
+      "role": "merged",
+      "scores": {
+        "combined_score": 0.0
+      },
+      "metadata": {
+        "orig": "insufficient",
+        "reasoning_snapshot": {
+          "reasoning_score": 0.7715664794247737,
+          "components": {
+            "goal_alignment": 0.5917866826057434,
+            "stepwise_coherence": 0.8133411854505539,
+            "coverage": 1.0,
+            "granularity": 0.4069517828041224,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.9037348330020905,
+              0.8453992903232574,
+              0.6908894330263138
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 1,
+            "average_step_length": 8.75,
+            "unique_clusters": 1.0,
+            "num_steps": 4,
+            "verifier_notes": "Define the specific aspect of 'insufficient' being addressed (e.g. lack of resources, information, etc.)"
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Identify the context in which \"insufficient\" is being used.\n 2. Determine if \"insufficient\" refers to a lack of resources, information, or something else.\n 3. Clarify what aspect of \"insufficient\" needs improvement.\n 4. Provide suggestions for addressing the issue.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Identify the context in which \"insufficient\" is being used.', 'Determine if \"insufficient\" refers to a lack of resources, information, or something else.', 'Clarify what aspect of \"insufficient\" needs improvement.', 'Provide suggestions for addressing the issue.']\n",
+        "source": "expansion",
+        "parent_node": "f1e01b32-203c-4cf9-9292-65808fead10c",
+        "added_at": 1763133340.921606,
+        "merged_into": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+        "was_score": 0.7715664794247737
+      },
+      "children": [],
+      "created_at": 1763133340.921606,
+      "embedding": null
+    },
+    "dd54944a-9058-41d6-89c5-5c76332beea0": {
+      "id": "dd54944a-9058-41d6-89c5-5c76332beea0",
+      "parent_id": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+      "text": "Specify what the 'main task' is to determine if the subtasks are sufficient Define the main task",
+      "role": "field:raw_verifier",
+      "scores": {
+        "combined_score": 0.7715664794247737
+      },
+      "metadata": {
+        "accept_all": false,
+        "missing": [
+          "Specify what the 'main task' is to determine if the subtasks are sufficient"
+        ],
+        "suggestions": [
+          "Define the main task"
+        ],
+        "reasoning_snapshot": {
+          "reasoning_score": 0.7715664794247737,
+          "components": {
+            "goal_alignment": 0.5917866826057434,
+            "stepwise_coherence": 0.8133411854505539,
+            "coverage": 1.0,
+            "granularity": 0.4069517828041224,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.9037348330020905,
+              0.8453992903232574,
+              0.6908894330263138
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 1,
+            "average_step_length": 8.75,
+            "unique_clusters": 1.0,
+            "num_steps": 4,
+            "verifier_notes": "Define the specific aspect of 'insufficient' being addressed (e.g. lack of resources, information, etc.)"
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Identify the context in which \"insufficient\" is being used.\n 2. Determine if \"insufficient\" refers to a lack of resources, information, or something else.\n 3. Clarify what aspect of \"insufficient\" needs improvement.\n 4. Provide suggestions for addressing the issue.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Identify the context in which \"insufficient\" is being used.', 'Determine if \"insufficient\" refers to a lack of resources, information, or something else.', 'Clarify what aspect of \"insufficient\" needs improvement.', 'Provide suggestions for addressing the issue.']\n",
+        "source": "expansion",
+        "parent_node": "f1e01b32-203c-4cf9-9292-65808fead10c",
+        "added_at": 1763133340.921606
+      },
+      "children": [],
+      "created_at": 1763133340.921606,
+      "embedding": null
+    },
+    "0a9c0495-8ede-42f4-b5c5-bbbf547b66db": {
+      "id": "0a9c0495-8ede-42f4-b5c5-bbbf547b66db",
+      "parent_id": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+      "text": "Identify the subject or object the word 'insufficient' is modifying in the given context.",
+      "role": "suggestion",
+      "scores": {
+        "combined_score": 0.817499399611061
+      },
+      "metadata": {
+        "orig": "Identify the subject or object the word 'insufficient' is modifying in the given context.",
+        "reasoning_snapshot": {
+          "reasoning_score": 0.817499399611061,
+          "components": {
+            "goal_alignment": 0.6527455747127533,
+            "stepwise_coherence": 0.8590345680713654,
+            "coverage": 1.0,
+            "granularity": 0.5691708517939369,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.8905928134918213,
+              0.9218024015426636,
+              0.7647084891796112
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 1,
+            "average_step_length": 12.25,
+            "unique_clusters": 1.0,
+            "num_steps": 4,
+            "verifier_notes": "More specific context required to provide meaningful information."
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Determine if the word \"insufficient\" is related to a lack or inadequacy.\n 2. Identify the context in which the word \"insufficient\" is being used (e.g., finance, education, etc.).\n 3. Research the meaning and possible synonyms for the word \"insufficient\".\n 4. Explore potential solutions or alternatives that could address the issue of insufficiency.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Determine if the word \"insufficient\" is related to a lack or inadequacy.', 'Identify the context in which the word \"insufficient\" is being used (e.g., finance, education, etc.).', 'Research the meaning and possible synonyms for the word \"insufficient\".', 'Explore potential solutions or alternative\n",
+        "source": "expansion",
+        "parent_node": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+        "added_at": 1763133426.5171566
+      },
+      "children": [],
+      "created_at": 1763133426.5171566,
+      "embedding": null
+    },
+    "5096fce9-3bfb-4ad2-96d9-4cb05813fe4a": {
+      "id": "5096fce9-3bfb-4ad2-96d9-4cb05813fe4a",
+      "parent_id": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+      "text": "",
+      "role": "merged",
+      "scores": {
+        "combined_score": 0.0
+      },
+      "metadata": {
+        "orig": "insufficient",
+        "reasoning_snapshot": {
+          "reasoning_score": 0.817499399611061,
+          "components": {
+            "goal_alignment": 0.6527455747127533,
+            "stepwise_coherence": 0.8590345680713654,
+            "coverage": 1.0,
+            "granularity": 0.5691708517939369,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.8905928134918213,
+              0.9218024015426636,
+              0.7647084891796112
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 1,
+            "average_step_length": 12.25,
+            "unique_clusters": 1.0,
+            "num_steps": 4,
+            "verifier_notes": "More specific context required to provide meaningful information."
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Determine if the word \"insufficient\" is related to a lack or inadequacy.\n 2. Identify the context in which the word \"insufficient\" is being used (e.g., finance, education, etc.).\n 3. Research the meaning and possible synonyms for the word \"insufficient\".\n 4. Explore potential solutions or alternatives that could address the issue of insufficiency.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Determine if the word \"insufficient\" is related to a lack or inadequacy.', 'Identify the context in which the word \"insufficient\" is being used (e.g., finance, education, etc.).', 'Research the meaning and possible synonyms for the word \"insufficient\".', 'Explore potential solutions or alternative\n",
+        "source": "expansion",
+        "parent_node": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+        "added_at": 1763133426.5171566,
+        "merged_into": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+        "was_score": 0.817499399611061
+      },
+      "children": [],
+      "created_at": 1763133426.5171566,
+      "embedding": null
+    },
+    "48ebc93e-2daa-442d-8544-b70184343bef": {
+      "id": "48ebc93e-2daa-442d-8544-b70184343bef",
+      "parent_id": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+      "text": "Analyze the specific text where 'insufficient' is mentioned to understand the exact problem it refers to. Identify the subject or object the word 'insufficient' is modifying in the given context.",
+      "role": "field:raw_verifier",
+      "scores": {
+        "combined_score": 0.817499399611061
+      },
+      "metadata": {
+        "accept_all": false,
+        "missing": [
+          "Analyze the specific text where 'insufficient' is mentioned to understand the exact problem it refers to."
+        ],
+        "suggestions": [
+          "Identify the subject or object the word 'insufficient' is modifying in the given context."
+        ],
+        "reasoning_snapshot": {
+          "reasoning_score": 0.817499399611061,
+          "components": {
+            "goal_alignment": 0.6527455747127533,
+            "stepwise_coherence": 0.8590345680713654,
+            "coverage": 1.0,
+            "granularity": 0.5691708517939369,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.8905928134918213,
+              0.9218024015426636,
+              0.7647084891796112
+            ],
+            "missing_concepts": [],
+            "expected_concepts": 1,
+            "average_step_length": 12.25,
+            "unique_clusters": 1.0,
+            "num_steps": 4,
+            "verifier_notes": "More specific context required to provide meaningful information."
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Determine if the word \"insufficient\" is related to a lack or inadequacy.\n 2. Identify the context in which the word \"insufficient\" is being used (e.g., finance, education, etc.).\n 3. Research the meaning and possible synonyms for the word \"insufficient\".\n 4. Explore potential solutions or alternatives that could address the issue of insufficiency.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Determine if the word \"insufficient\" is related to a lack or inadequacy.', 'Identify the context in which the word \"insufficient\" is being used (e.g., finance, education, etc.).', 'Research the meaning and possible synonyms for the word \"insufficient\".', 'Explore potential solutions or alternative\n",
+        "source": "expansion",
+        "parent_node": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+        "added_at": 1763133426.5171566
+      },
+      "children": [],
+      "created_at": 1763133426.5171566,
+      "embedding": null
+    },
+    "954ffe5f-3f9b-4f0e-989e-102af43899a0": {
+      "id": "954ffe5f-3f9b-4f0e-989e-102af43899a0",
+      "parent_id": "f3ccb292-2a89-4075-85c8-354a81aa5b51",
+      "text": "Convert the factorized expression into a trigonometric form directly if it involves any trigonometric functions, since the Pythagorean theorem is not applicable.",
+      "role": "suggestion",
+      "scores": {
+        "combined_score": 0.8050667628749729
+      },
+      "metadata": {
+        "orig": "Convert the factorized expression into a trigonometric form directly if it involves any trigonometric functions, since the Pythagorean theorem is not applicable.",
+        "reasoning_snapshot": {
+          "reasoning_score": 0.8050667628749729,
+          "components": {
+            "goal_alignment": 0.7920060455799103,
+            "stepwise_coherence": 0.8331510424613953,
+            "coverage": 0.8333333333333334,
+            "granularity": 0.5084385525231776,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.8911707997322083,
+              0.7805963754653931,
+              0.7856807708740234,
+              0.8751562237739563
+            ],
+            "missing_concepts": [
+              "Trigonometric identity verification"
+            ],
+            "expected_concepts": 6,
+            "average_step_length": 10.8,
+            "unique_clusters": 1.0,
+            "num_steps": 5,
+            "verifier_notes": "Verify Pythagorean theorem application"
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Identify the given expression as a candidate for the difference of squares formula.\n 2. Apply the difference of squares formula to factorize the given expression.\n 3. Simplify the resulting expression.\n 4. Rearrange the simplified expression to prepare it for conversion using the Pythagorean theorem.\n 5. Use the Pythagorean theorem to convert the rearranged expression into a trigonometric form.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Identify the given expression as a candidate for the difference of squares formula.', 'Apply the difference of squares formula to factorize the given expression.', 'Simplify the resulting expression.', 'Rearrange the simplified expression to prepare it for conversion using the Pythagorean theorem.\n",
+        "source": "expansion",
+        "parent_node": "f3ccb292-2a89-4075-85c8-354a81aa5b51",
+        "added_at": 1763133464.041065
+      },
+      "children": [],
+      "created_at": 1763133464.041065,
+      "embedding": null
+    },
+    "98ca8b9c-2571-4245-8044-b0d182a6bf2c": {
+      "id": "98ca8b9c-2571-4245-8044-b0d182a6bf2c",
+      "parent_id": "f3ccb292-2a89-4075-85c8-354a81aa5b51",
+      "text": "",
+      "role": "merged",
+      "scores": {
+        "combined_score": 0.0
+      },
+      "metadata": {
+        "orig": "insufficient",
+        "reasoning_snapshot": {
+          "reasoning_score": 0.8050667628749729,
+          "components": {
+            "goal_alignment": 0.7920060455799103,
+            "stepwise_coherence": 0.8331510424613953,
+            "coverage": 0.8333333333333334,
+            "granularity": 0.5084385525231776,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.8911707997322083,
+              0.7805963754653931,
+              0.7856807708740234,
+              0.8751562237739563
+            ],
+            "missing_concepts": [
+              "Trigonometric identity verification"
+            ],
+            "expected_concepts": 6,
+            "average_step_length": 10.8,
+            "unique_clusters": 1.0,
+            "num_steps": 5,
+            "verifier_notes": "Verify Pythagorean theorem application"
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Identify the given expression as a candidate for the difference of squares formula.\n 2. Apply the difference of squares formula to factorize the given expression.\n 3. Simplify the resulting expression.\n 4. Rearrange the simplified expression to prepare it for conversion using the Pythagorean theorem.\n 5. Use the Pythagorean theorem to convert the rearranged expression into a trigonometric form.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Identify the given expression as a candidate for the difference of squares formula.', 'Apply the difference of squares formula to factorize the given expression.', 'Simplify the resulting expression.', 'Rearrange the simplified expression to prepare it for conversion using the Pythagorean theorem.\n",
+        "source": "expansion",
+        "parent_node": "f3ccb292-2a89-4075-85c8-354a81aa5b51",
+        "added_at": 1763133464.041065,
+        "merged_into": "b057f139-3643-4930-9fb4-6be6d7ffaa8b",
+        "was_score": 0.8050667628749729
+      },
+      "children": [],
+      "created_at": 1763133464.041065,
+      "embedding": null
+    },
+    "aa74ec1b-4279-476a-8894-c97432654aa4": {
+      "id": "aa74ec1b-4279-476a-8894-c97432654aa4",
+      "parent_id": "f3ccb292-2a89-4075-85c8-354a81aa5b51",
+      "text": "Identify the given expression as involving trigonometric functions (e.g., sine, cosine) Convert the factorized expression into a trigonometric form directly if it involves any trigonometric functions, since the Pythagorean theorem is not applicable.",
+      "role": "field:raw_verifier",
+      "scores": {
+        "combined_score": 0.8050667628749729
+      },
+      "metadata": {
+        "accept_all": false,
+        "missing": [
+          "Identify the given expression as involving trigonometric functions (e.g., sine, cosine)"
+        ],
+        "suggestions": [
+          "Convert the factorized expression into a trigonometric form directly if it involves any trigonometric functions, since the Pythagorean theorem is not applicable."
+        ],
+        "reasoning_snapshot": {
+          "reasoning_score": 0.8050667628749729,
+          "components": {
+            "goal_alignment": 0.7920060455799103,
+            "stepwise_coherence": 0.8331510424613953,
+            "coverage": 0.8333333333333334,
+            "granularity": 0.5084385525231776,
+            "redundancy": 1.0
+          },
+          "diagnostics": {
+            "stepwise_similarities": [
+              0.8911707997322083,
+              0.7805963754653931,
+              0.7856807708740234,
+              0.8751562237739563
+            ],
+            "missing_concepts": [
+              "Trigonometric identity verification"
+            ],
+            "expected_concepts": 6,
+            "average_step_length": 10.8,
+            "unique_clusters": 1.0,
+            "num_steps": 5,
+            "verifier_notes": "Verify Pythagorean theorem application"
+          },
+          "verdict": "Reasoning is coherent and well-aligned with goal."
+        },
+        "__pipeline_debug": "Subtasks:\n 1. Identify the given expression as a candidate for the difference of squares formula.\n 2. Apply the difference of squares formula to factorize the given expression.\n 3. Simplify the resulting expression.\n 4. Rearrange the simplified expression to prepare it for conversion using the Pythagorean theorem.\n 5. Use the Pythagorean theorem to convert the rearranged expression into a trigonometric form.\n[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Identify the given expression as a candidate for the difference of squares formula.', 'Apply the difference of squares formula to factorize the given expression.', 'Simplify the resulting expression.', 'Rearrange the simplified expression to prepare it for conversion using the Pythagorean theorem.\n",
+        "source": "expansion",
+        "parent_node": "f3ccb292-2a89-4075-85c8-354a81aa5b51",
+        "added_at": 1763133464.041065
+      },
+      "children": [],
+      "created_at": 1763133464.041065,
+      "embedding": null
+    }
+  }
+}

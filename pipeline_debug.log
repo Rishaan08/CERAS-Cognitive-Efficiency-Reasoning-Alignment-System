@@ -1,0 +1,18 @@
+=== PIPELINE DEBUG ===
+
+Subtasks:
+ 1. Research the definition of trigonometric identities.
+ 2. Identify a suitable trigonometric identity to apply in solving the expression 51^2 - 49^2.
+ 3. Recall and apply the difference of squares formula (a^2 - b^2 = (a + b)(a - b)) to factorize the expression.
+ 4. Simplify the resulting expression using basic arithmetic operations.
+ 5. Evaluate the simplified expression to obtain the final answer.
+[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Research the definition of trigonometric identities.', 'Identify a suitable trigonometric identity to apply in solving the expression 51^2 - 49^2.', 'Recall and apply the difference of squares formula (a^2 - b^2 = (a + b)(a - b)) to factorize the expression.', 'Simplify the resulting expression us
+
+
+=== DECOMPOSER DEBUG ===
+
+Subtasks:
+ 1. Research trigonometric identities that apply to quadratic expressions.
+ 2. Identify a relevant identity, such as a² - b² = (a + b)(a - b), for solving the expression 51^2 - 49^2.
+ 3. Apply the identified identity to simplify the given expression.
+ 4. Perform arithmetic operations to further simplify the resulting expression.
