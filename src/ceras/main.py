@@ -21,7 +21,7 @@ TREE_IMG_SUB = "tree_of_thoughts_substantive.png"
 PIPELINE_DEBUG_LOG = "pipeline_debug.log"
 
 # Edit PROMPT as needed
-PROMPT = "what are trignometric identities and how can we solve the question (51^2 - 49^2) effeciently using them?"
+PROMPT = "Teach me Agentic AI, agents and strands AWS from scratch"
 
 # ---------- Helpers ----------
 def normalize_text(text) -> str:
