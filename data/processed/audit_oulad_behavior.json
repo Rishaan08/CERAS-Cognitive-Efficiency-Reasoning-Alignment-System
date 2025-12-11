@@ -1,204 +1,197 @@
 {
   "name": "oulad_behavior",
-  "rows": 32593,
-  "cols": 16,
+  "rows": 29766,
+  "cols": 15,
   "columns": {
-    "code_module": {
-      "dtype": "object",
-      "n_missing": 0,
-      "pct_missing": 0.0,
-      "n_unique": 7,
-      "top_values": {
-        "BBB": 7909,
-        "FFF": 7762,
-        "DDD": 6272,
-        "CCC": 4434,
-        "EEE": 2934
-      }
-    },
-    "code_presentation": {
-      "dtype": "object",
-      "n_missing": 0,
-      "pct_missing": 0.0,
-      "n_unique": 4,
-      "top_values": {
-        "2014J": 11260,
-        "2013J": 8845,
-        "2014B": 7804,
-        "2013B": 4684
-      }
-    },
     "student_id": {
-      "dtype": "int64",
+      "dtype": "string",
       "n_missing": 0,
       "pct_missing": 0.0,
       "n_unique": 28785,
       "top_values": {
         "584077": 5,
-        "542562": 4,
-        "546400": 4,
-        "596620": 4,
-        "2681198": 4
-      }
-    },
-    "gender": {
-      "dtype": "object",
-      "n_missing": 0,
-      "pct_missing": 0.0,
-      "n_unique": 2,
-      "top_values": {
-        "M": 17875,
-        "F": 14718
-      }
-    },
-    "region": {
-      "dtype": "object",
-      "n_missing": 0,
-      "pct_missing": 0.0,
-      "n_unique": 13,
-      "top_values": {
-        "Scotland": 3446,
-        "East Anglian Region": 3340,
-        "London Region": 3216,
-        "South Region": 3092,
-        "North Western Region": 2906
-      }
-    },
-    "highest_education": {
-      "dtype": "object",
-      "n_missing": 0,
-      "pct_missing": 0.0,
-      "n_unique": 5,
-      "top_values": {
-        "A Level or Equivalent": 14045,
-        "Lower Than A Level": 13158,
-        "HE Qualification": 4730,
-        "No Formal quals": 347,
-        "Post Graduate Qualification": 313
-      }
-    },
-    "imd_band": {
-      "dtype": "object",
-      "n_missing": 1111,
-      "pct_missing": 0.03408707391157611,
-      "n_unique": 10,
-      "top_values": {
-        "20-30%": 3654,
-        "30-40%": 3539,
-        "10-20": 3516,
-        "0-10%": 3311,
-        "40-50%": 3256
-      }
-    },
-    "age_band": {
-      "dtype": "object",
-      "n_missing": 0,
-      "pct_missing": 0.0,
-      "n_unique": 3,
-      "top_values": {
-        "0-35": 22944,
-        "35-55": 9433,
-        "55<=": 216
-      }
-    },
-    "num_of_prev_attempts": {
-      "dtype": "int64",
-      "n_missing": 0,
-      "pct_missing": 0.0,
-      "n_unique": 7,
-      "top_values": {
-        "0": 28421,
-        "1": 3299,
-        "2": 675,
-        "3": 142,
-        "4": 39
-      }
-    },
-    "studied_credits": {
-      "dtype": "int64",
-      "n_missing": 0,
-      "pct_missing": 0.0,
-      "n_unique": 61,
-      "top_values": {
-        "60": 16751,
-        "120": 6328,
-        "30": 3749,
-        "90": 3144,
-        "180": 830
-      }
-    },
-    "disability": {
-      "dtype": "object",
-      "n_missing": 0,
-      "pct_missing": 0.0,
-      "n_unique": 2,
-      "top_values": {
-        "N": 29429,
-        "Y": 3164
-      }
-    },
-    "final_result": {
-      "dtype": "object",
-      "n_missing": 0,
-      "pct_missing": 0.0,
-      "n_unique": 4,
-      "top_values": {
-        "Pass": 12361,
-        "Withdrawn": 10156,
-        "Fail": 7052,
-        "Distinction": 3024
+        "387276": 4,
+        "585769": 4,
+        "2046628": 4,
+        "596620": 4
       }
     },
     "oulad_avg_assessment_score": {
-      "dtype": "float64",
+      "dtype": "float32",
       "n_missing": 0,
       "pct_missing": 0.0,
       "n_unique": 3187,
       "top_values": {
-        "0.0": 5898,
-        "80.0": 220,
-        "70.0": 192,
-        "75.0": 191,
-        "76.0": 176
+        "76.0": 5931,
+        "80.0": 210,
+        "70.0": 181,
+        "75.0": 179,
+        "65.0": 158
       }
     },
     "oulad_n_assessments": {
       "dtype": "float64",
-      "n_missing": 0,
-      "pct_missing": 0.0,
-      "n_unique": 28,
+      "n_missing": 5749,
+      "pct_missing": 0.19313982396022308,
+      "n_unique": 27,
       "top_values": {
-        "0.0": 5847,
-        "12.0": 3648,
-        "5.0": 2894,
-        "7.0": 2463,
-        "11.0": 2353
+        "12.0": 3426,
+        "5.0": 2722,
+        "7.0": 2296,
+        "11.0": 2248,
+        "9.0": 2119
       }
     },
     "oulad_avg_clicks": {
+      "dtype": "float32",
+      "n_missing": 0,
+      "pct_missing": 0.0,
+      "n_unique": 20480,
+      "top_values": {
+        "3.0912964": 2836,
+        "1.0": 220,
+        "2.0": 218,
+        "1.5": 106,
+        "3.0": 105
+      }
+    },
+    "oulad_active_days": {
+      "dtype": "float32",
+      "n_missing": 0,
+      "pct_missing": 0.0,
+      "n_unique": 285,
+      "top_values": {
+        "51.0": 3023,
+        "1.0": 626,
+        "2.0": 511,
+        "3.0": 416,
+        "4.0": 408
+      }
+    },
+    "registration_duration_days": {
+      "dtype": "float32",
+      "n_missing": 0,
+      "pct_missing": 0.0,
+      "n_unique": 409,
+      "top_values": {
+        "1.3541667e-12": 19773,
+        "5.671296e-13": 69,
+        "6.597222e-13": 69,
+        "4.050926e-13": 68,
+        "1.6319445e-12": 68
+      }
+    },
+    "score_w": {
+      "dtype": "float64",
+      "n_missing": 0,
+      "pct_missing": 0.0,
+      "n_unique": 3069,
+      "top_values": {
+        "76.0": 5931,
+        "25.5": 304,
+        "96.75": 299,
+        "80.0": 210,
+        "70.0": 181
+      }
+    },
+    "score_norm": {
+      "dtype": "float32",
+      "n_missing": 0,
+      "pct_missing": 0.0,
+      "n_unique": 3069,
+      "top_values": {
+        "0.70877194": 5931,
+        "0.0": 304,
+        "1.0": 299,
+        "0.7649123": 210,
+        "0.6245614": 181
+      }
+    },
+    "clicks_log": {
       "dtype": "float64",
       "n_missing": 0,
       "pct_missing": 0.0,
       "n_unique": 20480,
       "top_values": {
-        "0.0": 2852,
-        "1.0": 222,
-        "2.0": 220,
-        "1.5": 109,
-        "3.0": 109
+        "1.408861876938532": 2836,
+        "0.6931471805599453": 220,
+        "1.0986122886681098": 218,
+        "0.9162907318741551": 106,
+        "1.3862943611198906": 105
       }
     },
-    "oulad_active_days": {
-      "dtype": "float64",
+    "clicks_norm": {
+      "dtype": "float32",
       "n_missing": 0,
       "pct_missing": 0.0,
-      "n_unique": 286,
+      "n_unique": 20173,
       "top_values": {
-        "0.0": 2852,
-        "1.0": 630,
-        "2.0": 522,
-        "3.0": 427,
-        "4.0": 413
+        "0.4856273": 2836,
+        "1.0": 298,
+        "0.0": 298,
+        "0.23378271": 218,
+        "0.0857835": 106
+      }
+    },
+    "days_norm": {
+      "dtype": "float32",
+      "n_missing": 0,
+      "pct_missing": 0.0,
+      "n_unique": 231,
+      "top_values": {
+        "0.21822387": 3023,
+        "0.0": 626,
+        "0.0043644775": 511,
+        "0.008728955": 416,
+        "0.013093432": 408
+      }
+    },
+    "reg_norm": {
+      "dtype": "float32",
+      "n_missing": 0,
+      "pct_missing": 0.0,
+      "n_unique": 301,
+      "top_values": {
+        "0.35771298": 19773,
+        "0.0": 310,
+        "1.0": 298,
+        "0.15712626": 69,
+        "0.13038136": 69
+      }
+    },
+    "has_reg_norm": {
+      "dtype": "bool",
+      "n_missing": 0,
+      "pct_missing": 0.0,
+      "n_unique": 1,
+      "top_values": {
+        "True": 29766
+      }
+    },
+    "effort_norm": {
+      "dtype": "float32",
+      "n_missing": 0,
+      "pct_missing": 0.0,
+      "n_unique": 26368,
+      "top_values": {
+        "1.0615641": 375,
+        "0.70385116": 237,
+        "0.35771298": 69,
+        "0.8342325": 30,
+        "0.5914957": 30
+      }
+    },
+    "cognitive_efficiency": {
+      "dtype": "float32",
+      "n_missing": 0,
+      "pct_missing": 0.0,
+      "n_unique": 26377,
+      "top_values": {
+        "0.343803": 358,
+        "0.0": 304,
+        "0.4159823": 237,
+        "0.5220337": 60,
+        "0.38641334": 30
       }
     }
   }

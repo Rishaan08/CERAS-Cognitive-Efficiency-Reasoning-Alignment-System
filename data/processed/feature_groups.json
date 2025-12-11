@@ -1,27 +1,36 @@
 {
   "behavioral": [
     "oulad_avg_clicks",
-    "engagement_intensity"
+    "oulad_active_days",
+    "clicks_log",
+    "clicks_norm"
   ],
   "cognitive": [
-    "has_scores",
-    "oulad_avg_assessment_score"
+    "oulad_avg_assessment_score",
+    "score_w",
+    "score_norm",
+    "cognitive_efficiency"
+  ],
+  "temporal": [
+    "registration_duration_days"
   ],
   "keystroke": [
     "Hold .",
-    "Hold 5",
-    "Hold Caps",
-    "Hold Enter",
-    "Hold Shift",
-    "Hold Shift.1",
-    "Hold a",
-    "Hold e",
-    "Hold i",
-    "Hold l",
-    "Hold n",
-    "Hold o",
-    "Hold r",
     "Hold t",
-    "typing_consistency"
+    "Hold i",
+    "Hold e",
+    "Hold Shift",
+    "Hold 5",
+    "Hold Shift.1",
+    "Hold Caps",
+    "Hold r",
+    "Hold o",
+    "Hold a",
+    "Hold n",
+    "Hold l",
+    "Hold Enter"
+  ],
+  "self_report": [
+    "effort_norm"
   ]
 }

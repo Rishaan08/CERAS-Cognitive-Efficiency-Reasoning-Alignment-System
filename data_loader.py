@@ -20,73 +20,88 @@ BASE_PROCESSED = os.path.expanduser("/Users/rishaan/Desktop/CERAS-Cognitive-Effi
 OULAD_DIR = os.path.join(BASE_DIR, "data", "anonymisedData")
 os.makedirs(BASE_PROCESSED, exist_ok=True)
 
-def load_pisa_parquet(base_raw=BASE_RAW) -> Dict[str, pd.DataFrame]:
-    out = {}
-    mapping = {
-        "stu_q": ["CY08MSP_STU_QQQ.parquet"],
-        "cog": ["CY08MSP_STU_COG.parquet"],
-        "tim": ["CY08MSP_STU_TIM.parquet"],
-        "sch": ["CY08MSP_SCH_QQQ.parquet"]
-    }
+def _read_table(path: str):
+    """Try parquet then CSV; return empty DataFrame on failure."""
+    if not os.path.exists(path):
+        return pd.DataFrame()
+    try:
+        return pd.read_parquet(path)
+    except Exception:
+        try:
+            return pd.read_csv(path)
+        except Exception:
+            return pd.DataFrame()
 
-    for key, names in mapping.items():
-        for name in names:
-            p = os.path.join(base_raw, name)
-            if os.path.exists(p):
-                out[key] = pd.read_parquet(p)
-                break
-        if key not in out:
-            out[key] = pd.DataFrame()
-    return out
-
-def load_oulad(oulad_dir: str = OULAD_DIR, use_chunked: bool = False):
+def load_oulad(oulad_dir: str = OULAD_DIR) -> Dict[str, pd.DataFrame]:
+    """Load common OULAD CSVs/parquets into a dict of DataFrames."""
     oulad = {}
     if not os.path.isdir(oulad_dir):
-        raise FileNotFoundError(
-            f"OULAD directory not found: {oulad_dir}\n"
-        )
+        raise FileNotFoundError(f"OULAD directory not found: {oulad_dir}")
     print(f"Loading OULAD datasets from: {oulad_dir}")
 
     for f in sorted(os.listdir(oulad_dir)):
         fpath = os.path.join(oulad_dir, f)
         name = f.rsplit(".", 1)[0]
-        try:
-            if f.lower().endswith(".csv"):
-                df = pd.read_csv(fpath)
-            elif f.lower().endswith(".parquet"):
-                df = pd.read_parquet(fpath)
-            else:
-                continue
-
-            oulad[name] = df
-            print(f"Loaded {name}: {df.shape}")
-        except Exception as e:
-            print(f"Failed to load {f}: {e}")
-
+        if f.lower().endswith((".csv", ".parquet")):
+            try:
+                df = _read_table(fpath)
+                oulad[name] = df
+                print(f"Loaded {name}: {df.shape}")
+            except Exception as e:
+                print(f"Failed to load {f}: {e}")
     if not oulad:
         print("No OULAD CSV or parquet files found in: ", oulad_dir)
-    
     return oulad
 
 def load_meu(path: str):
+    """Load MEU Excel file; if it contains 'Subject' rename to student_id."""
     if path and os.path.exists(path):
         print(f"Loading MEU dataset: {path}")
-        return pd.read_excel(path)
+        try:
+            df = pd.read_excel(path)
+        except Exception:
+            try:
+                df = pd.read_csv(path)
+            except Exception:
+                df = pd.DataFrame()
+        if not df.empty:
+            # rename common subject field to student_id if present
+            if "Subject" in df.columns and "student_id" not in df.columns:
+                df = df.rename(columns={"Subject": "student_id"})
+            # ensure student_id exists (string)
+            if "student_id" in df.columns:
+                df["student_id"] = df["student_id"].astype("string").str.strip()
+        return df
     print("MEU dataset not found:", path)
     return pd.DataFrame()
 
 def load_reveal_eval(path: str):
+    """Load reveal eval CSV and ensure student_id column if available."""
     if path and os.path.exists(path):
         print(f"Loading Reveal-Eval dataset: {path}")
-        return pd.read_csv(path)
+        try:
+            df = pd.read_csv(path)
+        except Exception:
+            try:
+                df = pd.read_parquet(path)
+            except Exception:
+                df = pd.DataFrame()
+        if not df.empty:
+            if "student_id" in df.columns:
+                df["student_id"] = df["student_id"].astype("string").str.strip()
+        return df
     print("Reveal-Eval dataset not found:", path)
     return pd.DataFrame()
 
 def save_df(df: pd.DataFrame, name: str, base_processed: str = BASE_PROCESSED):
-    os.makedirs(base_processed, exist_ok = True)
+    os.makedirs(base_processed, exist_ok=True)
     p = os.path.join(base_processed, name if name.endswith(".parquet") else f"{name}.parquet")
-    df.to_parquet(p, index=False)
-    print(f"Saved: {p} ({df.shape})")
+    df_out = df.copy()
+    for c in df_out.columns:
+        if df_out[c].dtype == bool:
+            df_out[c] = df_out[c].astype("int8")
+    df_out.to_parquet(p, index=False)
+    print(f"Saved: {p} ({df_out.shape})")
     return p
 
 if __name__ == "__main__":
@@ -96,15 +111,13 @@ if __name__ == "__main__":
     print("Base Processed: ", BASE_PROCESSED)
     print("OULAD Directory: ", OULAD_DIR)
 
-    print("Loading PISA Parquet files....")
-    pisa = load_pisa_parquet()
-
     print("Loading OULAD CSV files....")
     try:
         oulad = load_oulad(OULAD_DIR)
         print("OULAD tables loaded: ", list(oulad.keys()))
     except FileNotFoundError as e:
         print(e)
+        oulad = {}
 
     def find_first_file_with_substring(base_dir, substrings):
         for root, _, files in os.walk(base_dir):
@@ -116,9 +129,6 @@ if __name__ == "__main__":
         return None
 
     print("\nDiscovering MEU and Reveal files inside:", BASE_RAW)
-    meu_candidates = ["meu", "MEU", "MEU-Mobile", "MEU_Mobile"]
-    reveal_candidates = ["reveal", "reveal_eval", "reveal-eval", "reveal_eval.csv"]
-
     meu_path = find_first_file_with_substring(BASE_RAW, ["meu"])
     reveal_path = find_first_file_with_substring(BASE_RAW, ["reveal"])
 
@@ -147,7 +157,7 @@ if __name__ == "__main__":
         print(f"Reveal-Eval file found: {reveal_path}")
         reveal = load_reveal_eval(reveal_path)
     else:
-        print("Reveal-Eval file not found in", BASE_RAW)
+        print("Reveal-Eval file not found:", BASE_RAW)
         reveal = pd.DataFrame()
 
     print("MEU Shape: ", meu.shape if not meu.empty else "not found")

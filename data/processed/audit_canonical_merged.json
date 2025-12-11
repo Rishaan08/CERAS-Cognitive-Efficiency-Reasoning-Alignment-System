@@ -1,214 +1,54 @@
 {
   "name": "canonical_merged",
-  "rows": 28925,
-  "cols": 139,
+  "rows": 28845,
+  "cols": 135,
   "columns": {
     "student_id": {
       "dtype": "string",
       "n_missing": 1,
-      "pct_missing": 3.457216940363008e-05,
-      "n_unique": 28924,
+      "pct_missing": 3.4668053388802216e-05,
+      "n_unique": 28844,
       "top_values": {
         "1.0": 1,
-        "605118": 1,
-        "604939": 1,
-        "604932": 1,
-        "604930": 1
-      }
-    },
-    "has_scores": {
-      "dtype": "object",
-      "n_missing": 28845,
-      "pct_missing": 0.9972342264477096,
-      "n_unique": 1,
-      "top_values": {
-        "False": 80
-      }
-    },
-    "has_time": {
-      "dtype": "object",
-      "n_missing": 28845,
-      "pct_missing": 0.9972342264477096,
-      "n_unique": 1,
-      "top_values": {
-        "False": 80
-      }
-    },
-    "has_behavior": {
-      "dtype": "object",
-      "n_missing": 28845,
-      "pct_missing": 0.9972342264477096,
-      "n_unique": 1,
-      "top_values": {
-        "False": 80
-      }
-    },
-    "code_module": {
-      "dtype": "object",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 7,
-      "top_values": {
-        "BBB": 7692,
-        "FFF": 6777,
-        "DDD": 5126,
-        "CCC": 4249,
-        "GGG": 2468
-      }
-    },
-    "code_presentation": {
-      "dtype": "object",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 4,
-      "top_values": {
-        "2014J": 9859,
-        "2013J": 7736,
-        "2014B": 6676,
-        "2013B": 4514
-      }
-    },
-    "gender": {
-      "dtype": "object",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 2,
-      "top_values": {
-        "M": 15046,
-        "F": 13739
-      }
-    },
-    "region": {
-      "dtype": "object",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 13,
-      "top_values": {
-        "East Anglian Region": 3000,
-        "Scotland": 2934,
-        "London Region": 2845,
-        "South Region": 2737,
-        "North Western Region": 2548
-      }
-    },
-    "highest_education": {
-      "dtype": "object",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 5,
-      "top_values": {
-        "A Level or Equivalent": 12355,
-        "Lower Than A Level": 11780,
-        "HE Qualification": 4092,
-        "No Formal quals": 306,
-        "Post Graduate Qualification": 252
-      }
-    },
-    "imd_band": {
-      "dtype": "object",
-      "n_missing": 1111,
-      "pct_missing": 0.03840968020743302,
-      "n_unique": 10,
-      "top_values": {
-        "20-30%": 3200,
-        "10-20": 3132,
-        "30-40%": 3128,
-        "0-10%": 2944,
-        "40-50%": 2890
-      }
-    },
-    "age_band": {
-      "dtype": "object",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 3,
-      "top_values": {
-        "0-35": 20145,
-        "35-55": 8462,
-        "55<=": 178
-      }
-    },
-    "num_of_prev_attempts": {
-      "dtype": "float64",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 7,
-      "top_values": {
-        "0.0": 26055,
-        "1.0": 2155,
-        "2.0": 440,
-        "3.0": 97,
-        "4.0": 27
-      }
-    },
-    "studied_credits": {
-      "dtype": "float64",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 61,
-      "top_values": {
-        "60.0": 15035,
-        "120.0": 5550,
-        "30.0": 3469,
-        "90.0": 2551,
-        "180.0": 695
-      }
-    },
-    "disability": {
-      "dtype": "object",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 2,
-      "top_values": {
-        "N": 26068,
-        "Y": 2717
-      }
-    },
-    "final_result": {
-      "dtype": "object",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 4,
-      "top_values": {
-        "Pass": 10833,
-        "Withdrawn": 9043,
-        "Fail": 6264,
-        "Distinction": 2645
+        "604755": 1,
+        "604588": 1,
+        "604583": 1,
+        "604581": 1
       }
     },
     "oulad_avg_assessment_score": {
-      "dtype": "float64",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
+      "dtype": "float32",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
       "n_unique": 3187,
       "top_values": {
-        "0.0": 5458,
+        "76.0": 5592,
         "80.0": 203,
         "70.0": 175,
         "75.0": 173,
-        "76.0": 158
+        "65.0": 150
       }
     },
     "oulad_n_assessments": {
       "dtype": "float64",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 28,
+      "n_missing": 5476,
+      "pct_missing": 0.18984226035708096,
+      "n_unique": 27,
       "top_values": {
-        "0.0": 5416,
         "12.0": 3413,
         "5.0": 2661,
         "7.0": 2266,
-        "11.0": 2231
+        "11.0": 2231,
+        "9.0": 2101
       }
     },
     "oulad_avg_clicks": {
-      "dtype": "float64",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
+      "dtype": "float32",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
       "n_unique": 20480,
       "top_values": {
-        "0.0": 2711,
+        "3.0912964": 2711,
         "1.0": 209,
         "2.0": 208,
         "1.5": 102,
@@ -216,22 +56,148 @@
       }
     },
     "oulad_active_days": {
-      "dtype": "float64",
-      "n_missing": 140,
-      "pct_missing": 0.0048401037165082105,
-      "n_unique": 286,
+      "dtype": "float32",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
+      "n_unique": 285,
       "top_values": {
-        "0.0": 2711,
+        "51.0": 2887,
         "1.0": 596,
         "2.0": 488,
         "3.0": 395,
         "4.0": 388
       }
     },
+    "registration_duration_days": {
+      "dtype": "float32",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
+      "n_unique": 404,
+      "top_values": {
+        "1.3541667e-12": 19767,
+        "5.671296e-13": 68,
+        "6.597222e-13": 67,
+        "4.050926e-13": 62,
+        "3.3564815e-13": 62
+      }
+    },
+    "score_w": {
+      "dtype": "float64",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
+      "n_unique": 3069,
+      "top_values": {
+        "76.0": 5592,
+        "96.75": 292,
+        "25.5": 280,
+        "80.0": 203,
+        "70.0": 175
+      }
+    },
+    "score_norm": {
+      "dtype": "float32",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
+      "n_unique": 3069,
+      "top_values": {
+        "0.70877194": 5592,
+        "1.0": 292,
+        "0.0": 280,
+        "0.7649123": 203,
+        "0.6245614": 175
+      }
+    },
+    "clicks_log": {
+      "dtype": "float64",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
+      "n_unique": 20480,
+      "top_values": {
+        "1.408861876938532": 2711,
+        "0.6931471805599453": 209,
+        "1.0986122886681098": 208,
+        "0.9162907318741551": 102,
+        "1.3862943611198906": 100
+      }
+    },
+    "clicks_norm": {
+      "dtype": "float32",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
+      "n_unique": 20173,
+      "top_values": {
+        "0.4856273": 2711,
+        "1.0": 288,
+        "0.0": 283,
+        "0.23378271": 208,
+        "0.0857835": 102
+      }
+    },
+    "days_norm": {
+      "dtype": "float32",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
+      "n_unique": 231,
+      "top_values": {
+        "0.21822387": 2887,
+        "0.0": 596,
+        "0.0043644775": 488,
+        "0.008728955": 395,
+        "0.013093432": 388
+      }
+    },
+    "reg_norm": {
+      "dtype": "float32",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
+      "n_unique": 301,
+      "top_values": {
+        "0.35771298": 19767,
+        "0.0": 286,
+        "1.0": 264,
+        "0.13038136": 68,
+        "0.15712626": 67
+      }
+    },
+    "has_reg_norm": {
+      "dtype": "object",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
+      "n_unique": 1,
+      "top_values": {
+        "True": 28785
+      }
+    },
+    "effort_norm": {
+      "dtype": "float32",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
+      "n_unique": 25671,
+      "top_values": {
+        "1.0615641": 372,
+        "0.70385116": 224,
+        "0.35771298": 69,
+        "0.5914957": 30,
+        "0.8342325": 30
+      }
+    },
+    "cognitive_efficiency": {
+      "dtype": "float32",
+      "n_missing": 60,
+      "pct_missing": 0.0020800832033281333,
+      "n_unique": 25702,
+      "top_values": {
+        "0.343803": 355,
+        "0.0": 280,
+        "0.4159823": 224,
+        "0.5220337": 60,
+        "0.38641334": 30
+      }
+    },
     "Hold .": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 40,
       "top_values": {
         "101.0": 6,
@@ -243,8 +209,8 @@
     },
     "Hold t": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 36,
       "top_values": {
         "92.0": 4,
@@ -256,8 +222,8 @@
     },
     "Hold i": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 41,
       "top_values": {
         "74.0": 5,
@@ -269,8 +235,8 @@
     },
     "Hold e": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 40,
       "top_values": {
         "74.0": 4,
@@ -282,8 +248,8 @@
     },
     "Hold Shift": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 35,
       "top_values": {
         "87.0": 3,
@@ -295,8 +261,8 @@
     },
     "Hold 5": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 33,
       "top_values": {
         "82.0": 3,
@@ -308,8 +274,8 @@
     },
     "Hold Shift.1": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 36,
       "top_values": {
         "70.0": 3,
@@ -321,8 +287,8 @@
     },
     "Hold Caps": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 38,
       "top_values": {
         "78.0": 3,
@@ -334,8 +300,8 @@
     },
     "Hold r": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 31,
       "top_values": {
         "73.0": 4,
@@ -347,8 +313,8 @@
     },
     "Hold o": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 36,
       "top_values": {
         "92.0": 4,
@@ -360,8 +326,8 @@
     },
     "Hold a": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 37,
       "top_values": {
         "83.0": 4,
@@ -373,8 +339,8 @@
     },
     "Hold n": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 34,
       "top_values": {
         "91.0": 3,
@@ -386,8 +352,8 @@
     },
     "Hold l": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 39,
       "top_values": {
         "82.0": 4,
@@ -399,8 +365,8 @@
     },
     "Hold Enter": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 37,
       "top_values": {
         "70.0": 4,
@@ -412,8 +378,8 @@
     },
     "DD ..t": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 52,
       "top_values": {
         "660.0": 2,
@@ -425,8 +391,8 @@
     },
     "DD t.i": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 55,
       "top_values": {
         "401.0": 2,
@@ -438,8 +404,8 @@
     },
     "DD i.e": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 55,
       "top_values": {
         "1066.0": 2,
@@ -451,8 +417,8 @@
     },
     "DD e.Shift": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 56,
       "top_values": {
         "837.0": 1,
@@ -464,8 +430,8 @@
     },
     "DD Shift.5": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 52,
       "top_values": {
         "666.0": 2,
@@ -477,8 +443,8 @@
     },
     "DD 5.Shift": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 56,
       "top_values": {
         "444.0": 1,
@@ -490,8 +456,8 @@
     },
     "DD Shift.Caps": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 53,
       "top_values": {
         "600.0": 2,
@@ -503,8 +469,8 @@
     },
     "DD Caps.r": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 56,
       "top_values": {
         "431.0": 1,
@@ -516,8 +482,8 @@
     },
     "DD r.o": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 56,
       "top_values": {
         "618.0": 1,
@@ -529,8 +495,8 @@
     },
     "DD o.a": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 54,
       "top_values": {
         "591.0": 2,
@@ -542,8 +508,8 @@
     },
     "DD a.n": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 54,
       "top_values": {
         "496.0": 2,
@@ -555,8 +521,8 @@
     },
     "DD n.l": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 53,
       "top_values": {
         "313.0": 2,
@@ -568,8 +534,8 @@
     },
     "DD l.Enter": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 53,
       "top_values": {
         "601.0": 2,
@@ -581,8 +547,8 @@
     },
     "UD ..t": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 55,
       "top_values": {
         "436.0": 2,
@@ -594,8 +560,8 @@
     },
     "UD t.i": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 53,
       "top_values": {
         "530.0": 2,
@@ -607,8 +573,8 @@
     },
     "UD i.e": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 51,
       "top_values": {
         "529.0": 3,
@@ -620,8 +586,8 @@
     },
     "UD e.Shift": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 53,
       "top_values": {
         "282.0": 2,
@@ -633,8 +599,8 @@
     },
     "UD Shift.5": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 55,
       "top_values": {
         "569.0": 2,
@@ -646,8 +612,8 @@
     },
     "UD 5.Shift": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 55,
       "top_values": {
         "219.0": 2,
@@ -659,8 +625,8 @@
     },
     "UD Shift.Caps": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 54,
       "top_values": {
         "381.0": 2,
@@ -672,8 +638,8 @@
     },
     "UD Caps.r": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 56,
       "top_values": {
         "330.0": 1,
@@ -685,8 +651,8 @@
     },
     "UD r.o": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 55,
       "top_values": {
         "534.0": 2,
@@ -698,8 +664,8 @@
     },
     "UD o.a": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 53,
       "top_values": {
         "533.0": 2,
@@ -711,8 +677,8 @@
     },
     "UD a.n": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 54,
       "top_values": {
         "393.0": 2,
@@ -724,8 +690,8 @@
     },
     "UD n.l": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 50,
       "top_values": {
         "133.0": 2,
@@ -737,8 +703,8 @@
     },
     "UD l.Enter": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 55,
       "top_values": {
         "380.0": 2,
@@ -750,8 +716,8 @@
     },
     "Pressure .": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 37,
       "top_values": {
         "0.0864000022411346": 5,
@@ -763,8 +729,8 @@
     },
     "Pressure t": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 41,
       "top_values": {
         "0.10080000758171": 3,
@@ -776,8 +742,8 @@
     },
     "Pressure i": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 39,
       "top_values": {
         "0.302400022745132": 6,
@@ -789,8 +755,8 @@
     },
     "Pressure e": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 37,
       "top_values": {
         "0.0672000050544738": 4,
@@ -802,8 +768,8 @@
     },
     "Pressure Shift": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 42,
       "top_values": {
         "0.105600006878376": 4,
@@ -815,8 +781,8 @@
     },
     "Pressure 5": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 36,
       "top_values": {
         "0.0816000029444694": 4,
@@ -828,8 +794,8 @@
     },
     "Pressure Shift.1": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 39,
       "top_values": {
         "0.302400022745132": 7,
@@ -841,8 +807,8 @@
     },
     "Pressure Caps": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 35,
       "top_values": {
         "0.120000004768371": 7,
@@ -854,8 +820,8 @@
     },
     "Pressure r": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 35,
       "top_values": {
         "0.115200005471706": 5,
@@ -867,8 +833,8 @@
     },
     "Pressure o": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 33,
       "top_values": {
         "0.302400022745132": 6,
@@ -880,8 +846,8 @@
     },
     "Pressure a": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 43,
       "top_values": {
         "0.129600003361701": 4,
@@ -893,8 +859,8 @@
     },
     "Pressure n": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 32,
       "top_values": {
         "0.115200005471706": 4,
@@ -906,8 +872,8 @@
     },
     "Pressure l": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 36,
       "top_values": {
         "0.0768000036478042": 5,
@@ -919,8 +885,8 @@
     },
     "Pressure Enter": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 38,
       "top_values": {
         "0.302400022745132": 9,
@@ -932,8 +898,8 @@
     },
     "Size .": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 15,
       "top_values": {
         "0.25806450843811": 11,
@@ -945,8 +911,8 @@
     },
     "Size t": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 13,
       "top_values": {
         "0.25806450843811": 15,
@@ -958,8 +924,8 @@
     },
     "Size i": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 16,
       "top_values": {
         "0.25806450843811": 12,
@@ -971,8 +937,8 @@
     },
     "Size e": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 14,
       "top_values": {
         "0.290322571992874": 19,
@@ -984,8 +950,8 @@
     },
     "Size Shift": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 14,
       "top_values": {
         "0.290322571992874": 15,
@@ -997,8 +963,8 @@
     },
     "Size 5": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 11,
       "top_values": {
         "0.290322571992874": 16,
@@ -1010,8 +976,8 @@
     },
     "Size Shift.1": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 14,
       "top_values": {
         "0.290322571992874": 14,
@@ -1023,8 +989,8 @@
     },
     "Size Caps": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 8,
       "top_values": {
         "0.25806450843811": 17,
@@ -1036,8 +1002,8 @@
     },
     "Size r": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 8,
       "top_values": {
         "0.225806444883346": 14,
@@ -1049,8 +1015,8 @@
     },
     "Size o": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 16,
       "top_values": {
         "0.290322571992874": 18,
@@ -1062,8 +1028,8 @@
     },
     "Size a": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 10,
       "top_values": {
         "0.290322571992874": 14,
@@ -1075,8 +1041,8 @@
     },
     "Size n": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 9,
       "top_values": {
         "0.290322571992874": 15,
@@ -1088,8 +1054,8 @@
     },
     "Size l": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 12,
       "top_values": {
         "0.290322571992874": 13,
@@ -1101,8 +1067,8 @@
     },
     "Size Enter": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 17,
       "top_values": {
         "0.322580635547637": 7,
@@ -1114,8 +1080,8 @@
     },
     "AvH": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 55,
       "top_values": {
         "85.42857142857143": 2,
@@ -1127,8 +1093,8 @@
     },
     "AvP": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 56,
       "top_values": {
         "0.19097143837383762": 1,
@@ -1140,8 +1106,8 @@
     },
     "AvA": {
       "dtype": "float64",
-      "n_missing": 28869,
-      "pct_missing": 0.9980639585133967,
+      "n_missing": 28789,
+      "pct_missing": 0.998058589010227,
       "n_unique": 54,
       "top_values": {
         "0.26958524542195417": 2,
@@ -1153,8 +1119,8 @@
     },
     "dataset": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "fermi": 3
@@ -1162,30 +1128,30 @@
     },
     "question": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "Lot's wife was turned into a pillar of salt. How much salt would that produce?": 1,
-        "How many hours from one full moon to the next?": 1,
-        "How much farmed land does one need to survive?": 1
+        "Estimate the consumption of pigmentary TiO2 in the United States in 2004.": 1,
+        "Assuming infinite water, how much of an area will we need to cover such that the rate of heat loss from evaporation counteracts the heat gain from global warming?": 1,
+        "If microchip makers didn't keep trying to shrink their chips, how fast could your average home computer be by now?": 1
       }
     },
     "question_id": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "fermi/test_realfp/119": 1,
-        "fermi/test_realfp/176": 1,
-        "fermi/test_realfp/105": 1
+        "fermi/test_realfp/102": 1,
+        "fermi/test_realfp/106": 1,
+        "fermi/test_realfp/100": 1
       }
     },
     "step_idx": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "1.0": 3
@@ -1193,37 +1159,37 @@
     },
     "full_answer": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "The average human body contains 100 grams of salt. The average human body weighs 150 pounds. Thus, the average human body contains 100 / 150 = 0.667 pounds of salt. So the final answer is: 0.667": 1,
-        "The moon takes 29.53 days to go from one full moon to the next. There are 24 hours in a day. So, 29.53 days * 24 hours in a day = 9736 hours. So the final answer is: 9736": 1,
-        "The amount of farmed land needed to survive depends on the type of food one consumes. Generally, it takes around 0.5 acres of land to produce enough food for one person for a year. Thus, one needs 0.5 acres of farmed land to survive. So the final answer is: 0.5": 1
+        "The consumption of pigmentary TiO2 in the United States in 2004 was 1.1 million tons. So the final answer is: 1.1.": 1,
+        "The rate of heat loss from evaporation is proportional to the square of the area covered. The rate of heat gain from global warming is proportional to the cube of the temperature. Therefore, the area needed to be covered is proportional to the cube of the temperature. So the final answer is: 1.0.": 1,
+        "The speed of a computer is determined by the number of transistors on the chip. The number of transistors on a chip is directly proportional to the size of the chip. Thus, if microchip makers didn't keep trying to shrink their chips, the speed of the average home computer would not have increased significantly. So the final answer is: Not significantly": 1
       }
     },
     "step": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "The average human body contains 100 grams of salt.": 1,
-        "The moon takes 29.53 days to go from one full moon to the next.": 1,
-        "The amount of farmed land needed to survive depends on the type of food one consumes.": 1
+        "The consumption of pigmentary TiO2 in the United States in 2004 was 1.1 million tons.": 1,
+        "The rate of heat loss from evaporation is proportional to the square of the area covered.": 1,
+        "The speed of a computer is determined by the number of transistors on the chip.": 1
       }
     },
     "decontextualized_step": {
       "dtype": "object",
-      "n_missing": 28925,
+      "n_missing": 28845,
       "pct_missing": 1.0,
       "n_unique": 0,
       "top_values": {}
     },
     "attribution_relevance_label": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "Yes": 3
@@ -1231,48 +1197,49 @@
     },
     "attribution_relevance_majority": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 2,
       "top_values": {
         "5.0": 2,
-        "3.0": 1
+        "6.0": 1
       }
     },
     "attribution_relevance_annotations": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 2,
       "top_values": {
         "['Yes', 'Yes', 'Yes', 'Yes', 'Yes']": 2,
-        "['No', 'Yes', 'Yes', 'Yes', 'No']": 1
+        "['Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes']": 1
       }
     },
     "attribution_relevance_raters": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "['R3', 'R8', 'R0', 'R5', 'R1']": 1,
-        "['R10', 'R3', 'R8', 'R0', 'R1']": 1,
-        "['R3', 'R8', 'R9', 'R5', 'R1']": 1
+        "['R10', 'R8', 'R0', 'R4', 'R1']": 1,
+        "['R10', 'R3', 'R0', 'R4', 'R5', 'R1']": 1,
+        "['R3', 'R8', 'R4', 'R5', 'R1']": 1
       }
     },
     "attribution_relevance_num_ratings": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 1,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 2,
       "top_values": {
-        "5.0": 3
+        "5.0": 2,
+        "6.0": 1
       }
     },
     "evidence_id": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "1.0": 3
@@ -1280,90 +1247,92 @@
     },
     "evidence": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "Dietary Reference Values, Current recommendations, Salt: The guideline salt intake for adults is about 6 grams of salt (approximately one teaspoon). The Food Standards Agency estimate the average salt intake is about 8.6 grams/day  (2008). A high salt diet is likely to increase the risk of high blood pressure, which is associated with an increased risk of heart attack and stroke.": 1,
-        "Adhik Maas, Scientific calculation: The Moon takes about 27.3 days to make one complete orbit around the earth. The earth orbits around the sun once every 365.2422 days (= earth's orbital speed of 29.79 km per second). The earth and the moon in 27.3 days have moved as a system about 1/12 of the way around the sun. This means that from one full moon to the next full moon, the moon must travel 2.2 extra days before it appears again as a full moon, due to the curve of the earth's orbit around the sun. Ultimately this creates a variance of 10.87 days a year between a lunar year and a solar year. To compensate for this difference, the additional month is added after every 32.5 months on average.": 1,
-        "Sustainable agriculture, Factors affecting sustainability: A farm that can \"produce perpetually\", yet has negative effects on environmental quality elsewhere is not sustainable agriculture. An example of a case in which a global view may be warranted is the application of fertilizer or manure, which can improve the productivity of a farm but can pollute nearby rivers and coastal waters (eutrophication). The other extreme can also be undesirable, as the problem of low crop yields due to exhaustion of nutrients in the soil has been related to rainforest destruction. In Asia, the specific amount of land needed for sustainable farming is about 12.5 acres which include land for animal fodder, cereal production as a cash crop, and other food crops. In some cases, a small unit of aquaculture is included (AARI-1996).": 1
+        "Ilmenite, Processing and consumption: Titanium dioxide is most used as a white pigment and the major consuming industries for TiO2  pigments are paints and surface coatings, plastics, and paper and paperboard. Per capita consumption of TiO2 in China is about 1.1 kilograms per year, compared with 2.7 kilograms for Western Europe and the United States.": 1,
+        "Rising film evaporator, Main characteristic and assessments, Overall heat transfer area: This is the total contact area between the heating media and the liquid requiring the heating or any intermediate surfaces in between them. In the case of the rising film evaporator this is the specific region between the film and the surface of long tubes and also the surrounding heating media within the shell of the evaporator. As shown in the equation, the heat transfer area is one of the chief factors that affect the rate of conductive heat transfer. Therefore, it would be favourable to maximise the amount of area available for heat transfer. The limitations for these can be in terms of the cost per unit area as increasing the area would mean increasing the length of the tubes and also the shell of the evaporator which can significantly increase the cost of construction and maintenance,.": 1,
+        "Central processing unit, History, Transistor CPUs: Transistor-based computers had several distinct advantages over their predecessors. Aside from facilitating increased reliability and lower power consumption, transistors also allowed CPUs to operate at much higher speeds because of the short switching time of a transistor in comparison to a tube or relay. The increased reliability and dramatically increased speed of the switching elements (which were almost exclusively transistors by this time); CPU clock rates in the tens of megahertz were easily obtained during this period. Additionally, while discrete transistor and IC CPUs were in heavy usage, new high-performance designs like SIMD (Single Instruction Multiple Data) vector processors began to appear. These early experimental designs later gave rise to the era of specialized supercomputers like those made by Cray Inc and Fujitsu Ltd.": 1
       }
     },
     "attribution_label": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 1,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 2,
       "top_values": {
-        "Unsupported": 3
+        "Unsupported": 2,
+        "Partially": 1
       }
     },
     "attribution_majority": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 3,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 2,
       "top_values": {
-        "5.0": 1,
-        "2.0": 1,
+        "5.0": 2,
         "3.0": 1
       }
     },
     "attribution_annotations": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
         "['Unsupported', 'Unsupported', 'Unsupported', 'Unsupported', 'Unsupported']": 1,
-        "['Partially', 'Unsupported', 'Fully', 'Fully', 'Unsupported']": 1,
-        "['N/A', 'Unsupported', 'Unsupported', 'Unsupported', 'N/A']": 1
+        "['Unsupported', 'Unsupported', 'Unsupported', 'Partially', 'Unsupported', 'Unsupported']": 1,
+        "['Partially', 'Partially', 'Fully', 'Partially', 'Unsupported']": 1
       }
     },
     "attribution_raters": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "['R3', 'R8', 'R0', 'R5', 'R1']": 1,
-        "['R10', 'R3', 'R8', 'R0', 'R1']": 1,
-        "['R3', 'R8', 'R9', 'R5', 'R1']": 1
+        "['R10', 'R8', 'R0', 'R4', 'R1']": 1,
+        "['R10', 'R3', 'R0', 'R4', 'R5', 'R1']": 1,
+        "['R3', 'R8', 'R4', 'R5', 'R1']": 1
       }
     },
     "attribution_num_ratings": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 1,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 2,
       "top_values": {
-        "5.0": 3
+        "5.0": 2,
+        "6.0": 1
       }
     },
     "attribution_justifications": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "['None of the evidence confirms that an average human body contains 100 grams of salt.', 'None of the evidences state how much salt is in the average human body', 'The claim in step 0 is unsupported because there is not value given for the average amount of salt in a human body.', 'no evidence to support the claim as it only states what the average daily salt intake is and not how much salt the average human body contains. ', 'Step 0 is unsupported because there is no evidence of the average amount of salt in a body.']": 1,
-        "[\"The evidence partially supports the claim as it states The earth and the moon in 27.3 days have moved as a system about 1/12 of the way around the sun. This means that from one full moon to the next full moon, the moon must travel 2.2 extra days before it appears again as a full moon, due to the curve of the earth's orbit around the sun. If you do the math that would equal 29.5. \", 'None of the evidence fully infers that the moon takes 29.53 days to go from one full moon to the next.\\n\\n', 'With a little math, the evidence does state it would take 29.5 days to go from one full moon to the next. (27.3 plus 2.2)', 'E1 fully supports the claim in step 0 by stating that the moon takes about 27.3 days to make one complete orbit, and then an extra 2.2 days before it appears as a full moon again, which is about 29.5, similar to that as mentioned in the claim.', 'Step 0 is fully supported by the evidence stating that the moon cycle is 29.53 days.']": 1,
-        "['N/A', 'None of the evidences really support this claim', 'The evidence does not say that the amount of farmed land needed to survive depends on the type of food one consumes.\\n\\n', 'no evidence provided that support this claim', 'N/A']": 1
+        "['There is no evidence to support the claim that the consumption of pigmentary TiO2 in the United States in 2004 was 1.1 million tons, as the year 2004 is never mentioned in the evidence. ', 'None of the evidences support or unsupport the claim that the consumption of pigmentary TiO2 in the United States in 2004 was 1.1 million tons.', 'The claim in step 0 is unsupported because although E1 discusses the correct topic, it provides its figures per capita (per person) and we do not know the population size to calculate the totals, so the claim is left unsupported.', 'None of the evidences discuss the overall consumption of TiO2 in the US in 2004.', 'Step 0 is unsupported because there is no evidence regarding The consumption of pigmentary TiO2 in the United States in 2004']": 1,
+        "['The evidence contradicts the claim as it states The rate of evaporation heat loss is directly related to the vapor pressure at the skin surface and the amount of moisture present on the skin. ', 'None of the evidence supports the information provided in the claim.\\n', 'None of the evidence provides enough specific support to the claim in step 1 discussing the rate of heat loss from evaporation being proportional to the square of the area covered.', 'So I checked all the 3 evidences, and there was some good information but nothing of the 3 REALLY directly assessed the statement in STep0. The one about the human body was close but only referred to the release of heat from being wet from sweating and so on. \\nFor Step0, this is partially supported by suggesting that \"As shown in the equation, the heat transfer area is one of the chief factors that affect the rate of conductive heat transfer. Therefore, it would be favourable to maximise the amount of area available for heat transfer.\" I cant say fully, because it didnt really address Step0 completely, but it partially does confirm this to be true for other situations of heat transfer in general as well essentially.', 'No evidence that states the rate of heat loss from evaporation is proportional to the square of the area covered.\\n\\n', 'Step 0 is fully supported by the evidence describing heat conduction.']": 1,
+        "['One can infer from the evidence that the speed of a computer is determined by the number of transistors on the chip.\\n\\n', 'The evidence never states more transistors would make the computer run faster but it does state that transistors also allowed CPUs to operate at much higher speeds', 'I would say this is quite fully supported in Ev1 with \"...transistors also allowed CPUs to operate at much higher speeds because of the short switching time of a transistor in comparison to a tube or relay.\"\\nI know that it maybe is not fully determined by only the transistors, but it clearly states that the transistors allow the computer to operate at higher speeds.', 'evidence states that transistors allow the CPU to operate at higher speeds.', 'Step 0 is unsupported because the evidence does not state that number of transistors determines speed.']": 1
       }
     },
     "annotated_in_attribution_batch": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 1,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 2,
       "top_values": {
-        "['batch5', 'batch5', 'batch5', 'batch5', 'batch5']": 3
+        "['batch5', 'batch5', 'batch5', 'batch5', 'batch5']": 2,
+        "['batch5', 'batch5', 'batch5', 'batch5', 'batch5', 'batch5']": 1
       }
     },
     "type_label": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "Attribution step.": 3
@@ -1371,37 +1340,39 @@
     },
     "type_majority": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 1,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 2,
       "top_values": {
-        "5.0": 3
+        "5.0": 2,
+        "4.0": 1
       }
     },
     "type_annotations": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 1,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 2,
       "top_values": {
-        "['Attribution step.', 'Attribution step.', 'Attribution step.', 'Attribution step.', 'Attribution step.']": 3
+        "['Attribution step.', 'Attribution step.', 'Attribution step.', 'Attribution step.', 'Attribution step.']": 2,
+        "['Attribution step.', 'Attribution step.', 'Attribution step.', 'Attribution step.', 'Both.']": 1
       }
     },
     "type_raters": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "['R1', 'R5', 'R0', 'R9', 'R8']": 1,
-        "['R8', 'R9', 'R0', 'R1', 'R5']": 1,
-        "['R5', 'R6', 'R0', 'R8', 'R1']": 1
+        "['R7', 'R8', 'R1', 'R9', 'R5']": 1,
+        "['R8', 'R0', 'R6', 'R1', 'R9']": 1,
+        "['R8', 'R0', 'R6', 'R5', 'R1']": 1
       }
     },
     "type_num_ratings": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "5.0": 3
@@ -1409,8 +1380,8 @@
     },
     "logic_relevance_label": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "Relevant": 3
@@ -1418,39 +1389,37 @@
     },
     "logic_relevance_majority": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 2,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 1,
       "top_values": {
-        "5.0": 2,
-        "4.0": 1
+        "5.0": 3
       }
     },
     "logic_relevance_annotations": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 2,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 1,
       "top_values": {
-        "['Relevant', 'Relevant', 'Relevant', 'Relevant', 'Relevant']": 2,
-        "['Not relevant', 'Relevant', 'Relevant', 'Relevant', 'Relevant']": 1
+        "['Relevant', 'Relevant', 'Relevant', 'Relevant', 'Relevant']": 3
       }
     },
     "logic_relevance_raters": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "['R1', 'R5', 'R0', 'R9', 'R8']": 1,
-        "['R8', 'R9', 'R0', 'R1', 'R5']": 1,
-        "['R5', 'R6', 'R0', 'R8', 'R1']": 1
+        "['R7', 'R8', 'R1', 'R9', 'R5']": 1,
+        "['R8', 'R0', 'R6', 'R1', 'R9']": 1,
+        "['R8', 'R0', 'R6', 'R5', 'R1']": 1
       }
     },
     "logic_relevance_num_ratings": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "5.0": 3
@@ -1458,19 +1427,19 @@
     },
     "logic_justifications": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "['Step 1 adds that The average human body contains 100 grams of salt, but this is not relevant to the question.', 'brings new info on how much salt the average human body contain.', 'Relevant because it provides the details of how many grams of salt are in the body, on average.', 'The question is about how much salt that would produce, so it can be relevant that the average human body contains 100 grams of salt.\\n\\n\\n', 'States the average amount of salt in a human ']": 1,
-        "['States how long the moon takes to go to the next full moon', 'The question asks \"How many hours from one full moon to the next?\" So it could be relevant that the moon takes 29.53 days to go from one full moon to the next.\\n\\n\\n', 'Relevant because it provides the number of days that it takes from one full moon to the next, necessary to then convert to hours.', 'Step 1 adds that The moon takes 29.53 days to go from one full moon to the next.', 'brings new info on the time between 2 full moons.']": 1,
-        "['Brings new info that the amount of farmed land needed to survive depends on the type of food one consumes.\\n\\n', 'The bot introduces the information that the amount of farmed land needed to survive depends on the type of food one consumes.\\n', 'Relevant because it explains that the amount of food from a farm that humans need to survive absolutely depends on the type of food the person consumes.', 'States the amount of farmed land needed to survive depends on the type of food one consumes.', 'Step 1 adds that The amount of farmed land needed to survive depends on the type of food one consumes.']": 1
+        "['Step 1 says how many tons of pigmentary TiO2 was consumed in 2004.', 'States the consumption of pigmentary TiO2 in the United States in 2004 was 1.1 million tons.', 'Step 1 adds that 1.1 million tons were used.', 'The question is about the consumption of pigmentary TiO2 in 2004, so it could be relevant that was 1.1 million tons in 2004.', 'Brings new info and answers the question on the consumption of pigmentary TiO2 in the US in 2004.']": 1,
+        "['States the rate of heat loss from evaporation is proportional to the square of the area covered.', 'Relevant because it provides details about the rate of heat loss, which is what the question is discussing.', 'The bot introduces the information that the rate of heat loss from evaporation is proportional to the square of the area covered.', 'Step 1 adds that The rate of heat loss from evaporation is proportional to the square of the area covered.', 'The question is about rate of heat loss from evaporation, so it could be relevant that the rate of heat loss from evaporation is proportional to the square of the area covered.\\n\\n\\n']": 1,
+        "['States what determines the speed of a computer', 'Relevant because it provides some information about the speed of computers and that it depends on the number of transistors on the chip.', 'The bot introduces the information that the speed of a computer is determined by the number of transistors on the chip.\\n\\n', 'brings new info on what determines the speed of a computer.', 'Step 1 adds that speed is determined by transistors. ']": 1
       }
     },
     "annotated_in_logic_batch": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "['batch5', 'batch5', 'batch5', 'batch5', 'batch5']": 3
@@ -1478,74 +1447,74 @@
     },
     "correctness_label": {
       "dtype": "object",
-      "n_missing": 28925,
+      "n_missing": 28845,
       "pct_missing": 1.0,
       "n_unique": 0,
       "top_values": {}
     },
     "correctness_majority": {
       "dtype": "float64",
-      "n_missing": 28925,
+      "n_missing": 28845,
       "pct_missing": 1.0,
       "n_unique": 0,
       "top_values": {}
     },
     "correctness_annotations": {
       "dtype": "object",
-      "n_missing": 28925,
+      "n_missing": 28845,
       "pct_missing": 1.0,
       "n_unique": 0,
       "top_values": {}
     },
     "correctness_raters": {
       "dtype": "object",
-      "n_missing": 28925,
+      "n_missing": 28845,
       "pct_missing": 1.0,
       "n_unique": 0,
       "top_values": {}
     },
     "correctness_num_ratings": {
       "dtype": "float64",
-      "n_missing": 28925,
+      "n_missing": 28845,
       "pct_missing": 1.0,
       "n_unique": 0,
       "top_values": {}
     },
     "answer_id": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
-        "fermi/test_realfp/119//Flan-PaLM-540B": 1,
-        "fermi/test_realfp/176//Flan-UL2-20B": 1,
-        "fermi/test_realfp/105//GPT-3": 1
+        "fermi/test_realfp/102//Flan-PaLM-540B": 1,
+        "fermi/test_realfp/106//Flan-UL2-20B": 1,
+        "fermi/test_realfp/100//GPT-3": 1
       }
     },
     "attribution_majority_all_evidences": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 3,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 2,
       "top_values": {
-        "5.0": 1,
-        "2.0": 1,
+        "5.0": 2,
         "3.0": 1
       }
     },
     "attribution_majority_all_steps": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 1,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 2,
       "top_values": {
-        "2.0": 3
+        "5.0": 2,
+        "3.0": 1
       }
     },
     "logic_majority_all_steps": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 3,
       "top_values": {
         "3.0": 1,
@@ -1555,26 +1524,27 @@
     },
     "agreement_majority_all_steps": {
       "dtype": "float64",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
-      "n_unique": 1,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
+      "n_unique": 2,
       "top_values": {
-        "2.0": 3
+        "3.0": 2,
+        "4.0": 1
       }
     },
     "is_low_agreement_hard_case": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
-        "True": 3
+        "False": 3
       }
     },
     "contamination_identifier": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "Reveal:Mn12GAs2I3S0eWjbTUFC0Y51ijGFB7rGBLnzGGhCQ7OtJPfVg7e6qt9zb5RPL36U": 3
@@ -1582,8 +1552,8 @@
     },
     "is_final_rated_evidence_for_step": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 2,
       "top_values": {
         "False": 2,
@@ -1592,8 +1562,8 @@
     },
     "answer_is_fully_attributable": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "False": 3
@@ -1601,8 +1571,8 @@
     },
     "answer_is_logically_correct": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 2,
       "top_values": {
         "False": 2,
@@ -1611,8 +1581,8 @@
     },
     "answer_is_fully_attributable_and_correct": {
       "dtype": "object",
-      "n_missing": 28922,
-      "pct_missing": 0.9998962834917892,
+      "n_missing": 28842,
+      "pct_missing": 0.9998959958398336,
       "n_unique": 1,
       "top_values": {
         "False": 3
