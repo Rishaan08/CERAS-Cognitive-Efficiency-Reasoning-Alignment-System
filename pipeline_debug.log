@@ -1,0 +1,29 @@
+=== PIPELINE DEBUG ===
+
+Subtasks:
+ 1. Define what "Agentic AI" is.
+ 2. Explain the concept of an "agent" in the context of AI.
+ 3. Describe the relationship between agents and "strands".
+ 4. Introduce the Amazon Web Services (AWS) platform.
+ 5. Discuss how AWS can be used to create a scalable and secure environment for Agentic AI development.
+ 6. Provide an overview of the key components involved in building an Agentic AI system on AWS.
+ 7. Outline the steps required to implement an Agentic AI system using AWS from scratch.
+ 8. Describe the role of strands in an Agentic AI system.
+ 9. Explain how agents interact with their environment and each other in a strand-based architecture.
+ 10. Discuss the benefits of using an Agentic AI approach on AWS for scalable and efficient AI development.
+[DEBUG] run_decomposer returned type=<class 'list'>, preview=['Define what "Agentic AI" is.', 'Explain the concept of an "agent" in the context of AI.', 'Describe the relationship between agents and "strands".', 'Introduce the Amazon Web Services (AWS) platform.', 'Discuss how AWS can be used to create a scalable and secure environment for Agentic AI developm
+
+
+=== DECOMPOSER DEBUG ===
+
+Subtasks:
+ 1. Learn the basic concepts of Artificial General Intelligence (AGI) and its types.
+ 2. Understand the concept of agents in AGI and their relationship with autonomous systems.
+ 3. Study the different types of agents, including simple reflex agents, model-based agents, and learning agents.
+ 4. Explore the concept of strands in Agentic AI, their characteristics, and application areas.
+ 5. Learn about Amazon Web Services (AWS) cloud platform and its features relevant to AGI development.
+ 6. Set up an AWS account and explore its services such as SageMaker, Lambda, andrek.
+ 7. Choose a suitable programming language for building agents and learn the basics of that language.
+ 8. Start building simple reflex agents using Python or other chosen language.
+ 9. Learn about reinforcement learning (RL) algorithms and how they are used in agent training.
+ 10. Explore open-source libraries and frameworks for AGI development, such as OpenAI Gym or Gymnasium.
