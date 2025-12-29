@@ -175,7 +175,7 @@ ceras/
 ├── models/
 │   ├── cepm.py
 │   ├── anfis.py
-│   └── ann.py
+│   └── cnn.py
 │
 ├── postprocess/                     
 │   ├── __init__.py
