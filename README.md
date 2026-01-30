@@ -11,6 +11,8 @@ conda activate ceras
 
 ## Overview
 
+**TO RUN PLEASE NAVIGATE TO src\ceras and then - run streamlit run streamlit_app.py**
+
 **CERAS (Cognitive Efficiency & Reasoning Alignment System)** is a hybrid intelligent framework that models and measures an individual’s **learning readiness** by combining **Cognitive Efficiency (CE)** and **Reasoning Alignment (RA)**.
 
 It unifies:

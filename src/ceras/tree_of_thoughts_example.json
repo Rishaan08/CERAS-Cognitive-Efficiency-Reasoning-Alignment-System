@@ -1,75 +1,92 @@
 {
-  "tree_id": "63ba7821-0e82-46db-8439-ef335edcc597",
-  "root_id": "f701aa3d-0582-4cc8-b705-742fb173eb4e",
+  "tree_id": "6720b0d0-46e7-49ce-b750-88a8c59c90fd",
+  "root_id": "0518b158-861b-40e8-992b-5834c78c2692",
   "nodes": {
-    "f701aa3d-0582-4cc8-b705-742fb173eb4e": {
-      "id": "f701aa3d-0582-4cc8-b705-742fb173eb4e",
+    "0518b158-861b-40e8-992b-5834c78c2692": {
+      "id": "0518b158-861b-40e8-992b-5834c78c2692",
       "parent_id": null,
-      "text": "what are trignometric identities and how can we solve (51^2 - 49^2) efficiently using them?",
+      "text": "can you help me learn about llms",
       "role": "root",
       "scores": {},
       "metadata": {
-        "ts": 1767008608.3982012
+        "ts": 1769782390.9947264
       },
       "children": [
-        "18b7a46a-8d22-462c-a2f4-9045fd2d8bd9",
-        "5a12cbe6-c046-4773-8128-25c392052fbd",
-        "b1aafbe0-3a58-40bc-be8c-79f9771a896c",
-        "9c525003-bc6b-40a3-ae11-c3ff09b30488"
+        "6acb49e7-a383-40f4-9108-ef947504d931"
       ],
-      "created_at": 1767008608.3982012,
+      "created_at": 1769782390.9947264,
       "embedding": null
     },
-    "18b7a46a-8d22-462c-a2f4-9045fd2d8bd9": {
-      "id": "18b7a46a-8d22-462c-a2f4-9045fd2d8bd9",
-      "parent_id": "f701aa3d-0582-4cc8-b705-742fb173eb4e",
-      "text": "Research and identify key trigonometric identities.",
-      "role": "subtask",
+    "6acb49e7-a383-40f4-9108-ef947504d931": {
+      "id": "6acb49e7-a383-40f4-9108-ef947504d931",
+      "parent_id": "0518b158-861b-40e8-992b-5834c78c2692",
+      "text": "Solve the problem directly.",
+      "role": "strategy",
       "scores": {},
-      "metadata": {
-        "source": "decomposer"
-      },
-      "children": [],
-      "created_at": 1767008616.3122694,
+      "metadata": {},
+      "children": [
+        "a96f5528-7d1b-4b2c-b596-cc867ca4a230",
+        "3e5a2b2e-58fd-4040-bae6-23270fc4b168",
+        "188dbfc8-6d01-40c0-b4d1-a49344a5677a",
+        "89437894-c875-45e8-ba39-a69aa9bcbef4",
+        "735de0b4-a201-46c9-8e82-040c7ef40c42"
+      ],
+      "created_at": 1769782406.1568918,
       "embedding": null
     },
-    "5a12cbe6-c046-4773-8128-25c392052fbd": {
-      "id": "5a12cbe6-c046-4773-8128-25c392052fbd",
-      "parent_id": "f701aa3d-0582-4cc8-b705-742fb173eb4e",
-      "text": "Determine which identity applies to solving (51^2 - 49^2).",
+    "a96f5528-7d1b-4b2c-b596-cc867ca4a230": {
+      "id": "a96f5528-7d1b-4b2c-b596-cc867ca4a230",
+      "parent_id": "6acb49e7-a383-40f4-9108-ef947504d931",
+      "text": "Understand what Large Language Models (LLMs) are and how they differ from traditional language models.",
       "role": "subtask",
       "scores": {},
-      "metadata": {
-        "source": "decomposer"
-      },
+      "metadata": {},
       "children": [],
-      "created_at": 1767008616.3122694,
+      "created_at": 1769782483.7218678,
       "embedding": null
     },
-    "b1aafbe0-3a58-40bc-be8c-79f9771a896c": {
-      "id": "b1aafbe0-3a58-40bc-be8c-79f9771a896c",
-      "parent_id": "f701aa3d-0582-4cc8-b705-742fb173eb4e",
-      "text": "Break down the expression into a form suitable for applying the selected identity.",
+    "3e5a2b2e-58fd-4040-bae6-23270fc4b168": {
+      "id": "3e5a2b2e-58fd-4040-bae6-23270fc4b168",
+      "parent_id": "6acb49e7-a383-40f4-9108-ef947504d931",
+      "text": "Learn about the key applications and challenges in Natural Language Processing (NLP) where LLMs are particularly useful.",
       "role": "subtask",
       "scores": {},
-      "metadata": {
-        "source": "decomposer"
-      },
+      "metadata": {},
       "children": [],
-      "created_at": 1767008616.3122694,
+      "created_at": 1769782483.7218678,
       "embedding": null
     },
-    "9c525003-bc6b-40a3-ae11-c3ff09b30488": {
-      "id": "9c525003-bc6b-40a3-ae11-c3ff09b30488",
-      "parent_id": "f701aa3d-0582-4cc8-b705-742fb173eb4e",
-      "text": "Apply the chosen identity to simplify the expression.",
+    "188dbfc8-6d01-40c0-b4d1-a49344a5677a": {
+      "id": "188dbfc8-6d01-40c0-b4d1-a49344a5677a",
+      "parent_id": "6acb49e7-a383-40f4-9108-ef947504d931",
+      "text": "Study the importance of dataset curation and data augmentation in training effective LLMs.",
       "role": "subtask",
       "scores": {},
-      "metadata": {
-        "source": "decomposer"
-      },
+      "metadata": {},
       "children": [],
-      "created_at": 1767008616.3122694,
+      "created_at": 1769782483.7218678,
+      "embedding": null
+    },
+    "89437894-c875-45e8-ba39-a69aa9bcbef4": {
+      "id": "89437894-c875-45e8-ba39-a69aa9bcbef4",
+      "parent_id": "6acb49e7-a383-40f4-9108-ef947504d931",
+      "text": "Learn how the transformer architecture is applied to LLMs for input/output processing.",
+      "role": "subtask",
+      "scores": {},
+      "metadata": {},
+      "children": [],
+      "created_at": 1769782483.7218678,
+      "embedding": null
+    },
+    "735de0b4-a201-46c9-8e82-040c7ef40c42": {
+      "id": "735de0b4-a201-46c9-8e82-040c7ef40c42",
+      "parent_id": "6acb49e7-a383-40f4-9108-ef947504d931",
+      "text": "Implement a simple text classification model using a pre-trained LLM like BERT.",
+      "role": "subtask",
+      "scores": {},
+      "metadata": {},
+      "children": [],
+      "created_at": 1769782483.7218678,
       "embedding": null
     }
   }

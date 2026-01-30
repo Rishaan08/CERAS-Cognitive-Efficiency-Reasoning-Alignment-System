@@ -1,30 +1,32 @@
-# pipeline_tot_simple.py
-# Bounded Tree-of-Thoughts: 3–4 LLM calls max
+# pipeline_1.py
+# Solver-grounded, multi-verifier Tree-of-Thoughts
+# Final Answer = reviewed, corrected, high-quality steps
 
 from tree_of_thoughts import TreeOfThoughts
-from inference import run_decomposer, run_inference_pipeline
-import time, io, contextlib
+from inference import run_inference_pipeline
+from llm_utils import run_decomposer
+
+import time
+import io
+import contextlib
+import json
 from typing import List
 
-# ---------------- CONFIG ----------------
-MAX_SUBTASKS = 4
-MAX_EXPANSIONS = 2   # how many subtasks to expand
 
-# ---------------- helpers ----------------
-def normalize(x):
-    if x is None:
+# ===================== CONFIG =====================
+MAX_STRATEGIES = 2
+MAX_FINAL_STEPS = 5
+MAX_TOTAL_LLM_CALLS = 8   # quality mode
+
+
+# ===================== HELPERS =====================
+def normalize(text):
+    if not text:
         return ""
-    if isinstance(x, str):
-        return " ".join(x.split())
-    if isinstance(x, (list, tuple)):
-        return " ".join(normalize(i) for i in x if normalize(i))
-    if isinstance(x, dict):
-        for k in ("text", "content", "message", "step"):
-            if k in x:
-                return normalize(x[k])
-    return ""
+    return " ".join(str(text).split())
 
-def clean(items: List[str]) -> List[str]:
+
+def clean(items: List[str], limit: int):
     out, seen = [], set()
     for s in items:
         t = normalize(s)
@@ -35,91 +37,201 @@ def clean(items: List[str]) -> List[str]:
             continue
         seen.add(k)
         out.append(t)
-    return out[:MAX_SUBTASKS]
+        if len(out) >= limit:
+            break
+    return out
 
-# ---------------- main ----------------
+
+# ===================== STRATEGY =====================
+def propose_strategies(prompt: str) -> List[str]:
+    meta_prompt = f"""
+Propose at most {MAX_STRATEGIES} HIGH-LEVEL strategies
+to solve the following problem.
+
+Rules:
+- Do NOT compute the solution
+- Do NOT give steps
+- One sentence per strategy
+
+Problem:
+{prompt}
+"""
+    out = run_inference_pipeline(meta_prompt, auto_extend=False)
+
+    strategies = []
+    if isinstance(out, dict):
+        for k in ("strategies", "steps", "thoughts", "outputs"):
+            if k in out:
+                v = out[k]
+                strategies.extend(v if isinstance(v, list) else [v])
+
+    return clean(strategies, MAX_STRATEGIES)
+
+
+# ===================== SOLVER STEP GENERATOR =====================
+def generate_solver_steps(prompt: str, strategy: str) -> List[str]:
+    solver_prompt = f"""
+Solve the following problem step by step:
+
+{prompt}
+
+Chosen strategy:
+{strategy}
+
+Generate an ordered list of EXECUTABLE solution steps.
+
+Rules:
+- Each step must directly progress toward solving the problem
+- NO meta reasoning (no planning, no identifying problem type)
+- NO explanations
+- Do NOT compute the final numeric answer
+- Output as a numbered list
+"""
+
+    raw = run_decomposer(solver_prompt)
+    if not isinstance(raw, list):
+        raw = [raw]
+
+    return clean(raw, MAX_FINAL_STEPS)
+
+
+# ===================== QUALITY VERIFIER (NEW) =====================
+def review_and_fix_steps(prompt: str, steps: List[str]) -> List[str]:
+    """
+    Second-pass verifier.
+    Reviews steps for correctness and completeness.
+    Fixes them if needed.
+    """
+
+    review_prompt = f"""
+You are a strict solution reviewer.
+
+Original problem:
+{prompt}
+
+Proposed solution steps:
+{json.dumps(steps, indent=2)}
+
+Your task:
+- Check whether these steps correctly and completely solve the problem.
+- If they are correct, respond with JSON:
+  {{ "status": "correct", "final_steps": [...] }}
+
+- If they are incorrect or incomplete, respond with JSON:
+  {{
+    "status": "fix",
+    "issues": [
+      {{
+        "step_index": <index>,
+        "problem": "<what is wrong or missing>",
+        "fix": "<exact corrected step>"
+      }}
+    ],
+    "additional_steps": ["<step to add>", ...]
+  }}
+
+Rules:
+- Be precise and minimal
+- Do NOT add explanations
+- Output ONLY valid JSON
+"""
+
+    out = run_inference_pipeline(review_prompt, auto_extend=False)
+
+    # Try to parse JSON from verifier output
+    try:
+        raw = out.get("raw_verifier") if isinstance(out, dict) else out
+        if isinstance(raw, str):
+            parsed = json.loads(raw)
+        elif isinstance(raw, dict):
+            parsed = raw
+        else:
+            return steps
+    except Exception:
+        return steps
+
+    if parsed.get("status") == "correct":
+        return clean(parsed.get("final_steps", steps), MAX_FINAL_STEPS)
+
+    if parsed.get("status") == "fix":
+        fixed_steps = steps[:]
+
+        for issue in parsed.get("issues", []):
+            idx = issue.get("step_index")
+            fix = issue.get("fix")
+            if isinstance(idx, int) and 0 <= idx < len(fixed_steps):
+                fixed_steps[idx] = fix
+
+        for s in parsed.get("additional_steps", []):
+            fixed_steps.append(s)
+
+        return clean(fixed_steps, MAX_FINAL_STEPS)
+
+    return steps
+
+
+# ===================== MAIN =====================
 def main(prompt: str):
-    """
-    Guarantees:
-    - small ToT
-    - <= 4 LLM calls
-    - no recursion
-    """
+    stdout_buffer = io.StringIO()
+    llm_calls_used = 0
 
-    tree = TreeOfThoughts()
+    with contextlib.redirect_stdout(stdout_buffer):
+        tree = TreeOfThoughts()
 
-    # ---- root ----
-    root = tree.add_node(
-        text=prompt,
-        parent_id=None,
-        role="root",
-        metadata={"ts": time.time()}
-    )
-    tree.set_root(root.id)
-
-    # ---- 1) Decompose ONCE ----
-    buf = io.StringIO()
-    with contextlib.redirect_stdout(buf):
-        subtasks = run_decomposer(prompt)
-
-    if not isinstance(subtasks, list):
-        subtasks = [subtasks]
-
-    subtasks = clean(subtasks)
-
-    # ---- add subtasks as children ----
-    subtask_nodes = []
-    for s in subtasks:
-        n = tree.add_node(
-            text=s,
-            parent_id=root.id,
-            role="subtask",
-            metadata={"source": "decomposer"}
+        root = tree.add_node(
+            text=prompt,
+            parent_id=None,
+            role="root",
+            metadata={"ts": time.time()}
         )
-        subtask_nodes.append(n)
+        tree.set_root(root.id)
 
-    # ---- 2) Expand only top-k subtasks ONCE ----
-    for n in subtask_nodes[:MAX_EXPANSIONS]:
-        out = run_inference_pipeline(n.text, auto_extend=False)
+        # ---- STRATEGY ----
+        strategies = propose_strategies(prompt)
+        llm_calls_used += 1
+        strategy = strategies[0] if strategies else "Solve the problem directly."
 
-        expansions = []
-        if isinstance(out, dict):
-            for key in ("thoughts", "suggestions", "steps", "outputs"):
-                if key in out:
-                    vals = out[key]
-                    if not isinstance(vals, list):
-                        vals = [vals]
-                    expansions.extend(vals)
+        strategy_node = tree.add_node(
+            text=strategy,
+            parent_id=root.id,
+            role="strategy"
+        )
 
-        expansions = clean(expansions)[:2]  # very small fan-out
+        # ---- SOLVER STEPS ----
+        solver_steps = generate_solver_steps(prompt, strategy)
+        llm_calls_used += 1
 
-        for e in expansions:
+        # ---- VERIFIER #1 (GATEKEEPER) ----
+        verified = run_inference_pipeline(
+            prompt + "\nSteps:\n" + "\n".join(solver_steps),
+            auto_extend=False
+        )
+        llm_calls_used += 1
+
+        if verified.get("status") != "accepted":
+            solver_steps = [
+                "Apply the chosen strategy step by step to transform the given expression.",
+                "Derive the result logically from the transformed expression."
+            ]
+
+        # ---- VERIFIER #2 (QUALITY REVIEW) ----
+        final_steps = review_and_fix_steps(prompt, solver_steps)
+        llm_calls_used += 1
+
+        # ---- TREE BUILD ----
+        for step in final_steps:
             tree.add_node(
-                text=e,
-                parent_id=n.id,
-                role="thought",
-                metadata={"source": "inference"}
+                text=step,
+                parent_id=strategy_node.id,
+                role="subtask"
             )
 
-    # ---- done ----
-    tree.save_json("tree_of_thoughts_example.json")
+        tree.save_json("tree_of_thoughts_example.json")
 
-    # ---- print for visibility ----
-    print("\n=== TREE (SIMPLE ToT) ===")
-    print(prompt)
-    for c in tree.nodes[root.id].children:
-        print(" └─", tree.nodes[c].text)
-        for gc in tree.nodes[c].children:
-            print("    └─", tree.nodes[gc].text)
-            
-    
-    
-    # -------------------- SAVE TREE (JSON) --------------------
-    JSON_PATH = "tree_of_thoughts_example.json"
-    tree.save_json(JSON_PATH)
-    print(f"[INFO] Tree saved to {JSON_PATH}")
-    
     return {
+        "final_answer": final_steps,
+        "strategy_used": strategy,
+        "llm_calls_used": llm_calls_used,
         "tree": tree,
-        "llm_calls_used": 1 + min(len(subtask_nodes), MAX_EXPANSIONS)
+        "logs": stdout_buffer.getvalue()
     }
