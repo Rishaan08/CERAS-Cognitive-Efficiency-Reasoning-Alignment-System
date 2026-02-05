@@ -164,13 +164,17 @@ Where:
 ```
 ceras/
 ├── data_loader.py                     
-├── data_loader_pisa.py                
+├── data_loader_pisa.py
+├── run_preprocess.py
+├── run_caloibrator.py             
 │
 ├── preprocess/
 │   ├── __init__.py
 │   ├── signal_fusion.py               
 │   ├── auditor.py                     
-│   ├── pisa_ce_builder.py             
+│   ├── pisa_ce_builder.py
+│   ├── cog_student.py
+│   ├── questionnaire_student.py             
 │
 ├── features/
 │   ├── featurize.py                  
@@ -183,8 +187,7 @@ ceras/
 │
 ├── postprocess/
 │   ├── __init__.py
-│   ├── calibrator.py                 
-│   ├── insights.py                    
+│   ├── calibrator.py                                    
 │   └── model_monitor.py               
 │
 ├── infra/
@@ -216,6 +219,7 @@ ceras/
 │   └── reports.py                     
 │
 └── tests/
+    ├── test_features.py
     ├── test_preprocess.py
     ├── test_postprocess.py
     └── test_synthetic_benchmarks.py
