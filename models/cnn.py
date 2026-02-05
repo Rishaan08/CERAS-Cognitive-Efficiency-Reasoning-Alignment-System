@@ -1,4 +1,4 @@
-# Imports
+#Imports
 import os
 import numpy as np
 import pandas as pd
@@ -82,7 +82,6 @@ if len(non_numeric_cols) > 0:
 
 #Cognitive Feature Refinement Pipeline (Four-Layer)
 #MI → RFE → LASSO → Boruta
-
 #Layer 1: Mutual Information
 mi = mutual_info_regression(X_full, y, random_state=42)
 mi_scores = pd.Series(mi, index=X_full.columns)
@@ -93,7 +92,7 @@ X_l1 = X_full[selected_l1]
 
 print("Layer 1 retained:", len(selected_l1))
 
-# Layer 2: Recursive Feature Elimination
+#Layer 2: Recursive Feature Elimination
 rfe = RFE(
     estimator=LGBMRegressor(
         n_estimators=200,
@@ -110,7 +109,7 @@ X_l2 = X_l1[selected_l2]
 
 print("Layer 2 retained:", len(selected_l2))
 
-# Layer 3: LASSO
+#Layer 3: LASSO
 scaler_lasso = StandardScaler()
 X_l2_scaled = scaler_lasso.fit_transform(X_l2)
 
@@ -128,7 +127,7 @@ X_l3 = X_l2[selected_l3]
 
 print("Layer 3 retained:", len(selected_l3))
 
-# Layer 4: Boruta (Optional)
+#Layer 4: Boruta (Optional)
 if X_l3.shape[1] > 10:
     boruta = BorutaPy(
         estimator=RandomForestRegressor(

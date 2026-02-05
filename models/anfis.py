@@ -21,6 +21,9 @@ os.makedirs(artifact_dir, exist_ok=True)
 id_col = "cntstuid"
 target = "ce_score"
 
+#Cognitive Feature Refinement Pipeline (Four-Layer)
+#MI → RFE → LASSO → Boruta
+
 #Phase A: PISA Only (Cognitive)
 print("\nLoading PISA student features")
 pisa_df = pd.read_parquet("./data/processed/pisa_student.parquet")
@@ -31,18 +34,18 @@ y_pisa = pisa_df[target]
 
 print("PISA feature count:", X_pisa.shape[1])
 
-# ---------------- Layer 1 — Mutual Information ----------------
+#Layer 1: Mutual Information
 mi = mutual_info_regression(X_pisa, y_pisa, random_state=42)
 mi_scores = pd.Series(mi, index=X_pisa.columns)
 
 selected_l1 = mi_scores[mi_scores >= np.percentile(mi_scores, 50)].index
 X_l1 = X_pisa[selected_l1]
 
-print("\n[PISA] Layer 1 — Mutual Information")
+print("\nLayer 1 — Mutual Information")
 print("Retained:", len(selected_l1))
 print(selected_l1.tolist())
 
-# ---------------- Layer 2 — RFE ----------------
+#Layer 2: Recursive Feature Elimination
 rfe = RFE(
     estimator=LGBMRegressor(
         n_estimators=200,
@@ -58,11 +61,11 @@ rfe.fit(X_l1, y_pisa)
 selected_l2 = X_l1.columns[rfe.support_]
 X_l2 = X_l1[selected_l2]
 
-print("\n[PISA] Layer 2 — RFE")
+print("\nLayer 2 — Recursive Feature Elimination")
 print("Retained:", len(selected_l2))
 print(selected_l2.tolist())
 
-# ---------------- Layer 3 — LASSO ----------------
+#Layer 3: LASSO
 scaler_lasso = StandardScaler()
 X_l2_scaled = scaler_lasso.fit_transform(X_l2)
 
@@ -79,11 +82,11 @@ lasso_coef = pd.Series(lasso.coef_, index=X_l2.columns)
 selected_l3 = lasso_coef[lasso_coef.abs() > 1e-4].index
 X_l3 = X_l2[selected_l3]
 
-print("\n[PISA] Layer 3 — LASSO")
+print("\nLayer 3 — LASSO")
 print("Retained:", len(selected_l3))
 print(selected_l3.tolist())
 
-# ---------------- Layer 4 — Boruta ----------------
+#Layer 4: Boruta
 boruta = BorutaPy(
     estimator=RandomForestRegressor(
         n_estimators=200,
@@ -100,10 +103,10 @@ boruta = BorutaPy(
 boruta.fit(X_l3.values, y_pisa.values)
 pisa_features = X_l3.columns[boruta.support_].tolist()
 
-print("\n[PISA] Layer 4 — Boruta")
+print("\nLayer 4 — Boruta")
 print("Final PISA features:", pisa_features)
 
-# ---------------- Impute + MinMax Scale ----------------
+#Impute + MinMax Scale
 pisa_refined = pisa_df[[id_col, target] + pisa_features].copy()
 
 imputer = IterativeImputer(
@@ -114,9 +117,7 @@ imputer = IterativeImputer(
 pisa_refined[pisa_features] = imputer.fit_transform(pisa_refined[pisa_features])
 pisa_refined[pisa_features] = MinMaxScaler(feature_range=(0, 1)).fit_transform(pisa_refined[pisa_features])
 
-# ============================================================
-# Phase 0B — QQQ ONLY
-# ============================================================
+#Phase B: QQQ Only
 print("\nLoading QQQ student features")
 qqq_df = pd.read_parquet("./data/processed/qqq_student_features.parquet")
 qqq_df.columns = qqq_df.columns.str.lower()
@@ -124,27 +125,27 @@ qqq_df.columns = qqq_df.columns.str.lower()
 X_qqq = qqq_df.drop(columns=[id_col])
 y_qqq = pisa_df.set_index(id_col).loc[qqq_df[id_col], target].values
 
-# ---------------- Layer 1 — Mutual Information ----------------
+#Layer 1: Mutual Information
 mi = mutual_info_regression(X_qqq, y_qqq, random_state=42)
 mi_scores = pd.Series(mi, index=X_qqq.columns)
 
 selected_l1 = mi_scores[mi_scores >= np.percentile(mi_scores, 65)].index
 X_l1 = X_qqq[selected_l1]
 
-print("\n[QQQ] Layer 1 — Mutual Information")
+print("\nLayer 1 — Mutual Information")
 print("Retained:", len(selected_l1))
 print(selected_l1.tolist())
 
-# ---------------- Layer 2 — RFE ----------------
+#Layer 2: Recursive Feature Elimination
 rfe.fit(X_l1, y_qqq)
 selected_l2 = X_l1.columns[rfe.support_]
 X_l2 = X_l1[selected_l2]
 
-print("\n[QQQ] Layer 2 — RFE")
+print("\nLayer 2 — Recursive Feature Elimination")
 print("Retained:", len(selected_l2))
 print(selected_l2.tolist())
 
-# ---------------- Layer 3 — LASSO ----------------
+#Layer 3: LASSO
 X_l2_scaled = scaler_lasso.fit_transform(X_l2)
 lasso.fit(X_l2_scaled, y_qqq)
 
@@ -152,25 +153,23 @@ lasso_coef = pd.Series(lasso.coef_, index=X_l2.columns)
 selected_l3 = lasso_coef[lasso_coef.abs() > 1e-4].index
 X_l3 = X_l2[selected_l3]
 
-print("\n[QQQ] Layer 3 — LASSO")
+print("\nLayer 3 — LASSO")
 print("Retained:", len(selected_l3))
 print(selected_l3.tolist())
 
-# ---------------- Layer 4 — Boruta ----------------
+#Layer 4: Boruta
 boruta.fit(X_l3.values, y_qqq)
 qqq_features = X_l3.columns[boruta.support_].tolist()
 
-print("\n[QQQ] Layer 4 — Boruta")
+print("\nLayer 4 — Boruta")
 print("Final QQQ features:", qqq_features)
 
-# ---------------- Impute + MinMax Scale ----------------
+#Impute + MinMax Scale
 qqq_refined = qqq_df[[id_col] + qqq_features].copy()
 qqq_refined[qqq_features] = imputer.fit_transform(qqq_refined[qqq_features])
 qqq_refined[qqq_features] = MinMaxScaler(feature_range=(0, 1)).fit_transform(qqq_refined[qqq_features])
 
-# ------------------------------------------------------------
-# Final ANFIS feature set (NO artificial limit)
-# ------------------------------------------------------------
+#Final ANFIS feature set
 print("Safe merge")
 df = pisa_refined.merge(qqq_refined, on=id_col, how="inner")
 
@@ -185,9 +184,7 @@ print("Final ANFIS features:")
 print(final_features)
 print("Total features:", len(final_features))
 
-# ------------------------------------------------------------
-# Train / Test split (ANFIS)
-# ------------------------------------------------------------
+#Train / Val/ Test split
 X = df[final_features].values
 y = df[target].values
 X_train_pool, X_test, y_train_pool, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
@@ -209,11 +206,11 @@ class SimpleANFIS:
         }
         self.consequents = None
 
-    #ANFIS Architecture: Layer 1 : Fuzzification and membership function
+    #ANFIS Architecture: Layer 1: Fuzzification and membership function
     def gaussian_mf(self, x, mean, sigma):
         return np.exp(-0.5 * ((x - mean) / sigma) ** 2)
 
-    #ANFIS Architecture: Layer 2-3 : Rule Firing Strength and Normalization
+    #ANFIS Architecture: Layer 2-3: Rule Firing Strength and Normalization
     def forward(self, X):
         firing = []
         for x in X:
@@ -231,7 +228,7 @@ class SimpleANFIS:
         firing = np.array(firing)
         return firing / (np.sum(firing, axis=1, keepdims=True) + 1e-8)
 
-    #ANFIS Architecture: Layer 4 : Consequent Layer
+    #ANFIS Architecture: Layer 4: Consequent Layer
     def fit(self, X, y):
         W = self.forward(X)
         X_aug = np.hstack([X, np.ones((X.shape[0], 1))])
@@ -241,7 +238,7 @@ class SimpleANFIS:
         ])
         self.consequents = np.linalg.pinv(Phi) @ y
 
-    #ANFIS Architecture: Layer 5 : Defuzzification
+    #ANFIS Architecture: Layer 5: Defuzzification
     def predict(self, X):
         W = self.forward(X)
         X_aug = np.hstack([X, np.ones((X.shape[0], 1))])
