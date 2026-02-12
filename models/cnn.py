@@ -80,7 +80,7 @@ if len(non_numeric_cols) > 0:
     print("Dropping non-numeric columns:", non_numeric_cols)
     X_full = X_full.drop(columns=non_numeric_cols)
 
-#Cognitive Feature Refinement Pipeline (Four-Layer)
+#Cognitive Feature Refinement Selection (Four-Layer Pipeline)
 #MI → RFE → LASSO → Boruta
 #Layer 1: Mutual Information
 mi = mutual_info_regression(X_full, y, random_state=42)
