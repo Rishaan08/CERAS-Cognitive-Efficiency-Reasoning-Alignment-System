@@ -1,92 +1,92 @@
 {
-  "tree_id": "6720b0d0-46e7-49ce-b750-88a8c59c90fd",
-  "root_id": "0518b158-861b-40e8-992b-5834c78c2692",
+  "tree_id": "babda210-7288-48f7-8e60-0f0310b91a1b",
+  "root_id": "bab5885b-5466-4587-ba95-913c288450e9",
   "nodes": {
-    "0518b158-861b-40e8-992b-5834c78c2692": {
-      "id": "0518b158-861b-40e8-992b-5834c78c2692",
+    "bab5885b-5466-4587-ba95-913c288450e9": {
+      "id": "bab5885b-5466-4587-ba95-913c288450e9",
       "parent_id": null,
-      "text": "can you help me learn about llms",
+      "text": "what is machine learning as I only know that there are some algorithms which we use to train our machine and it is subpart of ai",
       "role": "root",
       "scores": {},
       "metadata": {
-        "ts": 1769782390.9947264
+        "ts": 1770920625.5594418
       },
       "children": [
-        "6acb49e7-a383-40f4-9108-ef947504d931"
+        "cc257c47-7685-44c3-b56b-0075a00a25d3"
       ],
-      "created_at": 1769782390.9947264,
+      "created_at": 1770920625.559455,
       "embedding": null
     },
-    "6acb49e7-a383-40f4-9108-ef947504d931": {
-      "id": "6acb49e7-a383-40f4-9108-ef947504d931",
-      "parent_id": "0518b158-861b-40e8-992b-5834c78c2692",
+    "cc257c47-7685-44c3-b56b-0075a00a25d3": {
+      "id": "cc257c47-7685-44c3-b56b-0075a00a25d3",
+      "parent_id": "bab5885b-5466-4587-ba95-913c288450e9",
       "text": "Solve the problem directly.",
       "role": "strategy",
       "scores": {},
       "metadata": {},
       "children": [
-        "a96f5528-7d1b-4b2c-b596-cc867ca4a230",
-        "3e5a2b2e-58fd-4040-bae6-23270fc4b168",
-        "188dbfc8-6d01-40c0-b4d1-a49344a5677a",
-        "89437894-c875-45e8-ba39-a69aa9bcbef4",
-        "735de0b4-a201-46c9-8e82-040c7ef40c42"
+        "d7fe0a21-8c34-4618-8aeb-035475aaee04",
+        "7be32c4b-9563-42d4-8d3f-f62debc7bc5b",
+        "794e8e11-676d-46fd-966d-2513e9164161",
+        "25ff408d-4a15-48a9-a886-1d86e82cbf60",
+        "c06861e4-79e4-4cd8-9c86-fcdc8e44fcf4"
       ],
-      "created_at": 1769782406.1568918,
+      "created_at": 1770920629.994167,
       "embedding": null
     },
-    "a96f5528-7d1b-4b2c-b596-cc867ca4a230": {
-      "id": "a96f5528-7d1b-4b2c-b596-cc867ca4a230",
-      "parent_id": "6acb49e7-a383-40f4-9108-ef947504d931",
-      "text": "Understand what Large Language Models (LLMs) are and how they differ from traditional language models.",
+    "d7fe0a21-8c34-4618-8aeb-035475aaee04": {
+      "id": "d7fe0a21-8c34-4618-8aeb-035475aaee04",
+      "parent_id": "cc257c47-7685-44c3-b56b-0075a00a25d3",
+      "text": "Understand the core purpose of the topic",
       "role": "subtask",
       "scores": {},
       "metadata": {},
       "children": [],
-      "created_at": 1769782483.7218678,
+      "created_at": 1770920636.1331148,
       "embedding": null
     },
-    "3e5a2b2e-58fd-4040-bae6-23270fc4b168": {
-      "id": "3e5a2b2e-58fd-4040-bae6-23270fc4b168",
-      "parent_id": "6acb49e7-a383-40f4-9108-ef947504d931",
-      "text": "Learn about the key applications and challenges in Natural Language Processing (NLP) where LLMs are particularly useful.",
+    "7be32c4b-9563-42d4-8d3f-f62debc7bc5b": {
+      "id": "7be32c4b-9563-42d4-8d3f-f62debc7bc5b",
+      "parent_id": "cc257c47-7685-44c3-b56b-0075a00a25d3",
+      "text": "Understand machine learning as a statistical approach to enable machines to learn and improve from experience",
       "role": "subtask",
       "scores": {},
       "metadata": {},
       "children": [],
-      "created_at": 1769782483.7218678,
+      "created_at": 1770920636.133132,
       "embedding": null
     },
-    "188dbfc8-6d01-40c0-b4d1-a49344a5677a": {
-      "id": "188dbfc8-6d01-40c0-b4d1-a49344a5677a",
-      "parent_id": "6acb49e7-a383-40f4-9108-ef947504d931",
-      "text": "Study the importance of dataset curation and data augmentation in training effective LLMs.",
+    "794e8e11-676d-46fd-966d-2513e9164161": {
+      "id": "794e8e11-676d-46fd-966d-2513e9164161",
+      "parent_id": "cc257c47-7685-44c3-b56b-0075a00a25d3",
+      "text": "Study official documentation and examples",
       "role": "subtask",
       "scores": {},
       "metadata": {},
       "children": [],
-      "created_at": 1769782483.7218678,
+      "created_at": 1770920636.133141,
       "embedding": null
     },
-    "89437894-c875-45e8-ba39-a69aa9bcbef4": {
-      "id": "89437894-c875-45e8-ba39-a69aa9bcbef4",
-      "parent_id": "6acb49e7-a383-40f4-9108-ef947504d931",
-      "text": "Learn how the transformer architecture is applied to LLMs for input/output processing.",
+    "25ff408d-4a15-48a9-a886-1d86e82cbf60": {
+      "id": "25ff408d-4a15-48a9-a886-1d86e82cbf60",
+      "parent_id": "cc257c47-7685-44c3-b56b-0075a00a25d3",
+      "text": "Explore advanced or related tools",
       "role": "subtask",
       "scores": {},
       "metadata": {},
       "children": [],
-      "created_at": 1769782483.7218678,
+      "created_at": 1770920636.133149,
       "embedding": null
     },
-    "735de0b4-a201-46c9-8e82-040c7ef40c42": {
-      "id": "735de0b4-a201-46c9-8e82-040c7ef40c42",
-      "parent_id": "6acb49e7-a383-40f4-9108-ef947504d931",
-      "text": "Implement a simple text classification model using a pre-trained LLM like BERT.",
+    "c06861e4-79e4-4cd8-9c86-fcdc8e44fcf4": {
+      "id": "c06861e4-79e4-4cd8-9c86-fcdc8e44fcf4",
+      "parent_id": "cc257c47-7685-44c3-b56b-0075a00a25d3",
+      "text": "Build a small practical example",
       "role": "subtask",
       "scores": {},
       "metadata": {},
       "children": [],
-      "created_at": 1769782483.7218678,
+      "created_at": 1770920636.133157,
       "embedding": null
     }
   }

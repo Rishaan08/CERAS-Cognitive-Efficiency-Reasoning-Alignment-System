@@ -37,7 +37,7 @@ def test_calibrator_fit_evaluate_and_save_load():
 
 # Fusion Insight Test
 def test_fusion_produces_diagnostics_and_confidence():
-    from inference.fusion import CERASFusion
+    from ceras.fusion import CERASFusion
 
     fusion = CERASFusion()
 
