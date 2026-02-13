@@ -1,75 +1,80 @@
 {
-  "tree_id": "bca93fdf-efcb-4655-8384-aeb4dc82fbfd",
-  "root_id": "579086dd-5701-41d0-9ba9-18e385f2aa7c",
+  "tree_id": "64c57e19-5575-41df-9da9-e26eb681acb7",
+  "root_id": "67206060-0512-4d82-aefa-896fdb7099f8",
   "nodes": {
-    "579086dd-5701-41d0-9ba9-18e385f2aa7c": {
-      "id": "579086dd-5701-41d0-9ba9-18e385f2aa7c",
+    "67206060-0512-4d82-aefa-896fdb7099f8": {
+      "id": "67206060-0512-4d82-aefa-896fdb7099f8",
       "parent_id": null,
-      "text": "what are trignometric identities and how can we solve (51^2 - 49^2) efficiently using them?",
+      "text": "how can i solve the question 51^2 - 49^2 using algebric identities",
       "role": "root",
       "scores": {},
       "metadata": {
-        "ts": 1767693034.5779865
+        "ts": 1771011974.9091623
       },
       "children": [
-        "23a36e53-5bda-4994-b9d5-7e595cd479d5",
-        "9b08d343-0114-4e35-af5a-7893427b3634",
-        "1de20684-48ee-40cc-84a7-ca9200b08c7d",
-        "2e936b92-524a-4ec3-b4a0-fb3b3ecd8dd3"
+        "643a71f7-60a1-4449-9704-d42ec82dc539"
       ],
-      "created_at": 1767693034.5779865,
+      "created_at": 1771011974.9091623,
       "embedding": null
     },
-    "23a36e53-5bda-4994-b9d5-7e595cd479d5": {
-      "id": "23a36e53-5bda-4994-b9d5-7e595cd479d5",
-      "parent_id": "579086dd-5701-41d0-9ba9-18e385f2aa7c",
-      "text": "Define what trigonometric identities are.",
-      "role": "subtask",
+    "643a71f7-60a1-4449-9704-d42ec82dc539": {
+      "id": "643a71f7-60a1-4449-9704-d42ec82dc539",
+      "parent_id": "67206060-0512-4d82-aefa-896fdb7099f8",
+      "text": "Solve the problem directly.",
+      "role": "strategy",
       "scores": {},
-      "metadata": {
-        "source": "decomposer"
-      },
-      "children": [],
-      "created_at": 1767693046.8181381,
+      "metadata": {},
+      "children": [
+        "bb18f81d-6d87-41aa-ad76-4f54bb5a65be",
+        "34c9bec9-80e2-469c-9a57-5c5b92d78712",
+        "caf32e13-f82d-4e85-a7da-f761a8a08d8a",
+        "f9b6ddf2-cff8-485a-b59e-825567b6c294"
+      ],
+      "created_at": 1771011976.2549875,
       "embedding": null
     },
-    "9b08d343-0114-4e35-af5a-7893427b3634": {
-      "id": "9b08d343-0114-4e35-af5a-7893427b3634",
-      "parent_id": "579086dd-5701-41d0-9ba9-18e385f2aa7c",
-      "text": "Explain the concept of difference of squares formula in trigonometry.",
+    "bb18f81d-6d87-41aa-ad76-4f54bb5a65be": {
+      "id": "bb18f81d-6d87-41aa-ad76-4f54bb5a65be",
+      "parent_id": "643a71f7-60a1-4449-9704-d42ec82dc539",
+      "text": "Recall the algebraic identity for the difference of two squares: a^2 - b^2 = (a-b)(a+b)",
       "role": "subtask",
       "scores": {},
-      "metadata": {
-        "source": "decomposer"
-      },
+      "metadata": {},
       "children": [],
-      "created_at": 1767693046.8181381,
+      "created_at": 1771011979.5669765,
       "embedding": null
     },
-    "1de20684-48ee-40cc-84a7-ca9200b08c7d": {
-      "id": "1de20684-48ee-40cc-84a7-ca9200b08c7d",
-      "parent_id": "579086dd-5701-41d0-9ba9-18e385f2aa7c",
-      "text": "Derive or list the relevant trigonometric identity for solving a difference of squares expression like (a^2 - b^2).",
+    "34c9bec9-80e2-469c-9a57-5c5b92d78712": {
+      "id": "34c9bec9-80e2-469c-9a57-5c5b92d78712",
+      "parent_id": "643a71f7-60a1-4449-9704-d42ec82dc539",
+      "text": "Identify the values for 'a' and 'b' from the given expression (a=51, b=49)",
       "role": "subtask",
       "scores": {},
-      "metadata": {
-        "source": "decomposer"
-      },
+      "metadata": {},
       "children": [],
-      "created_at": 1767693046.8181381,
+      "created_at": 1771011979.5669765,
       "embedding": null
     },
-    "2e936b92-524a-4ec3-b4a0-fb3b3ecd8dd3": {
-      "id": "2e936b92-524a-4ec3-b4a0-fb3b3ecd8dd3",
-      "parent_id": "579086dd-5701-41d0-9ba9-18e385f2aa7c",
-      "text": "Apply this identity to solve (51^2 - 49^2) efficiently.",
+    "caf32e13-f82d-4e85-a7da-f761a8a08d8a": {
+      "id": "caf32e13-f82d-4e85-a7da-f761a8a08d8a",
+      "parent_id": "643a71f7-60a1-4449-9704-d42ec82dc539",
+      "text": "Set up the substitution: replace a with 51 and b with 49 in the identity",
       "role": "subtask",
       "scores": {},
-      "metadata": {
-        "source": "decomposer"
-      },
+      "metadata": {},
       "children": [],
-      "created_at": 1767693046.8181381,
+      "created_at": 1771011979.5669765,
+      "embedding": null
+    },
+    "f9b6ddf2-cff8-485a-b59e-825567b6c294": {
+      "id": "f9b6ddf2-cff8-485a-b59e-825567b6c294",
+      "parent_id": "643a71f7-60a1-4449-9704-d42ec82dc539",
+      "text": "Multiply the calculated difference and sum to find the final result",
+      "role": "subtask",
+      "scores": {},
+      "metadata": {},
+      "children": [],
+      "created_at": 1771011979.5669765,
       "embedding": null
     }
   }

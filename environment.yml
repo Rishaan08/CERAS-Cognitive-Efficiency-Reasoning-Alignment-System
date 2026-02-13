@@ -50,3 +50,5 @@ dependencies:
       - pytest
       # uvloop is Unix-only; skip on Windows:
       - "uvloop; sys_platform != 'win32'"
+      - langchain-groq
+      - python-dotenv

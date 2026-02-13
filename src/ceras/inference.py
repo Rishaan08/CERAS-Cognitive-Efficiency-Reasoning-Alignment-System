@@ -4,10 +4,14 @@ import uuid
 from typing import Any, Dict, List, Union
 from llm_utils import run_decomposer
 
-from langchain.llms import Ollama
+from langchain_groq import ChatGroq
+from dotenv import load_dotenv
+import os
 
-VERIFICATION_MODEL = 'mistral'
-llm_verify = Ollama(model=VERIFICATION_MODEL)  
+load_dotenv()
+
+VERIFICATION_MODEL = 'llama-3.1-8b-instant'
+llm_verify = ChatGroq(model=VERIFICATION_MODEL, api_key=os.environ.get("GROQ_API_KEY"))  
 
 
 def _make_subtask_dict(id_: str = None, inp: str = "", out: str = "") -> Dict[str, str]:
@@ -99,7 +103,8 @@ def build_quick_verifier_prompt(original_prompt: str, subtasks: List[Dict[str, A
 def fast_verify_subtasks(original_prompt: str, raw_subtasks: Union[List[Any], Any], domain_hint: str = "") -> Dict[str, Any]:
     subtasks = normalize_subtasks(raw_subtasks)
     prompt = build_quick_verifier_prompt(original_prompt, subtasks, domain_hint)
-    raw = llm_verify(prompt)
+    raw_msg = llm_verify.invoke(prompt)
+    raw = raw_msg.content if hasattr(raw_msg, "content") else str(raw_msg)
     try:
         parsed = extract_json_from_text(raw)
     except Exception:

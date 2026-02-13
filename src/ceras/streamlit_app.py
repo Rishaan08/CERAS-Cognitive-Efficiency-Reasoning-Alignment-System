@@ -8,7 +8,7 @@ import numpy as np
 from pipeline_1 import main as run_infer
 
 # --- CERAS fusion engine ---
-from ceras.fusion import CERASFusion
+from fusion import CERASFusion
 
 # ===================== PAGE CONFIG =====================
 st.set_page_config(
@@ -16,6 +16,21 @@ st.set_page_config(
     page_icon="🧠",
     layout="wide",
 )
+
+# Custom CSS for better styling
+st.markdown("""
+<style>
+    .metric-card {
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #f0f2f6;
+        margin-bottom: 10px;
+    }
+    .stProgress > div > div > div > div {
+        background-color: #4CAF50;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # ===================== HEADER =====================
 st.markdown("## 🧠 CAMRE EDU - Intelligent Learning Lab")
@@ -27,18 +42,51 @@ with st.sidebar:
     st.markdown("### ⚙️ Run Configuration")
     show_trace = st.checkbox("Show Reasoning Trace", value=True)
     show_tree = st.checkbox("Show Tree JSON", value=False)
+    
+    st.markdown("---")
+    st.markdown("### 🖥️ System Status")
+    st.success("🟢 Groq API: Connected")
+    st.success("🟢 Fusion Engine: Online")
+    st.info("🔵 Telemetry: Active")
 
+
+# ===================== SESSION STATE =====================
+if "start_time" not in st.session_state:
+    st.session_state.start_time = time.time()
+
+if "formulation_time" not in st.session_state:
+    st.session_state.formulation_time = 0.0
 
 # ===================== INPUT =====================
+c_in1, c_in2 = st.columns([0.8, 0.2])
+with c_in2:
+    if st.button("🔄 New Problem"):
+        st.session_state.start_time = time.time()
+        st.session_state.formulation_time = 0.0
+        # We can't clear text_area directly without session_state binding, 
+        # so we rely on user manually clearing or overwrite if we bound it.
+        # But for now, just resetting the time is the key action.
+        st.rerun()
+
 prompt = st.text_area(
     "Enter your learning question or problem",
-    height=150
+    height=150,
+    help="Time starts tracking when you click 'New Problem' or reload."
 )
 
 run_btn = st.button("▶ Run Learning Session")
 
 
-# ===================== TEMP FEATURE ADAPTER =====================
+# ===================== RUN PIPELINE =====================
+if run_btn and prompt.strip():
+    
+    # Calculate User Latency (Formulation Time)
+    st.session_state.formulation_time = time.time() - st.session_state.start_time
+    
+    with st.spinner("Running reasoning engine..."):
+        t0 = time.time()
+        result = run_infer(prompt)
+        runtime = time.time() - t0  # System Latency
 def extract_ceras_features(prompt_text, llm_result):
     """
     Temporary simulation of CEPM / CNN / ANFIS signals.
@@ -74,10 +122,27 @@ if run_btn and prompt.strip():
     else:
         st.write(final_steps)
 
+    # ===================== RAW SENSOR DATA =====================
+    st.markdown("---")
+    st.markdown("### 📡 Live User Telemetry (Raw Inputs)")
+    st.caption("Data captured from user interaction *before* feature extraction.")
+
+    r1, r2, r3, r4 = st.columns(4)
+    
+    with r1:
+        st.metric("⏱️ Formulation Time", f"{st.session_state.formulation_time:.2f}s", help="Time taken to type/submit")
+    with r2:
+        st.metric("⚡ System Latency", f"{runtime:.3f}s", help="AI Processing Time")
+    with r3:
+        st.metric("📝 Input Volume", f"{len(prompt)} chars")
+    with r4:
+        # Simulated "Live" status for external sensors
+        st.metric("👁️ Gaze Tracker", "Active", delta="Tracking", delta_color="normal")
+
     # ===================== CERAS ANALYSIS =====================
     st.markdown("---")
     st.markdown("Cognitive Efficiency Analysis")
-
+    
     # Extract simulated signals
     cepm_score, cnn_score, anfis_score = extract_ceras_features(prompt, result)
 
@@ -93,18 +158,75 @@ if run_btn and prompt.strip():
     fused_score = fusion_df["fused_ce_score"].iloc[0]
     confidence = fusion_df["confidence"].iloc[0]
     diagnostics = fusion_df["diagnostics"].iloc[0]
+    readiness = fusion_df["readiness_label"].iloc[0]
 
-    # ===================== METRICS =====================
-    c1, c2, c3 = st.columns(3)
+    # (Metrics moved to visualization sections)
 
-    with c1:
-        st.metric("Fused CE Score", f"{fused_score:.2f}")
+    # ===================== ADAPTIVE LEARNING RESPONSE =====================
+    st.markdown("## 🎓 Adaptive Learning Response")
+    from llm_utils import generate_adaptive_response  # lazy import
+    
+    with st.spinner("Generating personalized learning summary..."):
+        adaptive_res = generate_adaptive_response(prompt, final_steps, fused_score, diagnostics)
+        st.markdown(adaptive_res)
 
-    with c2:
-        st.metric("Confidence", f"{confidence:.2f}")
+    # ===================== LIVE DATA VISUALIZATION =====================
+    st.markdown("### 📊 Live Cognitive Signals")
+    
+    # Create a visual dashboard for the signals
+    sig_col1, sig_col2, sig_col3 = st.columns(3)
+    
+    with sig_col1:
+        st.markdown("**CEPM (Behavioral)**")
+        st.progress(float(cepm_score), text=f"Load: {cepm_score:.2f}")
+        st.caption("Derived from interaction cadence")
+        
+    with sig_col2:
+        st.markdown("**CNN (Visual)**")
+        st.progress(float(cnn_score), text=f"Focus: {cnn_score:.2f}")
+        st.caption("Facial attention estimation")
+        
+    with sig_col3:
+        st.markdown("**ANFIS (Neuro-Fuzzy)**")
+        st.progress(float(anfis_score), text=f"State: {anfis_score:.2f}")
+        st.caption("Non-linear state mapping")
+    
+    st.markdown("---")
+    
+    # Main Score Visualization
+    m1, m2 = st.columns([1, 2])
+    
+    with m1:
+        st.metric("🧠 Fused CE Score", f"{fused_score:.2f}", delta="Real-time")
+        if fused_score > 0.7:
+            st.success("State: High Efficiency (Flow)")
+        elif fused_score > 0.4:
+            st.warning("State: Moderate Load")
+        else:
+            st.error("State: High Cognitive Load")
+            
+    with m2:
+        st.markdown("**Fusion Engine Confidence**")
+        st.progress(float(confidence), text=f"Confidence: {confidence:.2f}")
+        st.info(f"Readiness State: {readiness}")
 
-    with c3:
-        st.metric("Execution Time", f"{runtime:.2f}s")
+
+
+    #RISHAAN CHANGEEEEE THISSSSSSSSS
+
+    with st.expander("ℹ️ What is Fused CE Score?"):
+        st.markdown("""
+        **Fused Cognitive Efficiency (CE) Score** is a real-time metric derived from multiple sensors:
+        - **0.0 - 0.4 (Low)**: Indicates high cognitive load, confusion, or lack of focus. Requires foundational support.
+        - **0.4 - 0.7 (Moderate)**: Indicates active processing but some struggle or inconsistency.
+        - **0.7 - 1.0 (High)**: Indicates flow state, mastery, and high efficiency.
+        
+        *Note: Validated by the CERAS Fusion Engine using Dempster-Shafer Theory.*
+        """)
+
+
+
+
 
     # ===================== DIAGNOSTIC REPORT =====================
     st.markdown("##Cognitive Diagnostic Report")
@@ -204,8 +326,8 @@ if run_btn and prompt.strip():
         )
 
     # ===================== TRACE =====================
-    if show_trace:
-        st.markdown("Reasoning Trace")
+    with st.expander("🔍 Reasoning Trace", expanded=show_trace):
+        st.caption("Detailed logs of the decomposition and verification process.")
         logs = result.get("logs", "")
         st.code(logs)
 

@@ -7,11 +7,15 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics.pairwise import cosine_similarity
-from langchain.llms import Ollama
+from langchain_groq import ChatGroq
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Choose a sentence-transformers model available locally or will auto-download.
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"  # fast and effective; change if you prefer
-OLLAMA_MODEL = 'llama3.2'
+OLLAMA_MODEL = 'llama-3.1-8b-instant'
 
 print("Loading embedding model:", EMBEDDING_MODEL_NAME)
 embed_model = SentenceTransformer(EMBEDDING_MODEL_NAME)
@@ -106,8 +110,9 @@ Chain-of-thought steps:
 
 Produce the JSON now.
 """
-    llm = Ollama(model=OLLAMA_MODEL)
-    raw = llm(verifier_prompt)
+    llm = ChatGroq(model=OLLAMA_MODEL, api_key=os.environ.get("GROQ_API_KEY"))
+    response = llm.invoke(verifier_prompt)
+    raw = response.content
     # Try to extract JSON substring (some LLMs may wrap). We'll attempt to find the first '{' and last '}'.
     try:
         start = raw.index("{")
