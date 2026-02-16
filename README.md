@@ -17,8 +17,7 @@ conda activate ceras
 
 It unifies:
 - **Neuro-Fuzzy Systems (ANFIS)** for interpretable rule-based reasoning,  
-- **Neural Networks (ANN)** for adaptive pattern discovery,  
-- **Genetic Algorithms (GA)** for optimal parameter and rule search,  
+- **Neural Networks (CNN)** for adaptive pattern discovery,  
 - **Large Language Models (LLMs)** via **LangChain + Ollama** for reasoning decomposition and verification.
 
 The system evaluates **how efficiently** a learner processes information and **how closely** their reasoning aligns with domain experts — producing an interpretable, multi-dimensional *Learning Readiness Score (LRS)*.
