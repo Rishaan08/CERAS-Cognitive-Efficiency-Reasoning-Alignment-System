@@ -1,80 +1,92 @@
 {
-  "tree_id": "64c57e19-5575-41df-9da9-e26eb681acb7",
-  "root_id": "67206060-0512-4d82-aefa-896fdb7099f8",
+  "tree_id": "cb892191-cf51-4249-9441-4b073ae067bf",
+  "root_id": "5995d222-629a-4779-ac94-f20942e07577",
   "nodes": {
-    "67206060-0512-4d82-aefa-896fdb7099f8": {
-      "id": "67206060-0512-4d82-aefa-896fdb7099f8",
+    "5995d222-629a-4779-ac94-f20942e07577": {
+      "id": "5995d222-629a-4779-ac94-f20942e07577",
       "parent_id": null,
-      "text": "how can i solve the question 51^2 - 49^2 using algebric identities",
+      "text": "hi",
       "role": "root",
       "scores": {},
       "metadata": {
-        "ts": 1771011974.9091623
+        "ts": 1771247660.594242
       },
       "children": [
-        "643a71f7-60a1-4449-9704-d42ec82dc539"
+        "1cb14593-38a3-4f3f-8804-d6096bc7f6af"
       ],
-      "created_at": 1771011974.9091623,
+      "created_at": 1771247660.5942998,
       "embedding": null
     },
-    "643a71f7-60a1-4449-9704-d42ec82dc539": {
-      "id": "643a71f7-60a1-4449-9704-d42ec82dc539",
-      "parent_id": "67206060-0512-4d82-aefa-896fdb7099f8",
+    "1cb14593-38a3-4f3f-8804-d6096bc7f6af": {
+      "id": "1cb14593-38a3-4f3f-8804-d6096bc7f6af",
+      "parent_id": "5995d222-629a-4779-ac94-f20942e07577",
       "text": "Solve the problem directly.",
       "role": "strategy",
       "scores": {},
       "metadata": {},
       "children": [
-        "bb18f81d-6d87-41aa-ad76-4f54bb5a65be",
-        "34c9bec9-80e2-469c-9a57-5c5b92d78712",
-        "caf32e13-f82d-4e85-a7da-f761a8a08d8a",
-        "f9b6ddf2-cff8-485a-b59e-825567b6c294"
+        "ab062859-eff2-4027-a55c-61b81b42a21b",
+        "935ec4b6-034d-4a29-a4cc-b5ffc6c8bd3b",
+        "677f0bd3-54c5-41b2-80f2-19625e79e0e3",
+        "e284a9db-0071-4538-bb92-73661b7d465a",
+        "3bba94d8-819c-4e50-9545-45a9563fdcc8"
       ],
-      "created_at": 1771011976.2549875,
+      "created_at": 1771247662.54758,
       "embedding": null
     },
-    "bb18f81d-6d87-41aa-ad76-4f54bb5a65be": {
-      "id": "bb18f81d-6d87-41aa-ad76-4f54bb5a65be",
-      "parent_id": "643a71f7-60a1-4449-9704-d42ec82dc539",
-      "text": "Recall the algebraic identity for the difference of two squares: a^2 - b^2 = (a-b)(a+b)",
+    "ab062859-eff2-4027-a55c-61b81b42a21b": {
+      "id": "ab062859-eff2-4027-a55c-61b81b42a21b",
+      "parent_id": "1cb14593-38a3-4f3f-8804-d6096bc7f6af",
+      "text": "1. Define the problem to be solved",
       "role": "subtask",
       "scores": {},
       "metadata": {},
       "children": [],
-      "created_at": 1771011979.5669765,
+      "created_at": 1771247665.674688,
       "embedding": null
     },
-    "34c9bec9-80e2-469c-9a57-5c5b92d78712": {
-      "id": "34c9bec9-80e2-469c-9a57-5c5b92d78712",
-      "parent_id": "643a71f7-60a1-4449-9704-d42ec82dc539",
-      "text": "Identify the values for 'a' and 'b' from the given expression (a=51, b=49)",
+    "935ec4b6-034d-4a29-a4cc-b5ffc6c8bd3b": {
+      "id": "935ec4b6-034d-4a29-a4cc-b5ffc6c8bd3b",
+      "parent_id": "1cb14593-38a3-4f3f-8804-d6096bc7f6af",
+      "text": "2. Determine the given information",
       "role": "subtask",
       "scores": {},
       "metadata": {},
       "children": [],
-      "created_at": 1771011979.5669765,
+      "created_at": 1771247665.6747038,
       "embedding": null
     },
-    "caf32e13-f82d-4e85-a7da-f761a8a08d8a": {
-      "id": "caf32e13-f82d-4e85-a7da-f761a8a08d8a",
-      "parent_id": "643a71f7-60a1-4449-9704-d42ec82dc539",
-      "text": "Set up the substitution: replace a with 51 and b with 49 in the identity",
+    "677f0bd3-54c5-41b2-80f2-19625e79e0e3": {
+      "id": "677f0bd3-54c5-41b2-80f2-19625e79e0e3",
+      "parent_id": "1cb14593-38a3-4f3f-8804-d6096bc7f6af",
+      "text": "3. Identify the unknown quantities",
       "role": "subtask",
       "scores": {},
       "metadata": {},
       "children": [],
-      "created_at": 1771011979.5669765,
+      "created_at": 1771247665.6747148,
       "embedding": null
     },
-    "f9b6ddf2-cff8-485a-b59e-825567b6c294": {
-      "id": "f9b6ddf2-cff8-485a-b59e-825567b6c294",
-      "parent_id": "643a71f7-60a1-4449-9704-d42ec82dc539",
-      "text": "Multiply the calculated difference and sum to find the final result",
+    "e284a9db-0071-4538-bb92-73661b7d465a": {
+      "id": "e284a9db-0071-4538-bb92-73661b7d465a",
+      "parent_id": "1cb14593-38a3-4f3f-8804-d6096bc7f6af",
+      "text": "4. Outline the overall objective",
       "role": "subtask",
       "scores": {},
       "metadata": {},
       "children": [],
-      "created_at": 1771011979.5669765,
+      "created_at": 1771247665.674725,
+      "embedding": null
+    },
+    "3bba94d8-819c-4e50-9545-45a9563fdcc8": {
+      "id": "3bba94d8-819c-4e50-9545-45a9563fdcc8",
+      "parent_id": "1cb14593-38a3-4f3f-8804-d6096bc7f6af",
+      "text": "5. Break down the problem into manageable parts",
+      "role": "subtask",
+      "scores": {},
+      "metadata": {},
+      "children": [],
+      "created_at": 1771247665.674735,
       "embedding": null
     }
   }
