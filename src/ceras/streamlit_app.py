@@ -29,12 +29,52 @@ st.markdown("""
     .stProgress > div > div > div > div {
         background-color: #4CAF50;
     }
+    .prompt-box {
+        background-color: #1e293b;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        margin-bottom: 10px;
+        height: 200px;
+        overflow-y: auto;
+        font-size: 14px;
+        color: #e2e8f0;
+        text-align: justify;
+    }
+    .prompt-box-bad {
+        background-color: #2a1515;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #451a1a;
+        margin-bottom: 10px;
+        font-size: 14px;
+        color: #fca5a5;
+        text-align: justify;
+    }
+    /* Justify text for better readability */
+    p, li {
+        text-align: justify;
+    }
+    /* Sidebar specific refinements */
+    .sidebar-box {
+        background-color: #0f172a;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #334155;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
 </style>
 """, unsafe_allow_html=True)
 
 #Header
-st.markdown("## 📖 CAMRE EDU - Intelligent Learning Lab")
-st.caption("LLM Reasoning + Cognitive Efficiency + Behavioral Diagnostics")
+st.markdown("## 🧠 CERAS - Cognitive Efficiency & Reasoning Alignment System")
+st.markdown("""
+**CERAS** is an advanced adaptive learning environment designed to optimize how you learn and solve complex problems. 
+By fusing **Large Language Model (LLM)** reasoning capabilities with real-time **Cognitive Efficiency** metrics, current behavioral diagnostics, and 
+neuro-fuzzy alignment, CERAS provides a personalized learning experience. It analyzes your input complexity, structure, and intent to guide you 
+through deep concepts with tailored roadmaps, ensuring you don't just get answers, but truly master the material.
+""")
 
 
 #Sidebar
@@ -42,59 +82,55 @@ with st.sidebar:
 
     st.markdown(
         """
-        <div style="text-align:center;">
-            <h2 style="margin-bottom:0;">📖 CAMRE EDU</h2>
-            <p style="color:gray; font-size:13px; margin-top:4px;">
-                Intelligent Learning Lab
+        <div style="text-align:center; padding-bottom: 20px;">
+            <h1 style="margin-bottom:0; font-size: 2.5rem;">🧠</h1>
+            <h2 style="margin-top:0;">CERAS</h2>
+            <p style="color:#94a3b8; font-size:14px; margin-top:5px;">
+                Cognitive Efficiency & Reasoning Alignment System
             </p>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.markdown("---")
-
-    st.markdown("### System Core")
+    st.markdown("### ⚙️ System Status")
 
     st.markdown(
         """
-        <div style="
-            background-color:#0f172a;
-            padding:14px;
-            border-radius:12px;
-            border:1px solid #1e293b;
-        ">
-            <p style="margin:6px 0;">🟢 <b>Groq API</b> — Connected</p>
-            <p style="margin:6px 0;">🟢 <b>Fusion Engine</b> — Active</p>
-            <p style="margin:6px 0;">🔵 <b>Telemetry</b> — Tracking Signals</p>
+        <div class="sidebar-box">
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span>🔌 <b>Groq API</b></span>
+                <span style="color:#4ade80;">● Connected</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span>⚡ <b>Fusion Engine</b></span>
+                <span style="color:#4ade80;">● Active</span>
+            </div>
+             <div style="display:flex; justify-content:space-between;">
+                <span>📡 <b>Telemetry</b></span>
+                <span style="color:#60a5fa;">● Tracking</span>
+            </div>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.markdown("---")
-
-    st.markdown("### Architecture")
+    st.markdown("### 🏗️ Architecture")
 
     st.markdown(
         """
-        <div style="
-            background-color:#0b1220;
-            padding:14px;
-            border-radius:12px;
-            border:1px solid #1e293b;
-        ">
-            <p style="margin:6px 0;"> 🧩 LLM — Reasoning Engine (Tree-of-Thoughts)</p>
-            <p style="margin:6px 0;"> 🧠 CEPM — Cognitive Modeling</p>
-            <p style="margin:6px 0;"> 📈 CNN — Behavioral Signals</p>
-            <p style="margin:6px 0;"> 🔎 ANFIS — Reasoning Alignment</p>
-            <p style="margin:6px 0;"> 🔗 Fusion — Multi-Signal Integration</p>
+        <div class="sidebar-box" style="font-size: 13px;">
+            <p style="margin:8px 0;"> 🧩 <b>ToT-LLM</b><br><span style="color:#94a3b8;">Tree-of-Thoughts Reasoning Engine</span></p>
+            <p style="margin:8px 0;"> 🧠 <b>CEPM</b><br><span style="color:#94a3b8;">Cognitive Engagement Modeling</span></p>
+            <p style="margin:8px 0;"> 👁️ <b>CNN-Vis</b><br><span style="color:#94a3b8;">Behavioral Signal Analysis</span></p>
+            <p style="margin:8px 0;"> ⚖️ <b>ANFIS</b><br><span style="color:#94a3b8;">Neuro-Fuzzy Logic Alignment</span></p>
+            <p style="margin:8px 0;"> 🔗 <b>Fusion Layer</b><br><span style="color:#94a3b8;">Multi-Modal Signal Integration</span></p>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.caption("Version 1.0 • Neural Learning Stack")
+    st.caption("v1.2.0 • Neural Learning Stack")
 
 
 #Session State
@@ -104,28 +140,121 @@ if "start_time" not in st.session_state:
 if "formulation_time" not in st.session_state:
     st.session_state.formulation_time = 0.0
 
+if "auto_run" not in st.session_state:
+    st.session_state.auto_run = False
+
+if "user_prompt" not in st.session_state:
+    st.session_state.user_prompt = ""
+
+def set_prompt(text):
+    st.session_state.user_prompt = text
+    # Disable auto-run, user wants to manually click run
+    st.session_state.auto_run = False
+
+
+# ===================== GOOD EXAMPLES =====================
+st.markdown("### 🌟 GOOD EXAMPLES TO PROMPT (High CE Score)")
+st.caption("These prompts are detailed and structured, leading to higher cognitive efficiency scores.")
+
+gp1 = "Explain the concept of quantum entanglement in detail, using a comprehensive analogy of two magic dice that are separated by a vast distance but still show the same numbers when rolled. Discuss the implications for information transfer and how this phenomenon challenges classical physics intuitions about locality and realism. Also touch upon the concept of 'spooky action at a distance' as described by Einstein."
+gp2 = "Describe the biological process of photosynthesis in plants, detailing the light-dependent reactions and the Calvin cycle. Explain how chlorophyll captures light energy to convert carbon dioxide and water into glucose and oxygen, and discuss the importance of this process for life on Earth and the global carbon cycle. Mention the role of ATP and NADPH as energy carriers during this transformation."
+gp3 = "Analyze the profound historical impact of the Gutenberg printing press on European society during the Renaissance. Discuss how it facilitated the spread of literacy, the standardization of languages, the dissemination of scientific knowledge, and the religious shifts associated with the Reformation, ultimately reshaping the cultural and intellectual landscape. Consider the long-term effects on democratization of information."
+gp4 = "Compare and contrast supervised and unsupervised machine learning paradigms. Explain the key differences in their training data requirements, with supervised learning using labeled datasets and unsupervised learning finding patterns in unlabeled data. Provide specific examples of algorithms and real-world applications for each approach, such as classification versus clustering. Discuss the trade-offs in terms of data preparation and model interpretability."
+
+# Layout: 2 Columns x 2 Rows for better readability
+c1, c2 = st.columns(2)
+
+with c1:
+    st.markdown(f'<div class="prompt-box">{gp1}</div>', unsafe_allow_html=True)
+    if st.button("� Use: Quantum Physics", key="btn_gp1"):
+        set_prompt(gp1)
+        st.rerun()
+
+    st.markdown(f'<div class="prompt-box">{gp3}</div>', unsafe_allow_html=True)
+    if st.button("� Use: Printing Press", key="btn_gp3"):
+        set_prompt(gp3)
+        st.rerun()
+
+with c2:
+    st.markdown(f'<div class="prompt-box">{gp2}</div>', unsafe_allow_html=True)
+    if st.button("📝 Use: Photosynthesis", key="btn_gp2"):
+        set_prompt(gp2)
+        st.rerun()
+
+    st.markdown(f'<div class="prompt-box">{gp4}</div>', unsafe_allow_html=True)
+    if st.button("📝 Use: ML Paradigms", key="btn_gp4"):
+        set_prompt(gp4)
+        st.rerun()
+
+if st.session_state.auto_run:
+     # Force a rerun if auto_run was set by the button click callback 
+     # (Though we are calling rerun inside the if, the callback alternative is safer if we weren't doing direct logic checks? 
+     # actually simply calling set_prompt inside the if block works because we rerun immediately).
+     pass 
+
+# ===================== BAD EXAMPLES =====================
+st.markdown("### ⚠️ BAD EXAMPLES TO PROMPT (Low CE Score)")
+st.caption("These prompts are too short or vague, leading to lower cognitive efficiency scores.")
+
+bp1 = "What is AI?"
+bp2 = "Fix my code."
+bp3 = "Tell me a joke."
+bp4 = "Why is sky blue?"
+
+bc1, bc2, bc3, bc4 = st.columns(4)
+
+with bc1:
+    st.markdown(f'<div class="prompt-box-bad">{bp1}</div>', unsafe_allow_html=True)
+    if st.button("Use: AI?", key="btn_bp1"):
+        set_prompt(bp1)
+        st.rerun()
+
+with bc2:
+    st.markdown(f'<div class="prompt-box-bad">{bp2}</div>', unsafe_allow_html=True)
+    if st.button("Use: Fix Code", key="btn_bp2"):
+        set_prompt(bp2)
+        st.rerun()
+
+with bc3:
+    st.markdown(f'<div class="prompt-box-bad">{bp3}</div>', unsafe_allow_html=True)
+    if st.button("Use: Joke", key="btn_bp3"):
+        set_prompt(bp3)
+        st.rerun()
+
+with bc4:
+    st.markdown(f'<div class="prompt-box-bad">{bp4}</div>', unsafe_allow_html=True)
+    if st.button("Use: Sky", key="btn_bp4"):
+        set_prompt(bp4)
+        st.rerun()
+
+st.markdown("---")
+
 #Input
 c_in1, c_in2 = st.columns([0.8, 0.2])
 with c_in2:
     if st.button("New Problem"):
         st.session_state.start_time = time.time()
         st.session_state.formulation_time = 0.0
-        # We can't clear text_area directly without session_state binding, 
-        # so we rely on user manually clearing or overwrite if we bound it.
-        # But for now, just resetting the time is the key action.
+        st.session_state.user_prompt = ""
+        st.session_state.auto_run = False
         st.rerun()
 
 prompt = st.text_area(
     "Enter your learning question or problem",
     height=150,
-    help="Time starts tracking when you click 'New Problem' or reload."
+    help="Time starts tracking when you click 'New Problem' or reload.",
+    key="user_prompt"
 )
 
 run_btn = st.button("▶ Run Learning Session")
 
 
 #Run Pipeline
-if run_btn and prompt.strip():
+if (run_btn or st.session_state.auto_run) and prompt.strip():
+    
+    # Reset auto_run so it doesn't loop
+    if st.session_state.auto_run:
+        st.session_state.auto_run = False
     
     # Calculate User Latency (Formulation Time)
     st.session_state.formulation_time = time.time() - st.session_state.start_time
@@ -151,12 +280,55 @@ def extract_ceras_features(prompt_text, llm_result):
 
 
 #Run Pipeline
-if run_btn and prompt.strip():
+should_run = False
+if run_btn:
+    should_run = True
+if st.session_state.auto_run:
+    should_run = True
+    st.session_state.auto_run = False
 
+if should_run and prompt.strip():
     with st.spinner("Running reasoning engine..."):
         t0 = time.time()
+        # Calculate User Latency (Formulation Time)
+        st.session_state.formulation_time = time.time() - st.session_state.start_time
+        
         result = run_infer(prompt)
         runtime = time.time() - t0
+        
+        # Store results in session state for persistence
+        st.session_state.current_result = result
+        st.session_state.current_runtime = runtime
+        st.session_state.current_prompt = prompt
+
+        # Generate and store adaptive response
+        from llm_utils import generate_adaptive_response
+        cepm_score, cnn_score, anfis_score = extract_ceras_features(prompt, result)
+        
+        # We need the diagnostics for the adaptive response
+        # Re-calculating fusion here to get diagnostics for the adaptive response generation
+        # This duplicates the logic below but ensures we have the data for the LLM call
+        fusion_engine = CERASFusion()
+        fusion_df = fusion_engine.fuse(
+            student_ids=[1],
+            cepm_scores=[cepm_score],
+            cnn_scores=[cnn_score],
+            anfis_scores=[anfis_score]
+        )
+        diagnostics = fusion_df["diagnostics"].iloc[0]
+        fused_score = fusion_df["fused_ce_score"].iloc[0] # Needed for tone selection
+        
+        final_steps = result.get("final_answer", [])
+        
+        with st.spinner("Generating personalized learning summary..."):
+             st.session_state.adaptive_res = generate_adaptive_response(prompt, final_steps, fused_score, diagnostics)
+
+# Render Results if available
+if "current_result" in st.session_state and st.session_state.current_result is not None:
+    result = st.session_state.current_result
+    runtime = st.session_state.current_runtime
+    # Use the prompt that generated the result for scoring to ensure consistency
+    result_prompt = st.session_state.current_prompt
 
     #Final Answer
     st.markdown("## Learning Response")
@@ -181,7 +353,7 @@ if run_btn and prompt.strip():
     with r2:
         st.metric("System Latency", f"{runtime:.3f}s", help="AI Processing Time")
     with r3:
-        st.metric("Input Volume", f"{len(prompt)} chars")
+        st.metric("Input Volume", f"{len(result_prompt)} chars")
     with r4:
         #Simulated "Live" status for external sensors
         st.metric("Gaze Tracker", "Active", delta="Tracking", delta_color="normal")
@@ -190,8 +362,8 @@ if run_btn and prompt.strip():
     st.markdown("---")
     st.markdown("Cognitive Efficiency Analysis")
     
-    # Extract simulated signals
-    cepm_score, cnn_score, anfis_score = extract_ceras_features(prompt, result)
+    # Extract simulated signals (Using result_prompt)
+    cepm_score, cnn_score, anfis_score = extract_ceras_features(result_prompt, result)
 
     fusion_engine = CERASFusion()
 
@@ -209,11 +381,11 @@ if run_btn and prompt.strip():
 
     #Adaptive Learning Response
     st.markdown("## Adaptive Learning Response")
-    from llm_utils import generate_adaptive_response  # lazy import
     
-    with st.spinner("Generating personalized learning summary..."):
-        adaptive_res = generate_adaptive_response(prompt, final_steps, fused_score, diagnostics)
-        st.markdown(adaptive_res)
+    if "adaptive_res" in st.session_state:
+        st.markdown(st.session_state.adaptive_res)
+    else:
+        st.info("Adaptive response not available.")
 
     #Live Data Visulaization
     st.markdown("### Live Cognitive Signals")
@@ -431,7 +603,7 @@ if run_btn and prompt.strip():
 
     #Export
     export = {
-        "prompt": prompt,
+        "prompt": result_prompt,
         "fused_ce_score": float(fused_score),
         "confidence": float(confidence),
         "diagnostics": diagnostics,

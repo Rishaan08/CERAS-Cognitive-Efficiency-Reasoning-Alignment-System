@@ -226,7 +226,7 @@ def main(prompt: str):
                 role="subtask"
             )
 
-        tree.save_json("tree_of_thoughts_example.json")
+        # tree.save_json("tree_of_thoughts_example.json")
 
     return {
         "final_answer": final_steps,

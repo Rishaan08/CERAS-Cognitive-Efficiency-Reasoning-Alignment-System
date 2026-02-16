@@ -100,29 +100,32 @@ User query:
 """
 
 # ===================== LEARNING PROMPT =====================
-DECOMP_PROMPT_LEARNING = """You are designing a LEARNING PATH.
+DECOMP_PROMPT_LEARNING = """You are an Expert Curriculum Designer creating a DEEP DIVE LEARNING ROADMAP.
+User intent: detailed acquisition of knowledge on a specific topic.
 
-User intent: learn a topic.
+Goal: Break down the learning process into granular, actionable, and comprehensive steps.
+The user wants to know EXACTLY how to go from zero to hero on this topic.
 
 Rules:
-- Steps should build understanding progressively
-- Start from prerequisites
-- Introduce key concepts before tools
-- Reference documentation or ecosystem where relevant
-- Avoid installation-only steps
-- Avoid meta reasoning ("identify the problem")
+1.  **Granularity**: Do not give high-level abstract steps like "Learn Python". Break it down: "Master Python control flow (if/else, loops) and basic data structures (lists, dicts)."
+2.  **Resources & Actions**: For each step, suggest *how* to learn it (e.g., "Read documentation on X", "Implement a small script to do Y", "Watch a visualization of Z").
+3.  **Logical Flow**:
+    *   **Phase 1: Conceptual Foundations** (Prerequisites, mental models, basic definitions)
+    *   **Phase 2: Core Mechanics** (How it works deeply, key theorems/laws/functions)
+    *   **Phase 3: Practical Application** (How to use it, real-world examples, solving standard problems)
+    *   **Phase 4: Advanced/Nuance** (Edge cases, limitations, conflicting theories)
+4.  **No Meta-Fluff**: Avoid generic steps like "Analyze the problem". Every step must be a learning action.
 
-Good step examples:
-- "Understand what Pydantic is and why it is used"
-- "Learn core Pydantic concepts like BaseModel and validation"
-- "Explore how Logfire integrates with Pydantic"
-- "Read official documentation and examples"
-- "Build a small example to connect concepts"
-
-Return an ordered list of LEARNING steps (one per line).
+Example Output format (List of strings):
+1.  "Foundations: Study the history of [Topic] to understand the motivation behind its invention (e.g., Resource X or Y)."
+2.  "Core Concept: Master the specific mathematical definition of [Sub-topic], specifically focusing on [Detail]."
+3.  "Practice: Solve 5 introductory problems involving [Scenario] to solidify intuition."
+4.  "Deep Dive: Read the seminal paper/chapter on [Advanced Aspect] to understand the theoretical limits."
 
 User query:
 '''{query}'''
+
+Return a list of 6-10 highly detailed, executable learning actions.
 """
 
 # ===================== STEP FILTERING =====================
@@ -222,7 +225,8 @@ def _lines_from_text(raw: str):
             continue
         # Remove numbering: "1. ", "1)", "- "
         line = re.sub(r'^[\d+\.\)\-\*]+\s+', '', line)
-        if 3 <= len(line) <= 300:
+        # Increased max length to 500 to allow for detailed learning steps
+        if 3 <= len(line) <= 500:
             lines.append(line)
     return lines
 
@@ -244,9 +248,20 @@ def decompose_query(query: str):
     models_to_try = [MODEL, "llama-3.1-8b-instant", "mixtral-8x7b-32768"]
     
     for model in models_to_try:
-        print(f"[DEBUG] Trying decomposition with model: {model}")
+        print(f"[DEBUG] Trying decomposition with model: {model} | Intent: {intent}")
         
-        # 1. Try JSON Prompt
+        # 0. If Learning Intent, try Learning Prompt first
+        if intent == "learning":
+            try:
+                raw_learn = call_llm(DECOMP_PROMPT_LEARNING.format(query=query), model_name=model)
+                lines = filter_steps(_lines_from_text(raw_learn))
+                if len(lines) >= 3:
+                    return lines
+            except Exception as e:
+                print(f"[DEBUG] Learning prompt failed: {e}")
+                pass
+
+        # 1. Try JSON Prompt (Standard Solver)
         try:
             raw = call_llm(DECOMP_PROMPT_JSON.format(query=query), model_name=model)
             parsed = _parse_json_subtasks(raw)
@@ -257,7 +272,7 @@ def decompose_query(query: str):
         except Exception:
             pass
             
-        # 2. Try Simple Prompt (List based)
+        # 2. Try Simple Prompt (List based fallback)
         try:
             raw2 = call_llm(DECOMP_PROMPT_SIMPLE.format(query=query), model_name=model)
             lines = filter_steps(_lines_from_text(raw2))
