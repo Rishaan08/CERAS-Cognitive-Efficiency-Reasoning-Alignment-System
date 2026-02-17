@@ -12,7 +12,7 @@ from fusion import CERASFusion
 
 #Page Configuration
 st.set_page_config(
-    page_title="CAMRE EDU",
+    page_title="CERAS",
     page_icon="📖",
     layout="wide",
 )
@@ -613,7 +613,7 @@ if "current_result" in st.session_state and st.session_state.current_result is n
     st.download_button(
         "Download Session Report",
         data=json.dumps(export, indent=2),
-        file_name="camre_session.json",
+        file_name="ceras_session.json",
         mime="application/json",
     )
 
@@ -622,7 +622,7 @@ if "current_result" in st.session_state and st.session_state.current_result is n
 if not run_btn:
     st.info(
         "Enter a learning question above and run the session.\n\n"
-        "CAMRE EDU will provide:\n"
+        "CERAS will provide:\n"
         "• Step-by-step reasoning\n"
         "• Cognitive Efficiency score\n"
         "• Diagnostic feedback\n"
@@ -634,8 +634,8 @@ st.markdown("---")
 st.markdown(
     """
     <div style="text-align:center; font-size:12px; color:#9ca3af; margin-top:8px;">
-        Developed by <b>Aman Goel</b> & <b>Rishaan Yadav</b><br>
-        <span style="color:#6b7280;">CAMRE EDU · CERAS Framework</span>
+        Developed by <b>© Aman Goel</b> & <b>Rishaan Yadav</b><br>
+        <span style="color:#6b7280;">CERAS · CERAS Framework</span>
     </div>
     """,
     unsafe_allow_html=True
