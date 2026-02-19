@@ -4,7 +4,9 @@
 
 from tree_of_thoughts import TreeOfThoughts
 from inference import run_inference_pipeline
-from llm_utils import run_decomposer
+from llm_utils import run_decomposer, call_llm
+from inference import run_inference_pipeline, extract_json_from_text, normalize_subtasks
+import re
 
 import time
 import io
@@ -43,7 +45,7 @@ def clean(items: List[str], limit: int):
 
 
 # ===================== STRATEGY =====================
-def propose_strategies(prompt: str) -> List[str]:
+def propose_strategies(prompt: str, api_config: dict = None) -> List[str]:
     meta_prompt = f"""
 Propose at most {MAX_STRATEGIES} HIGH-LEVEL strategies
 to solve the following problem.
@@ -56,20 +58,23 @@ Rules:
 Problem:
 {prompt}
 """
-    out = run_inference_pipeline(meta_prompt, auto_extend=False)
+    out = call_llm(meta_prompt, api_config=api_config)
+    
+    # Clean output: simple line splitting since rules say "One sentence per strategy"
+    lines = []
+    if out:
+        for line in out.splitlines():
+            line = line.strip()
+            # Remove numbering "1. ", "- "
+            line = re.sub(r'^[\d+\.\)\-\*]+\s+', '', line)
+            if len(line) > 10: 
+                lines.append(line)
 
-    strategies = []
-    if isinstance(out, dict):
-        for k in ("strategies", "steps", "thoughts", "outputs"):
-            if k in out:
-                v = out[k]
-                strategies.extend(v if isinstance(v, list) else [v])
-
-    return clean(strategies, MAX_STRATEGIES)
+    return clean(lines, MAX_STRATEGIES)
 
 
 # ===================== SOLVER STEP GENERATOR =====================
-def generate_solver_steps(prompt: str, strategy: str) -> List[str]:
+def generate_solver_steps(prompt: str, strategy: str, api_config: dict = None) -> List[str]:
     solver_prompt = f"""
 Solve the following problem step by step:
 
@@ -88,7 +93,7 @@ Rules:
 - Output as a numbered list
 """
 
-    raw = run_decomposer(solver_prompt)
+    raw = run_decomposer(solver_prompt, api_config=api_config)
     if not isinstance(raw, list):
         raw = [raw]
 
@@ -96,7 +101,7 @@ Rules:
 
 
 # ===================== QUALITY VERIFIER (NEW) =====================
-def review_and_fix_steps(prompt: str, steps: List[str]) -> List[str]:
+def review_and_fix_steps(prompt: str, steps: List[str], api_config: dict = None) -> List[str]:
     """
     Second-pass verifier.
     Reviews steps for correctness and completeness.
@@ -136,16 +141,12 @@ Rules:
 - Output ONLY valid JSON
 """
 
-    out = run_inference_pipeline(review_prompt, auto_extend=False)
+    raw_out = call_llm(review_prompt, api_config=api_config)
 
     # Try to parse JSON from verifier output
     try:
-        raw = out.get("raw_verifier") if isinstance(out, dict) else out
-        if isinstance(raw, str):
-            parsed = json.loads(raw)
-        elif isinstance(raw, dict):
-            parsed = raw
-        else:
+        parsed = extract_json_from_text(raw_out)
+        if not parsed:
             return steps
     except Exception:
         return steps
@@ -171,7 +172,7 @@ Rules:
 
 
 # ===================== MAIN =====================
-def main(prompt: str):
+def main(prompt: str, api_config: dict = None):
     stdout_buffer = io.StringIO()
     llm_calls_used = 0
 
@@ -186,39 +187,68 @@ def main(prompt: str):
         )
         tree.set_root(root.id)
 
-        # ---- STRATEGY ----
-        strategies = propose_strategies(prompt)
+        # 1. GENERATE CANDIDATES (Thoughts)
+        print("--- Step 1: Generating Candidates ---")
+        strategies = propose_strategies(prompt, api_config=api_config)
         llm_calls_used += 1
-        strategy = strategies[0] if strategies else "Solve the problem directly."
+        
+        candidates = []
+        for strategy in strategies:
+            print(f"Generating steps for strategy: {strategy}")
+            steps = generate_solver_steps(prompt, strategy, api_config=api_config)
+            llm_calls_used += 1
+            candidates.append({"strategy": strategy, "steps": steps})
 
+        # 2. VERIFY CANDIDATES
+        print("\n--- Step 2: Verifying Candidates ---")
+        verified_candidates = []
+        for cand in candidates:
+            # Format steps for verification
+            steps_text = "\n".join([f"{i+1}. {s}" for i, s in enumerate(cand["steps"])])
+            full_text = prompt + "\nStrategy: " + cand["strategy"] + "\nSteps:\n" + steps_text
+            
+            verification = run_inference_pipeline(
+                full_text,
+                auto_extend=False,
+                api_config=api_config
+            )
+            llm_calls_used += 1
+            
+            cand["verification"] = verification
+            if verification.get("status") == "accepted":
+                verified_candidates.append(cand)
+            else:
+                 print(f"Candidate rejected: {verification.get('message')}")
+
+        # 3. SELECT BEST PATH
+        print("\n--- Step 3: Selecting Best Path ---")
+        best_candidate = None
+        if verified_candidates:
+            # For now, pick the first accepted one (or could use confidence if available)
+            best_candidate = verified_candidates[0]
+            print("Selected a verified path.")
+        elif candidates:
+            # Fallback to the first generated path if none verified (graceful degradation)
+            print("No path fully verified. Falling back to first generated path.")
+            best_candidate = candidates[0]
+        else:
+             best_candidate = {"strategy": "Direct", "steps": ["Analysis failed to generate steps."]}
+        
+        
+        final_strategy = best_candidate["strategy"]
+        raw_steps = best_candidate["steps"]
+
+        # 4. FINAL STEPS (Quality Review)
+        print("\n--- Step 4: Final Polish ---")
+        final_steps = review_and_fix_steps(prompt, raw_steps, api_config=api_config)
+        llm_calls_used += 1
+
+        # ---- TREE BUILD (For Visualization) ----
         strategy_node = tree.add_node(
-            text=strategy,
+            text=final_strategy,
             parent_id=root.id,
             role="strategy"
         )
-
-        # ---- SOLVER STEPS ----
-        solver_steps = generate_solver_steps(prompt, strategy)
-        llm_calls_used += 1
-
-        # ---- VERIFIER #1 (GATEKEEPER) ----
-        verified = run_inference_pipeline(
-            prompt + "\nSteps:\n" + "\n".join(solver_steps),
-            auto_extend=False
-        )
-        llm_calls_used += 1
-
-        if verified.get("status") != "accepted":
-            solver_steps = [
-                "Apply the chosen strategy step by step to transform the given expression.",
-                "Derive the result logically from the transformed expression."
-            ]
-
-        # ---- VERIFIER #2 (QUALITY REVIEW) ----
-        final_steps = review_and_fix_steps(prompt, solver_steps)
-        llm_calls_used += 1
-
-        # ---- TREE BUILD ----
         for step in final_steps:
             tree.add_node(
                 text=step,
@@ -226,11 +256,9 @@ def main(prompt: str):
                 role="subtask"
             )
 
-        # tree.save_json("tree_of_thoughts_example.json")
-
     return {
         "final_answer": final_steps,
-        "strategy_used": strategy,
+        "strategy_used": final_strategy,
         "llm_calls_used": llm_calls_used,
         "tree": tree,
         "logs": stdout_buffer.getvalue()

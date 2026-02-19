@@ -70,27 +70,28 @@ flowchart TB
 
 ## 🚀 Key Features
 
-### 1. **Solver-Grounded Reasoning**
-Unlike standard LLMs that hallucinate, CERAS uses a rigid **Reasoning Pipeline**:
-1.  **Decomposition**: Breaks complex queries (e.g., "Explain Quantum Entanglement") into atomic, pedagogical sub-problems.
-2.  **Tree Search**: Explores multiple reasoning paths using Depth-First Search (DFS) on a custom Tree Data Structure.
-3.  **Strict Verification**: Every step is double-checked by a specialized "Verifier" model before being shown to the user.
+### 1. **Premium Cognitive Interface**
+-   **Adaptive Dashboard**: A sleek, dark-mode UI with gradient-styled "Good Examples" and a "Bad Examples" warning section.
+-   **Live Telemetry**: Real-time visualization of Formulation Time, Processing Latency, and Token Count.
+-   **Diagnostics**: Expandable reports detailing "Strengths" and "Suggestions" based on your prompt's density and structure.
 
-### 2. **Real-Time Cognitive Diagnostics**
-The system doesn't just grade *correctness*; it grades *efficiency*.
--   **CE Score (Cognitive Efficiency)**: A 0-1 metrics combining behavioral speed, focus, and logical consistency.
--   **Intention Clustering**: Uses 1D-CNNs to detect browsing patterns (e.g., "Rushing", "Struggling", "Flow State").
+### 2. **Deep Reasoning Pipeline (ToT)**
+Unlike standard LLMs, CERAS uses a structured **Tree-of-Thoughts** architecture:
+1.  **Generate**: Proposes multiple high-level strategies and step-by-step plans.
+2.  **Verify**: Each path is rigorously checked by a specialized "Verifier" model (e.g., Llama-3.1-8b).
+3.  **Select**: The optimal path is chosen based on verification scores.
+4.  **Polish**: The final output is synthesized into a coherent learning response.
 
-### 3. **Adaptive "Theory of Mind"**
-The AI adjusts its personality based on the student's state:
--   **Low CE (< 0.5)**: *Supportive & Detailed*. Breaks things down further.
--   **High CE (> 0.8)**: *Challenging & Concise*. Pushes for mastery.
+### 3. **Cognitive Efficiency Analysis**
+The system evaluates your prompt using a fused multi-modal approach:
+-   **CEPM (Structural)**: Measures complexity, density, and constraint adherence.
+-   **CNN (Semantic)**: Analyzes intent clarity and alignment with high-performance patterns.
+-   **Fused Score**: A holistic 0-1 metric guiding the adaptive response engine.
 
-### 4. **Interactive Learning Dashboard**
-A modern Streamlit UI providing:
--   **Example Prompts**: "Good" vs "Bad" examples to train students on effective questioning.
--   **Live Telemetry**: Real-time visualization of Formulation Time, System Latency, and Cognitive Load.
--   **Session Reports**: Downloadable JSON summaries of the learning session.
+### 4. **Multi-Model Support**
+Seamlessly switch between top-tier models for both Reasoning and Verification:
+-   **Groq**: Llama-3.3-70b (Versatile), Llama-3.1-8b (Instant), Qwen 2, Mixtral.
+-   **Gemini**: Gemini 1.5 Pro, Gemini 1.5 Flash, Gemini 1.0 Pro.
 
 ---
 
@@ -98,21 +99,21 @@ A modern Streamlit UI providing:
 
 | Component | Technology | Role |
 | :--- | :--- | :--- |
-| **LLM Backend** | **Groq API** | Ultra-low latency inference (Llama 3.3 70b, Llama 3.1 8b) |
-| **Orchestration** | **LangChain** | Chain management and prompt engineering |
-| **Interface** | **Streamlit** | Interactive web dashboard for students |
-| **ML Models** | **LightGBM / PyTorch** | Cognitive Efficiency Prediction (CEPM) & CNN Feature Extraction |
-| **Data Logic** | **Python (NetworkX)** | Tree-of-Thoughts graph management |
-| **Fuzzy Logic** | **Custom ANFIS** | Neuro-Fuzzy alignment of reasoning scores |
+| **LLM Backend** | **Groq & Google Gemini** | High-performance inference for Main Reasoning and Verification |
+| **Orchestration** | **LangChain** | Advanced chain management and direct API integration |
+| **Interface** | **Streamlit** | Premium interactive dashboard with custom CSS styling |
+| **ML Models** | **LightGBM / TensorFlow** | Cognitive Efficiency Prediction (CEPM) & CNN Feature Extraction |
+| **Fusion** | **Pandas / Numpy** | Weighted averaging and logic-based score fusion |
 
 ---
 
 ## 💻 Setup & Installation
 
 ### Prerequisites
--   Python 3.12+
+-   Python 3.10+
 -   Conda
--   **Groq API Key** (Required for reasoning engine)
+-   **Groq API Key**
+-   **Gemini API Key**
 
 ### Installation
 1.  **Clone the repository**:
@@ -127,18 +128,14 @@ A modern Streamlit UI providing:
     conda activate ceras
     ```
 
-3.  **Configure Credentials**:
-    Create a `.env` file in the root directory:
-    ```bash
-    GROQ_API_KEY=gsk_your_key_here
-    ```
-
-4.  **Run the Application**:
-    Navigate to the source directory and launch Streamlit:
+3.  **Run the Application**:
     ```bash
     cd src/ceras
     streamlit run streamlit_app.py
     ```
+
+4.  **Configure Keys**:
+    Enter your API keys directly in the application sidebar or set them as environment variables.
 
 ---
 

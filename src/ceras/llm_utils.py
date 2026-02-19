@@ -1,6 +1,7 @@
 import json
 import re
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 import os
 
@@ -8,7 +9,8 @@ load_dotenv()
 
 # ===================== MODEL =====================
 MODEL = "llama-3.3-70b-versatile"
-llm = ChatGroq(model=MODEL, api_key=os.environ.get("GROQ_API_KEY"))
+# Default fallback to environment variable if no config passed
+# llm = ChatGroq(model=MODEL, api_key=os.environ.get("GROQ_API_KEY"))
 
 # ===================== INTENT DETECTION =====================
 def detect_intent(query: str) -> str:
@@ -28,34 +30,35 @@ Preference rules:
 - Avoid expanding large numbers early if a simpler form can be obtained
 """
 
-DECOMP_PROMPT_JSON = """You are an Expert Tutor utilizing Dynamic Programming.
-Your goal is to guide the student through the problem by breaking it down into detailed, pedagogical sub-problems.
-Each sub-problem should be a clear, instructional step that teaches a specific concept or operation required for the solution.
+DECOMP_PROMPT_JSON = """You are an Expert Problem Solver using Chain-of-Thought reasoning.
+Your goal is to break down the complex problem into a logical sequence of EXECUTABLE steps.
 
 Rules:
-1. DO NOT just solve the problem. Break it into teachable components.
-2. Each step should explain *what* to do and *why* (briefly), but not give the final answer immediately.
-3. Use a "Divide and Conquer" approach: recursive breakdown.
-4. Output strict JSON.
+1.  **No Direct Solution**: Do not solve the problem yet. Just list the steps.
+2.  **Granularity**: Each step must be a single, distinct action (e.g., "Identify...", "Calculate...", "Compare...").
+3.  **Logical Flow**: Steps must follow a strict dependency order.
+4.  **Verification**: Include a final step to verify the result.
+5.  **Output**: Return a JSON object with a "subtasks" key containing the list of strings.
 
 Example:
-User: "51^2 - 49^2"
+User: "Calculate the kinetic energy of a 5kg mass moving at 10m/s."
 Result:
 {{
   "subtasks": [
-    "Recall the algebraic identity for the difference of two squares: a^2 - b^2 = (a-b)(a+b)",
-    "Identify the values for 'a' and 'b' from the given expression (a=51, b=49)",
-    "Set up the substitution: replace a with 51 and b with 49 in the identity",
-    "Calculate the difference term (51 - 49)",
-    "Calculate the sum term (51 + 49)",
-    "Multiply the calculated difference and sum to find the final result"
+    "Identify the given mass (m) and velocity (v) from the problem statement.",
+    "Recall the formula for kinetic energy: KE = 0.5 * m * v^2.",
+    "Substitute the values of m = 5 kg and v = 10 m/s into the formula.",
+    "Calculate the square of the velocity (10^2).",
+    "Multiply the mass by the squared velocity.",
+    "Multiply the result by 0.5 to get the final kinetic energy.",
+    "Verify the units are in Joules."
   ]
 }}
 
 User query:
 {query}
 
-Respond in STRICT JSON format used in the example.
+Respond in STRICT JSON format.
 """
 
 DECOMP_PROMPT_SIMPLE = """Break the problem into step-by-step subproblems.
@@ -168,14 +171,53 @@ def filter_steps(steps):
     return filtered
 
 # ===================== LLM CALL =====================
-def call_llm(prompt: str, model_name: str = MODEL) -> str:
-    # Allow dynamic model switching
-    current_llm = ChatGroq(model=model_name, api_key=os.environ.get("GROQ_API_KEY"))
+def get_llm_instance(model_name: str, api_config: dict = None):
+    """
+    Factory to return the appropriate LLM instance based on config.
+    """
+    provider = "Groq"
+    api_key = None
     
+    if api_config:
+        provider = api_config.get("main_provider", "Groq")
+        if provider == "Groq":
+            api_key = api_config.get("groq_api_key")
+        elif provider == "Gemini":
+            api_key = api_config.get("gemini_api_key")
+    
+    # Fallback to env if specific key not provided
+    if not api_key:
+        if provider == "Groq":
+            api_key = os.environ.get("GROQ_API_KEY")
+        elif provider == "Gemini":
+            api_key = os.environ.get("GOOGLE_API_KEY")
+
+    if provider == "Gemini":
+        if not api_key:
+            print("[WARN] Gemini selected but no API key provided. Trying env GOOGLE_API_KEY.")
+            api_key = os.environ.get("GOOGLE_API_KEY")
+        
+        # Use gemini-2.5-flash as requested
+        return ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=api_key)
+    else:
+        # Groq
+        if not api_key:
+            api_key = os.environ.get("GROQ_API_KEY")
+        return ChatGroq(model=model_name, api_key=api_key)
+
+
+def call_llm(prompt: str, model_name: str = MODEL, api_config: dict = None) -> str:
+    # Allow dynamic model switching
+    try:
+        current_llm = get_llm_instance(model_name, api_config)
+    except Exception as e:
+         print(f"[ERROR] Failed to instantiate LLM: {e}")
+         return str(e)
+
     try:
         out = current_llm.invoke(prompt)
         if hasattr(out, "content"):
-            print(f"[DEBUG] call_llm content ({model_name}): {out.content[:100]}...")
+            print(f"[DEBUG] call_llm content ({model_name} / {current_llm.__class__.__name__}): {out.content[:100]}...")
             return out.content
         if isinstance(out, str):
             print(f"[DEBUG] call_llm str ({model_name}): {out[:100]}...")
@@ -240,12 +282,50 @@ def solver_fallback(query: str):
         "Combine the results"
     ]
 
+def check_connection(provider: str, api_key: str, model_name: str = None) -> bool:
+    """
+    Verifies connectivity to the LLM provider with the given key.
+    """
+    if not api_key:
+        return False
+    
+    try:
+        config = {
+            "main_provider": provider,
+            "groq_api_key": api_key if provider == "Groq" else None,
+            "gemini_api_key": api_key if provider == "Gemini" else None
+        }
+        
+        # Use a lightweight/common model for check if not specified
+        if not model_name:
+            if provider == "Groq":
+                model_name = "llama-3.1-8b-instant"
+            elif provider == "Gemini":
+                model_name = "gemini-2.5-flash"
+
+        llm = get_llm_instance(model_name, api_config=config)
+        # Simple invocation
+        llm.invoke("Hello")
+        return True
+    except Exception as e:
+        print(f"[ERROR] Connection check failed for {provider}: {e}")
+        return False
+
 # ===================== MAIN DECOMPOSER =====================
-def decompose_query(query: str):
+def decompose_query(query: str, api_config: dict = None):
     intent = detect_intent(query)
     
-    # Models to try in order
-    models_to_try = [MODEL, "llama-3.1-8b-instant", "mixtral-8x7b-32768"]
+    # Determine which model to use as primary
+    primary_model = MODEL # default
+    if api_config and "main_model" in api_config:
+         primary_model = api_config["main_model"]
+    
+    # Models to try in order: User Selected -> Llama 3 -> Mixtral
+    models_to_try = [primary_model]
+    if primary_model != "llama-3.1-8b-instant":
+         models_to_try.append("llama-3.1-8b-instant")
+    if primary_model != "mixtral-8x7b-32768":
+         models_to_try.append("mixtral-8x7b-32768")
     
     for model in models_to_try:
         print(f"[DEBUG] Trying decomposition with model: {model} | Intent: {intent}")
@@ -253,7 +333,7 @@ def decompose_query(query: str):
         # 0. If Learning Intent, try Learning Prompt first
         if intent == "learning":
             try:
-                raw_learn = call_llm(DECOMP_PROMPT_LEARNING.format(query=query), model_name=model)
+                raw_learn = call_llm(DECOMP_PROMPT_LEARNING.format(query=query), model_name=model, api_config=api_config)
                 lines = filter_steps(_lines_from_text(raw_learn))
                 if len(lines) >= 3:
                     return lines
@@ -263,7 +343,7 @@ def decompose_query(query: str):
 
         # 1. Try JSON Prompt (Standard Solver)
         try:
-            raw = call_llm(DECOMP_PROMPT_JSON.format(query=query), model_name=model)
+            raw = call_llm(DECOMP_PROMPT_JSON.format(query=query), model_name=model, api_config=api_config)
             parsed = _parse_json_subtasks(raw)
             if parsed:
                 parsed = filter_steps(parsed)
@@ -274,7 +354,7 @@ def decompose_query(query: str):
             
         # 2. Try Simple Prompt (List based fallback)
         try:
-            raw2 = call_llm(DECOMP_PROMPT_SIMPLE.format(query=query), model_name=model)
+            raw2 = call_llm(DECOMP_PROMPT_SIMPLE.format(query=query), model_name=model, api_config=api_config)
             lines = filter_steps(_lines_from_text(raw2))
             if len(lines) >= 2:
                 return lines
@@ -285,15 +365,15 @@ def decompose_query(query: str):
     return solver_fallback(query)
 
 # ===================== PUBLIC API =====================
-def run_decomposer(query: str):
-    subtasks = decompose_query(query)
+def run_decomposer(query: str, api_config: dict = None):
+    subtasks = decompose_query(query, api_config=api_config)
     print("Subtasks:")
     for i, s in enumerate(subtasks, 1):
         print(f" {i}. {s}")
     return subtasks
 
 # ===================== ADAPTIVE RESPONSE =====================
-def generate_adaptive_response(query: str, steps: list, ce_score: float, diagnostics: dict):
+def generate_adaptive_response(query: str, steps: list, ce_score: float, diagnostics: dict, api_config: dict = None):
     # Select tone based on CE score
     if ce_score < 0.5:
         tone = "supportive, detailed, and encouraging. Focus on building foundational understanding."
@@ -321,4 +401,4 @@ def generate_adaptive_response(query: str, steps: list, ce_score: float, diagnos
     
     Keep it within 300 words. Format with Markdown.
     """
-    return call_llm(prompt)
+    return call_llm(prompt, api_config=api_config)

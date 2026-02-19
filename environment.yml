@@ -51,4 +51,8 @@ dependencies:
       # uvloop is Unix-only; skip on Windows:
       - "uvloop; sys_platform != 'win32'"
       - langchain-groq
+      - langchain-google-genai
       - python-dotenv
+      - tensorflow
+      - keras
+      - lightgbm

@@ -19,6 +19,8 @@ def load_models():
 
     cnn_model = tf.keras.models.load_model(os.path.join(artifact_dir, "cnn_ce_model.keras"))
     cnn_scaler = joblib.load(os.path.join(artifact_dir, "cnn_scaler.pkl"))
+    # cnn_model = tf.keras.models.load_model(os.path.join(artifact_dir, "cnn_ce_model.keras"))
+    # cnn_scaler = joblib.load(os.path.join(artifact_dir, "cnn_scaler.pkl"))
 
     # Load selected feature names
     cepm_features = np.load(os.path.join(artifact_dir, "cepm_features.npy"), allow_pickle=True).tolist()
@@ -48,6 +50,9 @@ from pipeline_1 import main as run_infer
 #CERAS fusion engine
 from fusion import CERASFusion
 
+#Connection Check
+from llm_utils import check_connection
+
 #Page Configuration
 st.set_page_config(
     page_title="CERAS",
@@ -55,64 +60,93 @@ st.set_page_config(
     layout="wide",
 )
 
-#Custom CSS for better styling
-st.markdown("""
-<style>
-    .metric-card {
-        padding: 10px;
-        border-radius: 8px;
-        background-color: #f0f2f6;
-        margin-bottom: 10px;
+#CSS Styles
+st.markdown(
+    """
+    <style>
+    .example-card {
+        background: #1e293b; 
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 15px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
-    .stProgress > div > div > div > div {
-        background-color: #4CAF50;
+    .example-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.4);
+        border-color: rgba(255, 255, 255, 0.3);
     }
-    .prompt-box {
-        background-color: #1e293b;
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #334155;
-        margin-bottom: 10px;
-        height: 200px;
-        overflow-y: auto;
-        font-size: 14px;
+    .example-header {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .example-body {
+        font-size: 0.95rem;
         color: #e2e8f0;
+        line-height: 1.6;
         text-align: justify;
+        flex-grow: 1;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 12px;
+        border-radius: 8px;
     }
     .prompt-box-bad {
-        background-color: #2a1515;
+        background-color: #450a0a;
         padding: 15px;
         border-radius: 8px;
-        border: 1px solid #451a1a;
+        border: 1px solid #7f1d1d;
         margin-bottom: 10px;
-        font-size: 14px;
         color: #fca5a5;
-        text-align: justify;
+        font-size: 0.9em;
+        height: 100%;
     }
-    /* Justify text for better readability */
-    p, li {
-        text-align: justify;
-    }
-    /* Sidebar specific refinements */
     .sidebar-box {
-        background-color: #0f172a;
+        background-color: #1e293b;
         padding: 15px;
         border-radius: 10px;
         border: 1px solid #334155;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        margin-bottom: 20px;
     }
-</style>
-""", unsafe_allow_html=True)
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
-#Header
-st.markdown("## 🧠 CERAS - Cognitive Efficiency & Reasoning Alignment System")
-st.markdown("""
-**CERAS** is an advanced adaptive learning environment designed to optimize how you learn and solve complex problems. 
-By fusing **Large Language Model (LLM)** reasoning capabilities with real-time **Cognitive Efficiency** metrics, current behavioral diagnostics, and 
-neuro-fuzzy alignment, CERAS provides a personalized learning experience. It analyzes your input complexity, structure, and intent to guide you 
-through deep concepts with tailored roadmaps, ensuring you don't just get answers, but truly master the material.
-""")
+#Session State Initialization
+if "groq_status" not in st.session_state:
+    st.session_state.groq_status = "Waiting"
+if "gemini_status" not in st.session_state:
+    st.session_state.gemini_status = "Waiting"
+
+def perform_check(provider):
+    key_key = f"input_{provider.lower()}_key"
+    api_key = st.session_state.get(key_key)
+    
+    status_key = f"{provider.lower()}_status"
+    st.session_state[status_key] = "Checking..."
+    
+    if check_connection(provider, api_key):
+        st.session_state[status_key] = "Connected"
+    else:
+        st.session_state[status_key] = "Not Connected"
+
+def check_groq():
+    perform_check("Groq")
+
+def check_gemini():
+    perform_check("Gemini")
 
 #Sidebar
 with st.sidebar:
@@ -130,20 +164,80 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
+    st.markdown("### 🔑 API Configuration")
+    
+    with st.expander("API Keys", expanded=True):
+        st.session_state.groq_api_key = st.text_input("Groq API Key", type="password", key="input_groq_key", on_change=check_groq)
+        st.session_state.gemini_api_key = st.text_input("Gemini API Key", type="password", key="input_gemini_key", on_change=check_gemini)
+
+    st.markdown("### 🤖 Model Selection")
+    
+    groq_models = [
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "qwen/qwen3-32b",
+        "groq/compound",
+        "groq/compound-mini",
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b"
+    ]
+    
+    gemini_models = [
+        "gemini-3-pro-preview",
+        "gemini-3-flash-preview",
+        "gemini-2.5-pro",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-lite",
+        "gemini-flash-latest",
+        "gemini-flash-lite-latest",
+        "gemini-robotics-er-1.5-preview"
+    ]
+    
+    # Main Reasoner
+    c1, c2 = st.columns([0.4, 0.6])
+    with c1:
+        st.session_state.main_provider = st.radio("Main Provider", ["Groq", "Gemini"], index=0, key="radio_main_provider", horizontal=False, label_visibility="collapsed")
+    with c2:
+        if st.session_state.main_provider == "Groq":
+            st.session_state.main_model = st.selectbox("Model", groq_models, index=0, key="select_main_model", label_visibility="collapsed")
+        else:
+            st.session_state.main_model = st.selectbox("Model", gemini_models, index=0, key="select_main_model", label_visibility="collapsed")
+
+    # Verifier
+    st.caption("Verifier Model")
+    v1, v2 = st.columns([0.4, 0.6])
+    with v1:
+        st.session_state.verifier_provider = st.radio("Verifier Provider", ["Groq", "Gemini"], index=0, key="radio_verifier_provider", horizontal=False, label_visibility="collapsed")
+    with v2:
+        if st.session_state.verifier_provider == "Groq":
+             # Default verifier to faster model
+            st.session_state.verifier_model = st.selectbox("Verifier", groq_models, index=1, key="select_verifier_model", label_visibility="collapsed")
+        else:
+            st.session_state.verifier_model = st.selectbox("Verifier", gemini_models, index=0, key="select_verifier_model", label_visibility="collapsed")
+
+
     st.markdown("### ⚙️ System Status")
 
+    g_status = st.session_state.groq_status
+    g_color = "#4ade80" if g_status == "Connected" else ("#ef4444" if g_status == "Not Connected" else "#94a3b8")
+    
+    gem_status = st.session_state.gemini_status
+    gem_color = "#4ade80" if gem_status == "Connected" else ("#ef4444" if gem_status == "Not Connected" else "#94a3b8")
+
     st.markdown(
-        """
+        f"""
         <div class="sidebar-box">
             <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                 <span>🔌 <b>Groq API</b></span>
-                <span style="color:#4ade80;">● Connected</span>
+                <span style="color:{g_color};">● {g_status}</span>
             </div>
             <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                <span>⚡ <b>Fusion Engine</b></span>
-                <span style="color:#4ade80;">● Active</span>
+                <span>✨ <b>Gemini API</b></span>
+                <span style="color:{gem_color};">● {gem_status}</span>
             </div>
-             <div style="display:flex; justify-content:space-between;">
+            <div style="display:flex; justify-content:space-between;">
                 <span>📡 <b>Telemetry</b></span>
                 <span style="color:#60a5fa;">● Tracking</span>
             </div>
@@ -186,6 +280,38 @@ def set_prompt(text):
     # Disable auto-run, user wants to manually click run
     st.session_state.auto_run = False
 
+#Header
+st.markdown(
+    """
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="font-size: 3rem; margin-bottom: 10px; background: linear-gradient(to right, #ec4899, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">CERAS</h1>
+        <h3 style="font-weight: 400; color: #cbd5e1; margin-top: 0;">Cognitive Efficiency & Reasoning Alignment System</h3>
+        <p style="color: #94a3b8; max-width: 700px; margin: 0 auto; line-height: 1.6;">
+            <b>CERAS</b> is an advanced reasoning engine designed to optimize your interactions with Large Language Models. 
+            By leveraging <b>Tree-of-Thoughts (ToT)</b> reasoning, multi-modal signal analysis, and cognitive efficiency modeling, 
+            CERAS transforms simple queries into structured, high-fidelity prompts that unlock model intelligence.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+with st.expander("🎓 Guide: How to Write the Perfect Prompt", expanded=False):
+    st.markdown(
+        """
+        ### 🔑 Key Principles of Cognitive Efficiency
+        To get the best results from CERAS (and any LLM), focus on these core elements:
+
+        1.  **Context & Role**: Define *who* the model is (e.g., "Act as a senior physicist") and *what* the situation is.
+        2.  **Explicit Constraints**: Set boundaries. Mention word counts, specific formats (JSON, Markdown), or stylistic requirements.
+        3.  **Chain of Thought**: Ask the model to "explain its reasoning" or "break down the problem step-by-step" before giving the final answer.
+        4.  **Few-Shot Examples**: Providing 1-2 examples of the desired output format is the single most effective way to guide behavior.
+        5.  **Iterative Refinement**: Use the **Diagnostics** below to see where your prompt lacks density or clarity, then refine it.
+
+        *Tip: Use the "Good Examples" below to see these principles in action!*
+        """
+    )
+
 #Good Examples
 st.markdown("### 🌟 GOOD EXAMPLES TO PROMPT (High CE Score)")
 st.caption("These prompts are detailed and structured, leading to higher cognitive efficiency scores.")
@@ -198,30 +324,52 @@ gp3 = "Develop a multi-layered historical and epistemological examination of the
 
 gp4 = "Produce a mathematically grounded and architecturally comparative analysis of supervised and unsupervised machine learning paradigms, emphasizing objective functions, representational geometry, and statistical inference principles. Begin by defining supervised learning as an empirical risk minimization framework over labeled distributions and contrast it with unsupervised latent-variable modeling and manifold estimation. Analyze bias-variance trade-offs, generalization bounds, and overfitting dynamics under distributional shift. Compare algorithmic mechanisms such as Support Vector Machines, ensemble-based decision forests, K-Means clustering, and Principal Component Analysis through the lens of optimization landscapes and feature-space transformations. Extend the discussion toward interpretability constraints, scalability limits, and robustness under adversarial perturbations. Finally, synthesize these paradigms into a structured framework evaluating when hybrid semi-supervised or self-supervised approaches become epistemically advantageous."
 
-#Layout: 2 Columns x 2 Rows for better readability
+#Layout: 2 Columns x 2 Rows with Custom Cards
 c1, c2 = st.columns(2)
 
-with c1:
-    st.markdown(f'<div class="prompt-box">{gp1}</div>', unsafe_allow_html=True)
-    if st.button("📝 Use: Quantum Foundations", key="btn_gp1"):
-        set_prompt(gp1)
+def render_card(title, text, prompt_var, btn_key, gradient):
+    st.markdown(
+        f"""
+        <div class="example-card" style="background: {gradient};">
+            <div class="example-header">
+                <span>✨</span> {title}
+            </div>
+            <div class="example-body">
+                {text[:280]}...
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    # Spacer
+    st.markdown('<div style="height: 10px;"></div>', unsafe_allow_html=True)
+    if st.button(f"🚀 Select: {title}", key=btn_key, use_container_width=True):
+        set_prompt(prompt_var)
         st.rerun()
 
-    st.markdown(f'<div class="prompt-box">{gp3}</div>', unsafe_allow_html=True)
-    if st.button("📝 Use: Printing Press Analysis", key="btn_gp3"):
-        set_prompt(gp3)
-        st.rerun()
+with c1:
+    render_card(
+        "Quantum Foundations", 
+        gp1, gp1, "btn_gp1", 
+        "linear-gradient(135deg, #4c1d95 0%, #1e1b4b 100%)" # Deep Purple
+    )
+    render_card(
+        "Printing Press Analysis", 
+        gp3, gp3, "btn_gp3", 
+        "linear-gradient(135deg, #9f1239 0%, #4c0519 100%)" # Rose/Red
+    )
 
 with c2:
-    st.markdown(f'<div class="prompt-box">{gp2}</div>', unsafe_allow_html=True)
-    if st.button("📝 Use: Photosynthesis Systems", key="btn_gp2"):
-        set_prompt(gp2)
-        st.rerun()
-
-    st.markdown(f'<div class="prompt-box">{gp4}</div>', unsafe_allow_html=True)
-    if st.button("📝 Use: ML Paradigm Theory", key="btn_gp4"):
-        set_prompt(gp4)
-        st.rerun()
+    render_card(
+        "Photosynthesis Systems", 
+        gp2, gp2, "btn_gp2", 
+        "linear-gradient(135deg, #065f46 0%, #064e3b 100%)" # Emerald/Green
+    )
+    render_card(
+        "ML Paradigm Theory", 
+        gp4, gp4, "btn_gp4", 
+        "linear-gradient(135deg, #1e40af 0%, #172554 100%)" # Blue
+    )
 
 if st.session_state.auto_run:
     pass
@@ -294,7 +442,16 @@ if (run_btn or st.session_state.auto_run) and prompt.strip():
     
     with st.spinner("Running reasoning engine..."):
         t0 = time.time()
-        result = run_infer(prompt)
+        # Collect API Config
+        api_config = {
+            "main_provider": st.session_state.get("main_provider", "Groq"),
+            "verifier_provider": st.session_state.get("verifier_provider", "Groq"),
+            "groq_api_key": st.session_state.get("groq_api_key", ""),
+            "gemini_api_key": st.session_state.get("gemini_api_key", ""),
+            "main_model": st.session_state.get("main_model"),
+            "verifier_model": st.session_state.get("verifier_model"),
+        }
+        result = run_infer(prompt, api_config=api_config)
         runtime = time.time() - t0  # System Latency
 
 def extract_ceras_features(prompt_text):
@@ -344,13 +501,23 @@ if st.session_state.auto_run:
     should_run = True
     st.session_state.auto_run = False
 
+#Collect API Config (Always available)
+api_config = {
+    "main_provider": st.session_state.get("main_provider", "Groq"),
+    "verifier_provider": st.session_state.get("verifier_provider", "Groq"),
+    "groq_api_key": st.session_state.get("groq_api_key", ""),
+    "gemini_api_key": st.session_state.get("gemini_api_key", ""),
+    "main_model": st.session_state.get("main_model"),
+    "verifier_model": st.session_state.get("verifier_model"),
+}
+
 if should_run and prompt.strip():
     with st.spinner("Running reasoning engine..."):
         t0 = time.time()
         # Calculate User Latency (Formulation Time)
         st.session_state.formulation_time = time.time() - st.session_state.start_time
         
-        result = run_infer(prompt)
+        result = run_infer(prompt, api_config=api_config)
         runtime = time.time() - t0
         
         # Store results in session state for persistence
@@ -358,13 +525,33 @@ if should_run and prompt.strip():
         st.session_state.current_runtime = runtime
         st.session_state.current_prompt = prompt
 
+    #Render Results IMMEDIATELY
+    result = st.session_state.current_result
+    result_prompt = st.session_state.current_prompt
+    st.markdown("## Learning Response")
+
+    final_steps = result.get("final_answer", [])
+    if isinstance(final_steps, list):
+        for i, step in enumerate(final_steps, 1):
+            st.markdown(f"**{i}.** {step}")
+    else:
+        st.write(final_steps)
+
+    #Trace
+    with st.expander("Reasoning Trace"):
+        st.caption("Detailed logs of the decomposition and verification process.")
+        logs = result.get("logs", "")
+        st.code(logs)
+
+    # --- CNN & FUSION LOGIC RESTORED ---
+    
     #Generate and store adaptive response
     from llm_utils import generate_adaptive_response
 
     #Extract Real Features
     final_steps = result.get("final_answer", [])
 
-    features = extract_ceras_features(prompt)
+    features = extract_ceras_features(result_prompt)
 
     #CEPM Inference
     cepm_input = np.array([features[f] for f in cepm_features]).reshape(1, -1)
@@ -384,85 +571,6 @@ if should_run and prompt.strip():
     fusion_engine = CERASFusion()
 
     fusion_df = fusion_engine.fuse(
-    session_ids=["session_1"],
-    cepm_scores=[cepm_score],
-    cnn_scores=[cnn_score])
-
-    fused_score = fusion_df["fused_ce_score"].iloc[0]
-    confidence = fusion_df["confidence"].iloc[0]
-
-    #Generate Adaptive Response
-    try:
-        with st.spinner("Generating personalized learning summary..."):
-            st.session_state.adaptive_res = generate_adaptive_response(
-                prompt,
-                final_steps,
-                fused_score,
-                confidence
-        )
-    except Exception as e:
-        st.warning("Adaptive response unavailable (LLM rate limit reached).")
-        st.session_state.adaptive_res = None
-
-#Render Results if available
-if "current_result" in st.session_state and st.session_state.current_result is not None:
-    result = st.session_state.current_result
-    runtime = st.session_state.current_runtime
-    #Use the prompt that generated the result for scoring to ensure consistency
-    result_prompt = st.session_state.current_prompt
-
-    #Final Answer
-    st.markdown("## Learning Response")
-
-    final_steps = result.get("final_answer", [])
-
-    if isinstance(final_steps, list):
-        for i, step in enumerate(final_steps, 1):
-            st.markdown(f"**{i}.** {step}")
-    else:
-        st.write(final_steps)
-
-    #Raw Sensor Data
-    st.markdown("---")
-    st.markdown("### Live User Telemetry (Raw Inputs)")
-    st.caption("Data captured from user interaction *before* feature extraction.")
-
-    r1, r2, r3, r4 = st.columns(4)
-    
-    with r1:
-        st.metric("Formulation Time", f"{st.session_state.formulation_time:.2f}s", help="Time taken to type/submit")
-    with r2:
-        st.metric("System Latency", f"{runtime:.3f}s", help="AI Processing Time")
-    with r3:
-        st.metric("Input Volume", f"{len(result_prompt)} chars")
-    with r4:
-        #Simulated "Live" status for external sensors
-        st.metric("Gaze Tracker", "Active", delta="Tracking", delta_color="normal")
-
-    #CERAS Analysis
-    st.markdown("---")
-    st.markdown("Cognitive Efficiency Analysis")
-    
-    # Extract simulated signals (Using result_prompt)
-    features = extract_ceras_features(result_prompt)
-
-    #CEPM
-    cepm_input = np.array([features[f] for f in cepm_features]).reshape(1, -1)
-    cepm_input_scaled = cepm_scaler.transform(cepm_input)
-    cepm_score = float(np.clip(cepm_model.predict(cepm_input_scaled)[0], 0, 1))
-
-    #CNN
-    cnn_input = np.array([features[f] for f in cnn_features]).reshape(1, -1)
-    cnn_input = cnn_scaler.transform(cnn_input)
-
-    if len(cnn_model.input_shape) == 3:
-        cnn_input = cnn_input.reshape(cnn_input.shape[0], cnn_input.shape[1], 1)
-
-    cnn_score = float(np.clip(np.squeeze(cnn_model.predict(cnn_input, verbose=0)), 0, 1))
-
-    fusion_engine = CERASFusion()
-
-    fusion_df = fusion_engine.fuse(
         session_ids=["session_1"],
         cepm_scores=[cepm_score],
         cnn_scores=[cnn_score]
@@ -473,250 +581,155 @@ if "current_result" in st.session_state and st.session_state.current_result is n
     diagnostics = fusion_df["diagnostics"].iloc[0]
     readiness = fusion_df["readiness_label"].iloc[0]
 
+    feature_count = len(features)
+    est_prompt_tokens = int(len(prompt) / 4)
+    est_response_tokens = int(len(str(final_steps)) / 4)
+    total_tokens = est_prompt_tokens + est_response_tokens
+    
+    # --- DIAGNOSTICS LOGIC ---
+    strengths = []
+    suggestions = []
+
+    if cepm_score > 0.75:
+        strengths.append("Strong structural complexity and adequate length.")
+    else:
+        suggestions.append("Try adding more specific constraints or context to increase structural density.")
+
+    if cnn_score > 0.75:
+        strengths.append("High semantic clarity; intent matches known high-performing patterns.")
+    else:
+        suggestions.append("Clarify the core intent. Use precise domain terminology to improve semantic alignment.")
+
+    if not strengths:
+        strengths.append("Prompt is functional but has room for optimization across all dimensions.")
+    if not suggestions:
+        suggestions.append("Excellent prompt! Maintains high cognitive efficiency.")
+
+    # --- DISPLAY METRICS & DIAGNOSTICS ---
+    
+    # 1. Session Metrics
+    st.markdown("### ⏱️ Session Metrics")
+    m1, m2, m3, m4 = st.columns(4)
+    with m1:
+        st.metric("Formulation Time", f"{st.session_state.formulation_time:.2f}s")
+    with m2:
+        st.metric("Processing Time", f"{runtime:.2f}s")
+    with m3:
+        st.metric("Est. Tokens", f"{total_tokens}")
+    with m4:
+        st.metric("Features Extracted", f"{feature_count}")
+
+    # 2. Diagnostic Report
+    with st.expander("📋 Cognitive Diagnostic Report", expanded=True):
+        d1, d2 = st.columns(2)
+        with d1:
+            st.markdown("**✅ Strengths**")
+            for s in strengths:
+                st.markdown(f"- {s}")
+        with d2:
+            st.markdown("**💡 Suggestions for Improvement**")
+            for s in suggestions:
+                st.markdown(f"- {s}")
+
+    # 3. Download Report
+    report_text = f"""CERAS Session Report
+====================
+Date: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+Session ID: session_1
+
+PROMPT:
+{prompt}
+
+METRICS:
+- Formulation Time: {st.session_state.formulation_time:.2f}s
+- Processing Time: {runtime:.2f}s
+- Est. Tokens: {total_tokens}
+
+SCORES:
+- Fused CE Score: {fused_score:.2f}
+- Structural (CEPM): {cepm_score:.2f}
+- Semantic (CNN): {cnn_score:.2f}
+- Readiness: {readiness} ({confidence:.2f} confidence)
+
+DIAGNOSTICS:
+Strengths:
+{chr(10).join(['- ' + s for s in strengths])}
+
+Suggestions:
+{chr(10).join(['- ' + s for s in suggestions])}
+
+LEARNING RESPONSE:
+{chr(10).join([f"{i}. {s}" for i, s in enumerate(final_steps, 1)]) if isinstance(final_steps, list) else str(final_steps)}
+"""
+    st.download_button(
+        label="📥 Download Session Report",
+        data=report_text,
+        file_name=f"ceras_report_{int(time.time())}.txt",
+        mime="text/plain"
+    )
+
+    # --- CE DISPLAY ---
+    st.markdown("### 🧠 Cognitive Efficiency Analysis")
+    
+    # Main Score Dashboard
+    k1, k2, k3, k4 = st.columns(4)
+    with k1:
+        st.metric("Fused CE Score", f"{fused_score:.2f}", delta="Target: > 0.7")
+    with k2:
+        st.metric("Structural (CEPM)", f"{cepm_score:.2f}")
+    with k3:
+        st.metric("Semantic (CNN)", f"{cnn_score:.2f}")
+    with k4:
+        # Color code the readiness
+        r_color = "green" if "High" in readiness else ("orange" if "Medium" in readiness else "red")
+        st.markdown(f"**Readiness:** :{r_color}[{readiness}]")
+        st.caption(f"Confidence: {confidence:.2f}")
+
+    # Explanation
+    st.info(
+        """
+        **What does this mean?**
+        - **Fused Score**: A holistic measure of how well your prompt is structured for LLM reasoning.
+        - **Structural (CEPM)**: Measures prompt length, complexity, and density.
+        - **Semantic (CNN)**: Measures the "meaning" and intent clarity matches with high-performing patterns.
+        """
+    )
+
+    # Live Telemetry
+    with st.expander("📡 Live Telemetry & Diagnostics"):
+        t1, t2 = st.columns(2)
+        with t1:
+            st.markdown("**Extracted Features**")
+            st.json(features)
+        with t2:
+            st.markdown("**System Diagnostics**")
+            st.write(diagnostics)
+
+    #Generate Adaptive Response
+    if "adaptive_res" not in st.session_state or st.session_state.current_prompt != prompt:
+        try:
+            with st.spinner("Generating personalized learning summary..."):
+                st.session_state.adaptive_res = generate_adaptive_response(
+                    prompt,
+                    final_steps,
+                    fused_score,
+                    diagnostics,
+                    api_config=api_config
+                )
+        except Exception as e:
+            st.warning(f"Adaptive response unavailable: {e}")
+            st.session_state.adaptive_res = None
+    
     #Adaptive Learning Response
     st.markdown("## Adaptive Learning Response")
     
-    if "adaptive_res" in st.session_state:
+    if st.session_state.adaptive_res:
         st.markdown(st.session_state.adaptive_res)
     else:
-        st.info("Adaptive response not available.")
+        st.info("Adaptive response unavailable.")
 
-    #Live Data Visulaization
-    st.markdown("### Live Cognitive Signals")
-    
-    #Create a visual dashboard for the signals
-    sig_col1, sig_col2 = st.columns(2)
-    
-    with sig_col1:
-        st.markdown("**CEPM**")
-        st.progress(float(cepm_score), text=f"Load: {cepm_score:.2f}")
-        st.caption("Derived from knowledge")
-        
-    with sig_col2:
-        st.markdown("**CNN (Behavioural)**")
-        st.progress(float(cnn_score), text=f"Focus: {cnn_score:.2f}")
-        st.caption("Derived from interaction cadence")
-    
-    st.markdown("---")
-    
-    # Main Score Visualization
-    m1, m2 = st.columns([1, 2])
-    
-    with m1:
-        st.metric("Fused CE Score", f"{fused_score:.2f}", delta="Real-time")
-        if fused_score > 0.7:
-            st.success("State: High Efficiency (Flow)")
-        elif fused_score > 0.4:
-            st.warning("State: Moderate Load")
-        else:
-            st.error("State: High Cognitive Load")
-            
-    with m2:
-        st.markdown("**Fusion Engine Confidence**")
-        st.progress(float(confidence), text=f"Confidence: {confidence:.2f}")
-        st.info(f"Readiness State: {readiness}")
+# (End of main execution block, skip rendering logic below since we moved it up)
 
-    #Fused CE Score(Explain)
-    with st.expander("What is the Fused CE Score?"):
-        st.markdown("""
-            ### Fused Cognitive Efficiency (CE) Score
-
-            The **Fused CE Score** reflects how efficiently you are learning in this session.
-
-            It combines three independent signals:
-
-            • **Conceptual Strength (CEPM)** – Depth of understanding  
-            • **Behavioral & Reasoning Alignment (CNN)** – Interaction patterns, engagement consistency, and structural reasoning signals 
-
-            These are fused into a single score between **0 and 1**.
-
-            ### What Your Level Means
-
-            **0.00 – 0.44 → Foundation Building**  
-            You may need to revisit core concepts and slow down. Strengthen fundamentals before moving forward.
-
-            **0.45 – 0.59 → Developing Momentum**  
-            You're engaging and learning, but some inconsistencies exist. Refining strategy will help.
-
-            **0.60 – 0.74 → Progressing Confidently**  
-            You demonstrate stable understanding and good engagement. Keep challenging yourself.
-
-            **0.75 – 1.00 → Peak Learning State**  
-            You are operating with strong clarity, alignment, and efficiency. Ready for advanced challenges.
-
-            This score reflects learning efficiency — not intelligence — and adapts to your behavior in real time.
-            """)
-
-    #Diagnostic Report
-    with st.expander("Cognitive Diagnostic Report"):
-
-        if fused_score < 0.40:
-            st.markdown("""
-            ### High Cognitive Load
-
-            Your overall cognitive efficiency is currently low.
-
-            **What this means:**  
-            You may be struggling with core concepts, reasoning structure, or engagement consistency.
-
-            **Recommended action:**  
-            • Revisit foundational concepts  
-            • Slow down your reasoning steps  
-            • Avoid jumping directly to conclusions  
-            • Practice structured problem solving  
-            """)
-
-        elif fused_score < 0.60:
-            st.markdown("""
-            ### Developing Understanding
-
-            You are making progress, but inconsistencies are present.
-
-            **What this means:**  
-            Your conceptual understanding and reasoning structure are partially aligned.
-
-            **Recommended action:**  
-            • Strengthen logical flow  
-            • Write clearer intermediate steps  
-            • Reduce reasoning shortcuts  
-            """)
-
-        elif fused_score < 0.75:
-            st.markdown("""
-            ### Stable Cognitive Processing
-
-            Your reasoning and engagement are well aligned.
-
-            **What this means:**  
-            You are learning efficiently with minor areas for refinement.
-
-            **Recommended action:**  
-            • Challenge yourself with harder problems  
-            • Maintain structured reasoning  
-            • Improve depth of explanations  
-            """)
-
-        else:
-            st.markdown("""
-            ### Peak Cognitive Efficiency
-
-            Your conceptual clarity, behavioral engagement, and reasoning alignment are strongly synchronized.
-
-            **What this means:**  
-            You are operating in a high-efficiency learning state.
-
-            **Recommended action:**  
-            • Attempt advanced multi-step problems  
-            • Explore edge cases  
-            • Try teaching the concept back  
-            """)
-
-    #Improvement Suggestions
-    with st.expander("Improvement Suggestions"):
-
-        if fused_score < 0.4:
-            st.markdown(
-                """
-                ### Priority: Rebuild Core Understanding
-
-                - Revisit fundamental definitions and key principles.  
-                - Solve 10–15 structured foundational problems.  
-                - Focus on understanding *why* each step works.  
-                - Avoid jumping directly to final answers.
-                """
-            )
-
-        elif fused_score < 0.6:
-            st.markdown(
-                """
-                ### Priority: Strengthen Logical Structure
-
-                - Break problems into clear step-by-step reasoning.  
-                - Write intermediate logic before concluding.  
-                - Double-check assumptions between steps.  
-                - Practice moderate-difficulty structured exercises.
-                """
-            )
-
-        elif fused_score < 0.75:
-            st.markdown(
-                """
-                ### Priority: Improve Consistency & Depth
-
-                - Solve mixed-difficulty problems with structured reasoning.  
-                - Explain your thought process explicitly.  
-                - Maintain clarity under mild time pressure.  
-                - Reduce small logical jumps.
-                """
-            )
-
-        else:
-            st.markdown(
-                """
-                ### Priority: Expand Mastery & Complexity
-
-                - Attempt multi-stage and cross-topic problems.  
-                - Practice timed reasoning sessions.  
-                - Teach the concept back in your own words.  
-                - Explore advanced variations and edge cases.
-                """
-            )
-
-    #Confidence Interpretation
-    with st.expander("Model Confidence Interpretation"):
-
-        if confidence < 0.4:
-            st.write(
-                "**Very Low Confidence**\n\n"
-                "Strong disagreement was detected between cognitive understanding, "
-                "behavioral engagement, and reasoning structure.\n\n"
-                "This assessment should be interpreted cautiously, and additional "
-                "interactions may be required for reliable evaluation."
-            )
-
-        elif confidence < 0.6:
-            st.write(
-                "**Low–Moderate Confidence**\n\n"
-                "There is noticeable inconsistency between learning signals.\n\n"
-                "Some aspects of understanding or engagement may not be stable "
-                "across similar tasks."
-            )
-
-        elif confidence < 0.85:
-            st.write(
-                "**High Confidence**\n\n"
-                "Cognitive and behavioral signals are largely aligned.\n\n"
-                "The system considers this assessment reasonably stable and reliable."
-            )
-
-        else:
-            st.write(
-                "**Very High Confidence**\n\n"
-                "All major learning signals are strongly aligned.\n\n"
-                "This indicates stable reasoning patterns and consistent engagement."
-            )
-
-    #Trace
-    with st.expander("Reasoning Trace"):
-        st.caption("Detailed logs of the decomposition and verification process.")
-        logs = result.get("logs", "")
-        st.code(logs)
-
-    #Export
-    export = {
-        "prompt": result_prompt,
-        "fused_ce_score": float(fused_score),
-        "confidence": float(confidence),
-        "diagnostics": diagnostics,
-        "timestamp": datetime.utcnow().isoformat()
-    }
-
-    st.download_button(
-        "Download Session Report",
-        data=json.dumps(export, indent=2),
-        file_name="ceras_session.json",
-        mime="application/json",
-    )
 
 #Empty State
 if not run_btn:

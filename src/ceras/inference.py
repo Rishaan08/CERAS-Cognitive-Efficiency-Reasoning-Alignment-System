@@ -5,13 +5,15 @@ from typing import Any, Dict, List, Union
 from llm_utils import run_decomposer
 
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
 VERIFICATION_MODEL = 'llama-3.1-8b-instant'
-llm_verify = ChatGroq(model=VERIFICATION_MODEL, api_key=os.environ.get("GROQ_API_KEY"))  
+# Global instance removed/commented out to support dynamic instantiation
+# llm_verify = ChatGroq(model=VERIFICATION_MODEL, api_key=os.environ.get("GROQ_API_KEY"))  
 
 
 def _make_subtask_dict(id_: str = None, inp: str = "", out: str = "") -> Dict[str, str]:
@@ -99,12 +101,60 @@ def build_quick_verifier_prompt(original_prompt: str, subtasks: List[Dict[str, A
     return prompt
 
 
+def get_verifier_llm(api_config: dict = None):
+    provider = "Groq"
+    api_key = None
+    if api_config:
+        provider = api_config.get("verifier_provider", "Groq")
+        if provider == "Groq":
+            api_key = api_config.get("groq_api_key")
+        elif provider == "Gemini":
+            api_key = api_config.get("gemini_api_key")
+    
+    # Fallback
+    if not api_key:
+        if provider == "Groq":
+             api_key = os.environ.get("GROQ_API_KEY")
+        elif provider == "Gemini":
+             api_key = os.environ.get("GOOGLE_API_KEY")
+
+    # Determine model
+    if provider == "Gemini":
+        model_name = "gemini-2.5-flash" # default
+    else:
+        model_name = VERIFICATION_MODEL # default
+        
+    if api_config and api_config.get("verifier_model"):
+        model_name = api_config.get("verifier_model")
+
+    if provider == "Gemini":
+         if not api_key:
+              api_key = os.environ.get("GOOGLE_API_KEY")
+         return ChatGoogleGenerativeAI(model=model_name, google_api_key=api_key)
+    else:
+         if not api_key:
+              api_key = os.environ.get("GROQ_API_KEY")
+         return ChatGroq(model=model_name, api_key=api_key)
+
+
 # --- fast verifier call ---
-def fast_verify_subtasks(original_prompt: str, raw_subtasks: Union[List[Any], Any], domain_hint: str = "") -> Dict[str, Any]:
+def fast_verify_subtasks(original_prompt: str, raw_subtasks: Union[List[Any], Any], domain_hint: str = "", api_config: dict = None) -> Dict[str, Any]:
     subtasks = normalize_subtasks(raw_subtasks)
     prompt = build_quick_verifier_prompt(original_prompt, subtasks, domain_hint)
-    raw_msg = llm_verify.invoke(prompt)
-    raw = raw_msg.content if hasattr(raw_msg, "content") else str(raw_msg)
+    
+    try:
+        llm_verify = get_verifier_llm(api_config)
+        raw_msg = llm_verify.invoke(prompt)
+        raw = raw_msg.content if hasattr(raw_msg, "content") else str(raw_msg)
+    except Exception as e:
+        return {
+             "accept_all": False,
+             "missing": ["verifier_error"],
+             "suggestions": [f"Verifier failed: {str(e)}"],
+             "subtasks": subtasks,
+             "raw_verifier": str(e)
+        }
+
     try:
         parsed = extract_json_from_text(raw)
     except Exception:
@@ -134,7 +184,8 @@ def run_inference_pipeline(
     prompt: str,
     domain_hint: str = "",
     auto_extend: bool = False,
-    keep_suggestions_field: bool = True
+    keep_suggestions_field: bool = True,
+    api_config: dict = None
 ) -> Dict[str, Any]:
     """
     Returns a dict containing:
@@ -142,10 +193,10 @@ def run_inference_pipeline(
       - final_subtasks: canonical forwardable subtasks (possibly extended if auto_extend=True)
       - suggestions, missing, raw_verifier
     """
-    raw = run_decomposer(prompt)
+    raw = run_decomposer(prompt, api_config=api_config)
     print(f"[DEBUG] run_decomposer returned type={type(raw)}, preview={str(raw)[:300]}")
 
-    check = fast_verify_subtasks(prompt, raw, domain_hint=domain_hint)
+    check = fast_verify_subtasks(prompt, raw, domain_hint=domain_hint, api_config=api_config)
 
     canonical = check["subtasks"]  # list of canonical subtask dicts
 
