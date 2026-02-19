@@ -6,8 +6,19 @@ import numpy as np
 import os
 import sys
 import joblib
+from pathlib import Path
 import tensorflow as tf
 import re
+
+#Page Configuration
+base_dir = Path(__file__).resolve().parents[2]
+logo_path = base_dir / "assets" / "ceras_logo.png"
+
+st.set_page_config(
+    page_title="CERAS",
+    page_icon=str(logo_path),
+    layout="wide",
+)
 
 artifact_dir = "./artifacts"
 
@@ -52,13 +63,6 @@ from fusion import CERASFusion
 
 #Connection Check
 from llm_utils import check_connection
-
-#Page Configuration
-st.set_page_config(
-    page_title="CERAS",
-    page_icon="🧠",
-    layout="wide",
-)
 
 #CSS Styles
 st.markdown(
@@ -151,18 +155,38 @@ def check_gemini():
 #Sidebar
 with st.sidebar:
 
-    st.markdown(
-        """
-        <div style="text-align:center; padding-bottom: 20px;">
-            <h1 style="margin-bottom:0; font-size: 2.5rem;">🧠</h1>
-            <h2 style="margin-top:0;">CERAS</h2>
-            <p style="color:#94a3b8; font-size:14px; margin-top:5px;">
-                Cognitive Efficiency & Reasoning Alignment System
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    if logo_path.exists():
+        st.markdown(
+            """
+            <div style="display:flex;
+                        flex-direction:column;
+                        align-items:center;
+                        text-align:center;
+                        padding-top:30px;
+                        padding-bottom:25px;">
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            f"""
+            <img src="assets/ceras_logo.png"
+                 width="260"
+                 class="logo-glow" />
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            """
+                <h2 style="margin-top:15px;">CERAS</h2>
+                <p style="color:#94a3b8; font-size:14px;">
+                    Cognitive Efficiency & Reasoning Alignment System
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     st.markdown("### 🔑 API Configuration")
     
@@ -281,20 +305,48 @@ def set_prompt(text):
     st.session_state.auto_run = False
 
 #Header
-st.markdown(
-    """
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="font-size: 3rem; margin-bottom: 10px; background: linear-gradient(to right, #ec4899, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">CERAS</h1>
-        <h3 style="font-weight: 400; color: #cbd5e1; margin-top: 0;">Cognitive Efficiency & Reasoning Alignment System</h3>
-        <p style="color: #94a3b8; max-width: 700px; margin: 0 auto; line-height: 1.6;">
-            <b>CERAS</b> is an advanced reasoning engine designed to optimize your interactions with Large Language Models. 
-            By leveraging <b>Tree-of-Thoughts (ToT)</b> reasoning, multi-modal signal analysis, and cognitive efficiency modeling, 
-            CERAS transforms simple queries into structured, high-fidelity prompts that unlock model intelligence.
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+if logo_path.exists():
+
+    st.markdown(
+        f"""
+        <div style="display:flex;
+                    flex-direction:column;
+                    align-items:center;
+                    justify-content:center;
+                    text-align:center;
+                    margin-top:80px;
+                    margin-bottom:40px;">
+
+            <img src="assets/ceras_logo.png"
+                 width="300"
+                 class="logo-glow"
+                 style="margin-bottom:30px;" />
+
+            <h1 style="font-size:52px;
+                       letter-spacing:3px;
+                       margin-bottom:10px;">
+                CERAS
+            </h1>
+
+            <h3 style="color:#94a3b8;
+                       font-weight:400;
+                       font-size:22px;">
+                Cognitive Efficiency Reasoning Alignment System
+            </h3>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+st.markdown("""
+<div style="text-align: justify;">
+<b>CERAS</b> is an advanced adaptive learning environment designed to optimize how you learn and solve complex problems. 
+By fusing <b>Large Language Model (LLM)</b> reasoning capabilities with real-time <b>Cognitive Efficiency</b> metrics, current behavioral diagnostics, and 
+neuro-fuzzy alignment, CERAS provides a personalized learning experience. It analyzes your input complexity, structure, and intent to guide you 
+through deep concepts with tailored roadmaps, ensuring you don't just get answers, but truly master the material.
+</div>
+""", unsafe_allow_html=True)
 
 with st.expander("🎓 Guide: How to Write the Perfect Prompt", expanded=False):
     st.markdown(
@@ -343,7 +395,7 @@ def render_card(title, text, prompt_var, btn_key, gradient):
     )
     # Spacer
     st.markdown('<div style="height: 10px;"></div>', unsafe_allow_html=True)
-    if st.button(f"🚀 Select: {title}", key=btn_key, use_container_width=True):
+    if st.button(f"Select: {title}", key=btn_key, use_container_width=True):
         set_prompt(prompt_var)
         st.rerun()
 
@@ -536,14 +588,6 @@ if should_run and prompt.strip():
             st.markdown(f"**{i}.** {step}")
     else:
         st.write(final_steps)
-
-    #Trace
-    with st.expander("Reasoning Trace"):
-        st.caption("Detailed logs of the decomposition and verification process.")
-        logs = result.get("logs", "")
-        st.code(logs)
-
-    # --- CNN & FUSION LOGIC RESTORED ---
     
     #Generate and store adaptive response
     from llm_utils import generate_adaptive_response
@@ -605,9 +649,9 @@ if should_run and prompt.strip():
     if not suggestions:
         suggestions.append("Excellent prompt! Maintains high cognitive efficiency.")
 
-    # --- DISPLAY METRICS & DIAGNOSTICS ---
+
     
-    # 1. Session Metrics
+    #Session Metrics
     st.markdown("### ⏱️ Session Metrics")
     m1, m2, m3, m4 = st.columns(4)
     with m1:
@@ -619,57 +663,20 @@ if should_run and prompt.strip():
     with m4:
         st.metric("Features Extracted", f"{feature_count}")
 
-    # 2. Diagnostic Report
-    with st.expander("📋 Cognitive Diagnostic Report", expanded=True):
+    #Diagnostic Report
+    with st.expander("Cognitive Diagnostic Report", expanded=True):
         d1, d2 = st.columns(2)
         with d1:
-            st.markdown("**✅ Strengths**")
+            st.markdown("**Strengths**")
             for s in strengths:
                 st.markdown(f"- {s}")
         with d2:
-            st.markdown("**💡 Suggestions for Improvement**")
+            st.markdown("**Suggestions for Improvement**")
             for s in suggestions:
                 st.markdown(f"- {s}")
 
-    # 3. Download Report
-    report_text = f"""CERAS Session Report
-====================
-Date: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-Session ID: session_1
-
-PROMPT:
-{prompt}
-
-METRICS:
-- Formulation Time: {st.session_state.formulation_time:.2f}s
-- Processing Time: {runtime:.2f}s
-- Est. Tokens: {total_tokens}
-
-SCORES:
-- Fused CE Score: {fused_score:.2f}
-- Structural (CEPM): {cepm_score:.2f}
-- Semantic (CNN): {cnn_score:.2f}
-- Readiness: {readiness} ({confidence:.2f} confidence)
-
-DIAGNOSTICS:
-Strengths:
-{chr(10).join(['- ' + s for s in strengths])}
-
-Suggestions:
-{chr(10).join(['- ' + s for s in suggestions])}
-
-LEARNING RESPONSE:
-{chr(10).join([f"{i}. {s}" for i, s in enumerate(final_steps, 1)]) if isinstance(final_steps, list) else str(final_steps)}
-"""
-    st.download_button(
-        label="📥 Download Session Report",
-        data=report_text,
-        file_name=f"ceras_report_{int(time.time())}.txt",
-        mime="text/plain"
-    )
-
     # --- CE DISPLAY ---
-    st.markdown("### 🧠 Cognitive Efficiency Analysis")
+    st.markdown("###Cognitive Efficiency Analysis")
     
     # Main Score Dashboard
     k1, k2, k3, k4 = st.columns(4)
@@ -685,15 +692,36 @@ LEARNING RESPONSE:
         st.markdown(f"**Readiness:** :{r_color}[{readiness}]")
         st.caption(f"Confidence: {confidence:.2f}")
 
-    # Explanation
-    st.info(
-        """
-        **What does this mean?**
-        - **Fused Score**: A holistic measure of how well your prompt is structured for LLM reasoning.
-        - **Structural (CEPM)**: Measures prompt length, complexity, and density.
-        - **Semantic (CNN)**: Measures the "meaning" and intent clarity matches with high-performing patterns.
-        """
-    )
+    # Explanation Fused CE Score
+    with st.expander("What is the Fused CE Score?"):
+        st.markdown("""
+            ### Fused Cognitive Efficiency (CE) Score
+
+            The **Fused CE Score** reflects how efficiently you are learning in this session.
+
+            It combines two independent signals:
+
+            • **Conceptual Strength (CEPM)** – Depth of understanding  
+            • **Behavioral & Reasoning Alignment (CNN)** – Interaction patterns, engagement consistency, and structural reasoning signals 
+
+            These are fused into a single score between **0 and 1**.
+
+            ### What Your Level Means
+
+            **0.00 – 0.44 → Foundation Building**  
+            You may need to revisit core concepts and slow down. Strengthen fundamentals before moving forward.
+
+            **0.45 – 0.59 → Developing Momentum**  
+            You're engaging and learning, but some inconsistencies exist. Refining strategy will help.
+
+            **0.60 – 0.74 → Progressing Confidently**  
+            You demonstrate stable understanding and good engagement. Keep challenging yourself.
+
+            **0.75 – 1.00 → Peak Learning State**  
+            You are operating with strong clarity, alignment, and efficiency. Ready for advanced challenges.
+
+            This score reflects learning efficiency — not intelligence — and adapts to your behavior in real time.
+            """)
 
     # Live Telemetry
     with st.expander("📡 Live Telemetry & Diagnostics"):
@@ -728,8 +756,44 @@ LEARNING RESPONSE:
     else:
         st.info("Adaptive response unavailable.")
 
-# (End of main execution block, skip rendering logic below since we moved it up)
+    #Trace
+    with st.expander("Reasoning Trace"):
+        st.caption("Detailed logs of the decomposition and verification process.")
+        logs = result.get("logs", "")
+        st.code(logs)
 
+    #Download Report
+    report_text = f"""CERAS Session Report
+    
+    Date: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+    Session ID: session_1
+
+    Prompt: {prompt}
+
+    Metrics:
+    - Formulation Time: {st.session_state.formulation_time:.2f}s
+    - Processing Time: {runtime:.2f}s
+    - Est. Tokens: {total_tokens}
+
+    Scores:
+    - Fused CE Score: {fused_score:.2f}
+    - Structural (CEPM): {cepm_score:.2f}
+    - Semantic (CNN): {cnn_score:.2f}
+    - Readiness: {readiness} ({confidence:.2f} confidence)
+
+    Diagnostics:
+    Strengths: {chr(10).join(['- ' + s for s in strengths])}
+
+    Suggestions: {chr(10).join(['- ' + s for s in suggestions])}
+
+    Learning Response: {chr(10).join([f"{i}. {s}" for i, s in enumerate(final_steps, 1)]) if isinstance(final_steps, list) else str(final_steps)}
+"""
+    st.download_button(
+        label="📥 Download Session Report",
+        data=report_text,
+        file_name=f"ceras_report_{int(time.time())}.txt",
+        mime="text/plain"
+    )
 
 #Empty State
 if not run_btn:
