@@ -2,6 +2,12 @@ FROM python:3.10.13-slim
 
 WORKDIR /app
 
+# Install required system libraries
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY . /app
 
 RUN pip install --upgrade pip
