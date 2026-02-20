@@ -1,12 +1,10 @@
 streamlit
 numpy
-pandas
 scikit-learn
-lightgbm
-tensorflow==2.16.1
+tensorflow
 joblib
 langchain==0.3.27
-langchain-community==0.3.27
+langchain_community==0.3.27
 langchain-groq
 openai
 tiktoken
