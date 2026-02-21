@@ -128,3 +128,27 @@
 .run-btn:disabled:hover::before {
     left: -100%;
 }
+
+/* Error state for run button */
+.run-btn.run-btn-error {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    border-color: rgba(239, 68, 68, 0.3);
+    opacity: 0.85;
+    animation: none;
+}
+
+.model-error-msg {
+    margin-top: 10px;
+    padding: 10px 16px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: var(--radius-sm);
+    color: #fca5a5;
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.model-error-msg .error-hint {
+    color: var(--text-muted);
+    font-style: italic;
+}

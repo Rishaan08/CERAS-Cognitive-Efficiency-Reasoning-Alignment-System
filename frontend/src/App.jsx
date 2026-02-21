@@ -29,6 +29,7 @@ export default function App() {
     const [result, setResult] = useState(null);
     const [hasResult, setHasResult] = useState(false);
     const [modelsLoaded, setModelsLoaded] = useState(false);
+    const [modelError, setModelError] = useState(null);
     const startTimeRef = useRef(Date.now());
 
     const { analytics, onKeyDown, reset: resetAnalytics } = useTypingAnalytics();
@@ -41,11 +42,16 @@ export default function App() {
                 const data = await checkHealth();
                 if (!alive) return;
                 setModelsLoaded(data.models_loaded);
-                if (!data.models_loaded && !data.model_error) {
-                    setTimeout(poll, 2000);
+                setModelError(data.model_error || null);
+                if (!data.models_loaded) {
+                    // Keep polling even on error — models might be reloaded
+                    setTimeout(poll, data.model_error ? 5000 : 2000);
                 }
             } catch {
-                if (alive) setTimeout(poll, 3000);
+                if (alive) {
+                    setModelError('Backend server is not reachable');
+                    setTimeout(poll, 3000);
+                }
             }
         };
         poll();
@@ -126,6 +132,7 @@ export default function App() {
                     onNewProblem={handleNewProblem}
                     loading={loading}
                     modelsLoaded={modelsLoaded}
+                    modelError={modelError}
                     onKeyDown={onKeyDown}
                 />
 
