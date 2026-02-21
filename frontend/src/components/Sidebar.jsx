@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { checkConnection, checkHealth } from '../api';
 import { GEMINI_MODELS, GROQ_MODELS, OPENAI_MODELS } from '../data/examples';
+import logo from '../assets/logo.png';  
 import './Sidebar.css';
 
 export default function Sidebar({ config, setConfig }) {
@@ -66,7 +67,7 @@ export default function Sidebar({ config, setConfig }) {
         <aside className="sidebar">
             {/* Brand */}
             <div className="sidebar-brand">
-                <img src="/api/logo" alt="CERAS Logo" />
+                <img src={logo} alt="CERAS Logo" />
                 <h2>CERAS</h2>
                 <p>Cognitive Efficiency & Reasoning Alignment System</p>
             </div>
@@ -106,6 +107,7 @@ export default function Sidebar({ config, setConfig }) {
                 {/* Main Model Selection */}
                 <div className="sidebar-section">
                     <div className="sidebar-section-title"><span>🤖</span> Model Selection</div>
+
                     <div className="model-select-group">
                         <div className="group-label">Main Reasoner</div>
                         <div className="model-row">
