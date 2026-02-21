@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { checkConnection, checkHealth } from '../api';
 import { GEMINI_MODELS, GROQ_MODELS, OPENAI_MODELS } from '../data/examples';
-import logo from '../assets/logo.png';  
+import logo from '../assets/ceras_logo.png';  
 import './Sidebar.css';
 
 export default function Sidebar({ config, setConfig }) {
