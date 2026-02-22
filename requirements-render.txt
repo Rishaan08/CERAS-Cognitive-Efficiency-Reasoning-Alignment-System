@@ -1,16 +1,48 @@
-streamlit
+# Core ML
 numpy
 pandas
 scikit-learn
-scipy
-joblib
-lightgbm==4.6.0
-tensorflow==2.16.1
-keras==3.13.0
-langchain
-langchain-community
+matplotlib
+seaborn
+lightgbm
+tensorflow
+keras
+
+# NLP / LLM
+langchain==0.3.27
+langchain_community==0.3.27
+langchain-openai
 langchain-groq
 langchain-google-genai
 openai
+tiktoken
+transformers
+sentence-transformers
+torch
+accelerate
+datasets
+
+# Vector DB / Retrieval
+faiss-cpu
+pinecone-client
+chromadb
+
+# Backend
+fastapi
+uvicorn[standard]
+python-multipart
+aiohttp
+requests
+sqlalchemy
+sqlmodel
 python-dotenv
-pyarrow
+
+# Utilities
+pyyaml
+openpyxl
+rich
+loguru
+zss
+
+# Optional performance (Unix only)
+uvloop; sys_platform != "win32"
