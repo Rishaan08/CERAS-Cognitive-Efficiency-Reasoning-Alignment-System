@@ -331,3 +331,58 @@
     font-size: 0.8rem;
     color: var(--green);
 }
+
+/* Close button — hidden on desktop */
+.sidebar-close-btn {
+    display: none;
+}
+
+/* ── Mobile Sidebar ── */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 300px;
+        min-width: 300px;
+        height: 100vh;
+        height: 100dvh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 100;
+        box-shadow: none;
+    }
+
+    .sidebar.sidebar--open {
+        transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar-close-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-sm);
+        background: var(--bg-input);
+        color: var(--text-secondary);
+        font-size: 1rem;
+        cursor: pointer;
+        z-index: 2;
+        transition: color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .sidebar-close-btn:hover {
+        color: var(--text-primary);
+        border-color: var(--text-muted);
+    }
+
+    .sidebar-brand {
+        position: relative;
+    }
+}

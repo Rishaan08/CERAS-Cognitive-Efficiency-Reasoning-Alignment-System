@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
+import logo from '../../assets/ceras_logo.png';
 import { checkConnection, checkHealth } from '../api';
 import { GEMINI_MODELS, GROQ_MODELS, OPENAI_MODELS } from '../data/examples';
 import './Sidebar.css';
-import logo from '../../assets/ceras_logo.png';
 
-export default function Sidebar({ config, setConfig }) {
+export default function Sidebar({ config, setConfig, isOpen, onClose }) {
     const [statuses, setStatuses] = useState({
         groq: 'Waiting',
         gemini: 'Waiting',
@@ -64,9 +64,10 @@ export default function Sidebar({ config, setConfig }) {
     };
 
     return (
-        <aside className="sidebar">
+        <aside className={`sidebar ${isOpen ? 'sidebar--open' : ''}`}>
             {/* Brand */}
             <div className="sidebar-brand">
+                <button className="sidebar-close-btn" onClick={onClose} aria-label="Close sidebar">✕</button>
                 <img src={logo} alt="CERAS Logo" />
                 <h2>CERAS</h2>
                 <p>Cognitive Efficiency & Reasoning Alignment System</p>

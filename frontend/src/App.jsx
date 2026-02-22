@@ -30,6 +30,7 @@ export default function App() {
     const [hasResult, setHasResult] = useState(false);
     const [modelsLoaded, setModelsLoaded] = useState(false);
     const [modelError, setModelError] = useState(null);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const startTimeRef = useRef(Date.now());
 
     const { analytics, onKeyDown, reset: resetAnalytics } = useTypingAnalytics();
@@ -118,7 +119,29 @@ export default function App() {
 
     return (
         <div className="app-layout">
-            <Sidebar config={config} setConfig={setConfig} />
+            {/* Mobile hamburger toggle */}
+            <button
+                className="mobile-menu-btn"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Open sidebar"
+            >
+                ☰
+            </button>
+
+            {/* Backdrop overlay for mobile */}
+            {sidebarOpen && (
+                <div
+                    className="sidebar-backdrop"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
+            <Sidebar
+                config={config}
+                setConfig={setConfig}
+                isOpen={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+            />
 
             <main className="main-content">
                 <Header />
