@@ -152,6 +152,7 @@ class AdaptiveResponseRequest(BaseModel):
 # --------------- ENDPOINTS ---------------
 
 @app.get("/health")
+@app.get("/api/health")
 def health():
     return {
         "status": "ok",
