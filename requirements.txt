@@ -2,10 +2,8 @@
 numpy
 pandas
 scikit-learn
-matplotlib
-seaborn
 lightgbm
-tensorflow
+tensorflow-cpu
 keras
 
 # NLP / LLM
@@ -16,16 +14,6 @@ langchain-groq
 langchain-google-genai
 openai
 tiktoken
-transformers
-sentence-transformers
-torch
-accelerate
-datasets
-
-# Vector DB / Retrieval
-faiss-cpu
-pinecone-client
-chromadb
 
 # Backend
 fastapi
