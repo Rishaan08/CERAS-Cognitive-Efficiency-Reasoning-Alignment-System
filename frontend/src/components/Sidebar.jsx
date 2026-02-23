@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import logo from '../../assets/ceras_logo.png';
 import { checkConnection, checkHealth } from '../api';
 import { GEMINI_MODELS, GROQ_MODELS, OPENAI_MODELS } from '../data/examples';
@@ -12,6 +12,7 @@ export default function Sidebar({ config, setConfig, isOpen, onClose }) {
     });
     const [modelsLoaded, setModelsLoaded] = useState(false);
     const [modelsLoading, setModelsLoading] = useState(true);
+    const debounceRef = useRef({});
 
     // Poll model loading status
     useEffect(() => {
@@ -33,18 +34,24 @@ export default function Sidebar({ config, setConfig, isOpen, onClose }) {
         return () => { alive = false; };
     }, []);
 
-    // Auto-check connection when keys change
-    const handleKeyChange = async (provider, value) => {
+    // Auto-check connection when keys change (debounced to avoid flooding backend)
+    const handleKeyChange = (provider, value) => {
         const key = provider.toLowerCase();
         setConfig(prev => ({ ...prev, [`${key}_api_key`]: value }));
+
+        // Clear any pending check for this provider
+        if (debounceRef.current[key]) clearTimeout(debounceRef.current[key]);
+
         if (value.length > 10) {
             setStatuses(prev => ({ ...prev, [key]: 'Checking...' }));
-            try {
-                const result = await checkConnection(provider, value);
-                setStatuses(prev => ({ ...prev, [key]: result.connected ? 'Connected' : 'Not Connected' }));
-            } catch {
-                setStatuses(prev => ({ ...prev, [key]: 'Not Connected' }));
-            }
+            debounceRef.current[key] = setTimeout(async () => {
+                try {
+                    const result = await checkConnection(provider, value);
+                    setStatuses(prev => ({ ...prev, [key]: result.connected ? 'Connected' : 'Not Connected' }));
+                } catch {
+                    setStatuses(prev => ({ ...prev, [key]: 'Not Connected' }));
+                }
+            }, 800);
         } else {
             setStatuses(prev => ({ ...prev, [key]: 'Waiting' }));
         }

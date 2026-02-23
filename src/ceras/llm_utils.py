@@ -302,6 +302,8 @@ def solver_fallback(query: str):
 def check_connection(provider: str, api_key: str, model_name: str = None) -> bool:
     """
     Verifies connectivity to the LLM provider with the given key.
+    Returns True if a simple LLM call succeeds, False otherwise.
+    Uses BaseException to catch ALL errors and prevent server crashes.
     """
     if not api_key:
         return False
@@ -324,10 +326,10 @@ def check_connection(provider: str, api_key: str, model_name: str = None) -> boo
                 model_name = "gpt-3.5-turbo"
 
         llm = get_llm_instance(model_name, api_config=config)
-        # Simple invocation
+        # Simple invocation to verify the key works
         llm.invoke("Hello")
         return True
-    except Exception as e:
+    except BaseException as e:
         print(f"[ERROR] Connection check failed for {provider}: {e}")
         return False
 

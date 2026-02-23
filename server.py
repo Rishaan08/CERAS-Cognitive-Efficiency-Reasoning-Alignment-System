@@ -173,11 +173,12 @@ def get_logo():
 
 @app.post("/api/check-connection")
 def check_connection_endpoint(req: CheckConnectionRequest):
-    from llm_utils import check_connection
     try:
+        from llm_utils import check_connection
         result = check_connection(req.provider, req.api_key)
         return {"connected": result}
-    except Exception as e:
+    except BaseException as e:
+        logger.error(f"Connection check failed for {req.provider}: {e}")
         return {"connected": False, "error": str(e)}
 
 
