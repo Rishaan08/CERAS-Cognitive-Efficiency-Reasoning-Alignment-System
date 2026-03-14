@@ -39,3 +39,43 @@ export async function getAdaptiveResponse(payload) {
   }
   return res.json();
 }
+
+export async function parseFile(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch(`${API_BASE}/parse-file`, {
+    method: 'POST',
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'File parse failed' }));
+    throw new Error(err.detail || 'File parse failed');
+  }
+  return res.json();
+}
+
+export async function sendFollowUp(payload) {
+  const res = await fetch(`${API_BASE}/followup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Follow-up failed' }));
+    throw new Error(err.detail || 'Follow-up failed');
+  }
+  return res.json();
+}
+
+export async function generatePlan(payload) {
+  const res = await fetch(`${API_BASE}/generate-plan`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Plan generation failed' }));
+    throw new Error(err.detail || 'Plan generation failed');
+  }
+  return res.json();
+}

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { getAdaptiveResponse } from '../api';
+import FollowUpChat from './FollowUpChat';
+import WorkflowModal from './WorkflowModal';
 import './Dashboard.css';
 
 /* ---- Collapsible Section ---- */
@@ -50,6 +52,9 @@ const getPercentile = (score) => {
 export default function Dashboard({ result, prompt, config, hasResult, typingAnalytics }) {
     const [adaptiveRes, setAdaptiveRes] = useState(null);
     const [adaptiveLoading, setAdaptiveLoading] = useState(false);
+    const [showWorkflow, setShowWorkflow] = useState(false);
+    const [followupCost, setFollowupCost] = useState({ tokens: 0, cost: 0 });
+    const [planCost, setPlanCost] = useState({ tokens: 0, cost: 0 });
     // Animated fill: start from 0 and transition to actual score
     const [animatedScore, setAnimatedScore] = useState(0);
     const heroRef = useRef(null);
@@ -369,12 +374,44 @@ export default function Dashboard({ result, prompt, config, hasResult, typingAna
                 <pre className="trace-pre">{result.logs || 'No logs available.'}</pre>
             </Collapse>
 
+            {/* ===== SOCRATIC FOLLOW-UP ===== */}
+            <FollowUpChat
+                result={result}
+                prompt={prompt}
+                config={config}
+                onCostUpdate={setFollowupCost}
+            />
+
             {/* ===== ACTIONS ===== */}
             <div className="dash-actions">
                 <button className="dash-download-btn" onClick={downloadReport}>
                     📥 Download Session Report
                 </button>
+                <button
+                    className="dash-download-btn dash-plan-btn"
+                    onClick={() => setShowWorkflow(true)}
+                >
+                    🗺 Generate Learning Plan
+                </button>
             </div>
+
+            {/* Cumulative follow-up cost */}
+            {followupCost.tokens > 0 && (
+                <div className="dash-followup-cost">
+                    Follow-up: {followupCost.tokens.toLocaleString()} tokens · ${followupCost.cost.toFixed(6)}
+                </div>
+            )}
+
+            {/* ===== WORKFLOW MODAL ===== */}
+            {showWorkflow && (
+                <WorkflowModal
+                    result={result}
+                    prompt={prompt}
+                    config={config}
+                    onClose={() => setShowWorkflow(false)}
+                    onCostUpdate={setPlanCost}
+                />
+            )}
         </div>
     );
 }

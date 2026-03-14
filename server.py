@@ -11,11 +11,12 @@ import re
 import json
 import threading
 import logging
+import tempfile
 from pathlib import Path
 from datetime import datetime
 
 import numpy as np
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
@@ -147,6 +148,42 @@ class AdaptiveResponseRequest(BaseModel):
     groq_api_key: Optional[str] = ""
     gemini_api_key: Optional[str] = ""
     openai_api_key: Optional[str] = ""
+
+
+class FollowUpRequest(BaseModel):
+    message: str
+    context: Dict[str, Any]  # {prompt, steps, ce_score}
+    history: List[Dict[str, str]] = []  # [{role, content}]
+    main_provider: str = "Groq"
+    main_model: Optional[str] = None
+    groq_api_key: Optional[str] = ""
+    gemini_api_key: Optional[str] = ""
+    openai_api_key: Optional[str] = ""
+
+
+class GeneratePlanRequest(BaseModel):
+    prompt: str
+    steps: List[str]
+    ce_score: float
+    diagnostics: Dict[str, Any]
+    main_provider: str = "Groq"
+    main_model: Optional[str] = None
+    groq_api_key: Optional[str] = ""
+    gemini_api_key: Optional[str] = ""
+    openai_api_key: Optional[str] = ""
+
+
+# --------------- TOKEN COST HELPER ---------------
+# Rates in USD per 1M tokens: (input_rate, output_rate)
+_COST_RATES = {
+    "Groq":   (0.59,  0.79),    # Llama 3.3-70B on Groq
+    "Gemini": (0.075, 0.30),    # Gemini 2.5 Flash
+    "OpenAI": (0.15,  0.60),    # GPT-4o-mini
+}
+
+def _estimate_cost(prompt_tokens: int, completion_tokens: int, provider: str) -> float:
+    inp_rate, out_rate = _COST_RATES.get(provider, (0.59, 0.79))
+    return round((prompt_tokens * inp_rate + completion_tokens * out_rate) / 1_000_000, 8)
 
 
 # --------------- ENDPOINTS ---------------
@@ -297,6 +334,121 @@ def adaptive_response(req: AdaptiveResponseRequest):
         )
         return {"response": response}
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --------------- NEW: FILE PARSING ---------------
+@app.post("/api/parse-file")
+async def parse_file(file: UploadFile = File(...)):
+    """Extract text from uploaded PDF, DOCX, TXT, or CSV files."""
+    filename = (file.filename or "").lower()
+    content = await file.read()
+
+    try:
+        if filename.endswith(".pdf"):
+            import pypdf
+            import io
+            reader = pypdf.PdfReader(io.BytesIO(content))
+            text = "\n".join(page.extract_text() or "" for page in reader.pages)
+
+        elif filename.endswith(".docx"):
+            import docx
+            import io
+            doc = docx.Document(io.BytesIO(content))
+            text = "\n".join(p.text for p in doc.paragraphs)
+
+        elif filename.endswith(".csv"):
+            text = content.decode("utf-8", errors="replace")
+
+        elif filename.endswith(".txt") or filename.endswith(".md"):
+            text = content.decode("utf-8", errors="replace")
+
+        else:
+            raise HTTPException(status_code=400, detail=f"Unsupported file type: {filename}")
+
+        # Truncate to ~8000 chars to keep context manageable
+        if len(text) > 8000:
+            text = text[:8000] + "\n... [truncated]"
+
+        return {"text": text.strip(), "filename": file.filename, "chars": len(text.strip())}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"File parsing error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to parse file: {str(e)}")
+
+
+# --------------- NEW: SOCRATIC FOLLOW-UP ---------------
+@app.post("/api/followup")
+def followup_chat(req: FollowUpRequest):
+    from llm_utils import generate_socratic_followup
+
+    api_config = {
+        "main_provider": req.main_provider,
+        "verifier_provider": req.main_provider,
+        "groq_api_key": req.groq_api_key,
+        "gemini_api_key": req.gemini_api_key,
+        "openai_api_key": req.openai_api_key,
+        "main_model": req.main_model,
+    }
+
+    try:
+        response, prompt_tokens, completion_tokens = generate_socratic_followup(
+            user_message=req.message,
+            context=req.context,
+            history=req.history,
+            api_config=api_config,
+        )
+        total_tokens = prompt_tokens + completion_tokens
+        cost_usd = _estimate_cost(prompt_tokens, completion_tokens, req.main_provider)
+
+        return {
+            "response": response,
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+            "cost_usd": cost_usd,
+        }
+    except Exception as e:
+        logger.error(f"Follow-up error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --------------- NEW: LEARNING PLAN GENERATOR ---------------
+@app.post("/api/generate-plan")
+def generate_plan(req: GeneratePlanRequest):
+    from llm_utils import generate_learning_plan
+
+    api_config = {
+        "main_provider": req.main_provider,
+        "verifier_provider": req.main_provider,
+        "groq_api_key": req.groq_api_key,
+        "gemini_api_key": req.gemini_api_key,
+        "openai_api_key": req.openai_api_key,
+        "main_model": req.main_model,
+    }
+
+    try:
+        plan, prompt_tokens, completion_tokens = generate_learning_plan(
+            query=req.prompt,
+            steps=req.steps,
+            ce_score=req.ce_score,
+            diagnostics=req.diagnostics,
+            api_config=api_config,
+        )
+        total_tokens = prompt_tokens + completion_tokens
+        cost_usd = _estimate_cost(prompt_tokens, completion_tokens, req.main_provider)
+
+        return {
+            "plan": plan,
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+            "cost_usd": cost_usd,
+        }
+    except Exception as e:
+        logger.error(f"Plan generation error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

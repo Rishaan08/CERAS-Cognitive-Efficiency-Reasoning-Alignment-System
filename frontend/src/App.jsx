@@ -222,6 +222,10 @@ export default function App() {
                     modelError={modelError}
                     onKeyDown={onKeyDown}
                     onPaste={simulateFromPaste}
+                    onFileContent={(text) => {
+                        const sep = prompt.trim() ? '\n\n---\n[File Content]:\n' : '';
+                        setPrompt(prev => prev + sep + text.slice(0, 4000));
+                    }}
                 />
 
                 {/* Live Prompt Score — appears below textarea */}

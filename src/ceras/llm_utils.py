@@ -424,3 +424,114 @@ def generate_adaptive_response(query: str, steps: list, ce_score: float, diagnos
     Keep it within 300 words. Format with Markdown.
     """
     return call_llm(prompt, api_config=api_config)
+
+
+# ===================== SOCRATIC FOLLOW-UP =====================
+SOCRATIC_SYSTEM = """You are a Socratic mentor. Your role is to help the student discover the answer themselves through questions.
+
+RULES — follow these strictly:
+1. You must NEVER directly answer the student's question.
+2. Instead, ask ONE thoughtful probing question that guides their thinking.
+3. Base your question on the learning steps they have been given.
+4. Keep it concise (1-2 sentences).
+5. If the student seems stuck, give a small nudge/hint framed as a question.
+6. Never say "Great question!" or similar filler — go straight to your probing question.
+"""
+
+def generate_socratic_followup(user_message: str, context: dict, history: list, api_config: dict = None):
+    """
+    Generate a Socratic follow-up response. Never directly answers — only asks guiding questions.
+    Returns (response_text, prompt_tokens_est, completion_tokens_est).
+    """
+    steps_text = "\n".join(f"  {i+1}. {s}" for i, s in enumerate(context.get("steps", [])))
+    ce_score = context.get("ce_score", 0.5)
+
+    history_text = ""
+    for msg in history[-6:]:  # keep last 6 turns for context
+        role = "Student" if msg["role"] == "user" else "Mentor"
+        history_text += f"{role}: {msg['content']}\n"
+
+    prompt = f"""{SOCRATIC_SYSTEM}
+
+Context:
+- Student's original question: {context.get("prompt", "")}
+- CE Score: {ce_score:.2f}
+- Learning steps the student received:
+{steps_text}
+
+Conversation so far:
+{history_text}
+Student: {user_message}
+
+Respond with ONE probing question (1-2 sentences):"""
+
+    response = call_llm(prompt, api_config=api_config)
+
+    # Estimate tokens (len/4 heuristic)
+    prompt_tokens = max(1, int(len(prompt) / 4))
+    completion_tokens = max(1, int(len(response) / 4))
+
+    return response, prompt_tokens, completion_tokens
+
+
+# ===================== LEARNING PLAN GENERATOR =====================
+def generate_learning_plan(query: str, steps: list, ce_score: float, diagnostics: dict, api_config: dict = None):
+    """
+    Generate a structured learning/action plan in Markdown.
+    Returns (plan_markdown, prompt_tokens_est, completion_tokens_est).
+    """
+    steps_text = "\n".join(f"  {i+1}. {s}" for i, s in enumerate(steps))
+
+    prompt = f"""You are an Expert Learning Architect. Based on the student's session below, generate a structured **Action Plan** in Markdown.
+
+Student's Question: {query}
+Cognitive Efficiency Score: {ce_score:.2f}
+Diagnostics: {json.dumps(diagnostics)}
+
+Learning Steps Already Generated:
+{steps_text}
+
+Create a plan with this EXACT structure:
+
+# 🗺 Learning Action Plan
+
+## Phase 1: Foundation (Days 1-3)
+- Goal: ...
+- Tasks:
+  - [ ] Task 1
+  - [ ] Task 2
+- Resources: ...
+
+## Phase 2: Core Understanding (Days 4-7)
+- Goal: ...
+- Tasks:
+  - [ ] Task 1
+  - [ ] Task 2
+- Resources: ...
+
+## Phase 3: Practice & Application (Days 8-12)
+- Goal: ...
+- Tasks:
+  - [ ] Task 1
+  - [ ] Task 2
+- Resources: ...
+
+## Phase 4: Mastery & Review (Days 13-14)
+- Goal: ...
+- Tasks:
+  - [ ] Task 1
+  - [ ] Task 2
+
+## 🎯 Milestones
+| Milestone | Target | Metric |
+|-----------|--------|--------|
+| ... | ... | ... |
+
+Keep the plan actionable, specific to the topic, and within 400 words. Format in clean Markdown.
+"""
+    response = call_llm(prompt, api_config=api_config)
+
+    prompt_tokens = max(1, int(len(prompt) / 4))
+    completion_tokens = max(1, int(len(response) / 4))
+
+    return response, prompt_tokens, completion_tokens

@@ -504,6 +504,25 @@
     box-shadow: var(--shadow-md);
 }
 
+.dash-plan-btn {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(236, 72, 153, 0.12));
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+.dash-plan-btn:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.dash-followup-cost {
+    margin-top: 8px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    text-align: right;
+    padding: 0 4px;
+}
+
 /* Score bars in CE section */
 .ce-bars {
     margin-top: 16px;

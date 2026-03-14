@@ -12,7 +12,94 @@
 .prompt-actions-top {
     display: flex;
     justify-content: flex-end;
+    gap: 8px;
     margin-bottom: 10px;
+}
+
+.attach-btn {
+    padding: 8px 16px;
+    background: rgba(96, 165, 250, 0.08);
+    border: 1px solid rgba(96, 165, 250, 0.15);
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.attach-btn:hover:not(:disabled) {
+    background: rgba(96, 165, 250, 0.15);
+    border-color: rgba(96, 165, 250, 0.3);
+}
+
+.attach-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.attached-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.file-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: rgba(96, 165, 250, 0.08);
+    border: 1px solid rgba(96, 165, 250, 0.15);
+    border-radius: 99px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    animation: fadeInUp 0.2s ease;
+}
+
+.file-chip-icon { font-size: 0.85rem; }
+.file-chip-name { font-weight: 500; color: var(--text-primary); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-chip-size { color: var(--text-muted); font-family: var(--font-mono); font-size: 0.7rem; }
+
+.file-chip-remove {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+}
+
+.file-chip-remove:hover {
+    color: #f87171;
+}
+
+.prompt-textarea-wrapper {
+    position: relative;
+    border-radius: var(--radius-lg);
+    transition: border-color var(--transition-fast);
+}
+
+.prompt-textarea-wrapper.drag-over {
+    outline: 2px dashed rgba(96, 165, 250, 0.4);
+    outline-offset: 2px;
+}
+
+.drag-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(59, 130, 246, 0.08);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: var(--accent);
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 5;
 }
 
 .new-problem-btn {
