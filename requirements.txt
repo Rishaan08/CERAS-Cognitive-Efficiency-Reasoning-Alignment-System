@@ -36,3 +36,7 @@ zss
 
 # Optional performance (Unix only)
 uvloop; sys_platform != "win32"
+
+# File Processing
+pypdf
+python-docx

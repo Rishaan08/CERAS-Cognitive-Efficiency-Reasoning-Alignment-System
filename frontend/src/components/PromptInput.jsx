@@ -77,14 +77,7 @@ export default function PromptInput({
         <div className="prompt-input-section">
             <hr />
             <div className="prompt-actions-top">
-                <button
-                    className="attach-btn"
-                    onClick={() => fileRef.current?.click()}
-                    disabled={parsing}
-                    title="Attach PDF, DOCX, TXT, or CSV"
-                >
-                    {parsing ? '⏳' : '📎'} Attach File
-                </button>
+
                 <input
                     ref={fileRef}
                     type="file"
@@ -120,7 +113,7 @@ export default function PromptInput({
             >
                 <textarea
                     className="prompt-textarea"
-                    placeholder="Enter your learning question or problem... (or drag & drop a file)"
+                    placeholder="Enter your learning question or problem..."
                     value={prompt}
                     onChange={e => setPrompt(e.target.value)}
                     onKeyDown={onKeyDown}
