@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { getAdaptiveResponse } from '../api';
+import ReasoningTree from './ReasoningTree';
 import './ResultsPanel.css';
 
 function Expandable({ title, defaultOpen = false, children }) {
@@ -272,6 +273,8 @@ ${result.final_steps?.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: 10 }}>
                     Detailed logs of the decomposition and verification process.
                 </p>
+                <ReasoningTree tree={result.tree} />
+                <div className="trace-divider" />
                 <pre className="trace-code">{result.logs || 'No logs available.'}</pre>
             </Expandable>
 

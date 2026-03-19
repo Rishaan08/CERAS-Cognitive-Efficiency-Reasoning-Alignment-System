@@ -138,6 +138,7 @@ export default function App() {
                 total_tokens: 0,
                 strengths: [],
                 suggestions: ['An error occurred. Please check your API keys and try again.'],
+                tree: null,
                 logs: err.message,
             });
         } finally {

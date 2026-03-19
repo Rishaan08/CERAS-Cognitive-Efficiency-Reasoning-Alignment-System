@@ -55,6 +55,7 @@ export default function HistoryPanel({ userId, onSelectSession, onClose }) {
                 diagnostics: {},
                 strengths: [],
                 suggestions: [],
+                tree: null,
                 logs: '',
             },
             config: {

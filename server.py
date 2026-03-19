@@ -454,6 +454,7 @@ def run_session(req: RunSessionRequest):
         "final_steps": final_steps if isinstance(final_steps, list) else [str(final_steps)],
         "strategy_used": result.get("strategy_used", ""),
         "llm_calls_used": result.get("llm_calls_used", 0),
+        "tree": result.get("tree"),
         "logs": result.get("logs", ""),
         "runtime": runtime,
         "formulation_time": req.formulation_time,
