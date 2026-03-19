@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { getAdaptiveResponse } from '../api';
 import { supabase } from '../lib/supabase';
 import FollowUpChat from './FollowUpChat';
+import ReasoningTree from './ReasoningTree';
 import WorkflowModal from './WorkflowModal';
 import './Dashboard.css';
 
@@ -385,6 +386,8 @@ export default function Dashboard({ result, prompt, config, hasResult, typingAna
 
             {/* ===== REASONING TRACE ===== */}
             <Collapse title="🔍 Reasoning Trace">
+                <ReasoningTree tree={result.tree} />
+                <div className="trace-divider" />
                 <pre className="trace-pre">{result.logs || 'No logs available.'}</pre>
             </Collapse>
 

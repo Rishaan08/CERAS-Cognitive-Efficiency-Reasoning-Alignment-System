@@ -12,7 +12,7 @@ import time
 import io
 import contextlib
 import json
-from typing import List
+from typing import List, Optional
 
 
 # ===================== CONFIG =====================
@@ -45,7 +45,8 @@ def clean(items: List[str], limit: int):
 
 
 # ===================== STRATEGY =====================
-def propose_strategies(prompt: str, api_config: dict = None) -> List[str]:
+def propose_strategies(prompt: str, api_config: Optional[dict] = None) -> List[str]:
+    api_config = api_config or {}
     meta_prompt = f"""
 Propose at most {MAX_STRATEGIES} HIGH-LEVEL strategies
 to solve the following problem.
@@ -74,7 +75,8 @@ Problem:
 
 
 # ===================== SOLVER STEP GENERATOR =====================
-def generate_solver_steps(prompt: str, strategy: str, api_config: dict = None) -> List[str]:
+def generate_solver_steps(prompt: str, strategy: str, api_config: Optional[dict] = None) -> List[str]:
+    api_config = api_config or {}
     solver_prompt = f"""
 Solve the following problem step by step:
 
@@ -97,17 +99,18 @@ Rules:
     if not isinstance(raw, list):
         raw = [raw]
 
-    return clean(raw, MAX_FINAL_STEPS)
+    return clean([str(step) for step in raw], MAX_FINAL_STEPS)
 
 
 # ===================== QUALITY VERIFIER (NEW) =====================
-def review_and_fix_steps(prompt: str, steps: List[str], api_config: dict = None) -> List[str]:
+def review_and_fix_steps(prompt: str, steps: List[str], api_config: Optional[dict] = None) -> List[str]:
     """
     Second-pass verifier.
     Reviews steps for correctness and completeness.
     Fixes them if needed.
     """
 
+    api_config = api_config or {}
     review_prompt = f"""
 You are a strict solution reviewer.
 
@@ -172,7 +175,8 @@ Rules:
 
 
 # ===================== MAIN =====================
-def main(prompt: str, api_config: dict = None):
+def main(prompt: str, api_config: Optional[dict] = None):
+    api_config = api_config or {}
     stdout_buffer = io.StringIO()
     llm_calls_used = 0
 
@@ -195,9 +199,29 @@ def main(prompt: str, api_config: dict = None):
         candidates = []
         for strategy in strategies:
             print(f"Generating steps for strategy: {strategy}")
+            strategy_node = tree.add_node(
+                text=strategy,
+                parent_id=root.id,
+                role="strategy",
+                metadata={"stage": "candidate", "status": "generated"}
+            )
             steps = generate_solver_steps(prompt, strategy, api_config=api_config)
             llm_calls_used += 1
-            candidates.append({"strategy": strategy, "steps": steps})
+            step_nodes = []
+            for index, step in enumerate(steps, start=1):
+                step_node = tree.add_node(
+                    text=step,
+                    parent_id=strategy_node.id,
+                    role="candidate_step",
+                    metadata={"step_number": index, "stage": "generated"}
+                )
+                step_nodes.append(step_node.id)
+            candidates.append({
+                "strategy": strategy,
+                "steps": steps,
+                "strategy_node_id": strategy_node.id,
+                "step_node_ids": step_nodes,
+            })
 
         # 2. VERIFY CANDIDATES
         print("\n--- Step 2: Verifying Candidates ---")
@@ -213,12 +237,17 @@ def main(prompt: str, api_config: dict = None):
                 api_config=api_config
             )
             llm_calls_used += 1
-            
+
             cand["verification"] = verification
+            strategy_node = tree.get_node(cand["strategy_node_id"])
+            strategy_node.metadata.update({
+                "verification_status": verification.get("status", "unknown"),
+                "verification_message": verification.get("message", ""),
+            })
             if verification.get("status") == "accepted":
                 verified_candidates.append(cand)
             else:
-                 print(f"Candidate rejected: {verification.get('message')}")
+                print(f"Candidate rejected: {verification.get('message')}")
 
         # 3. SELECT BEST PATH
         print("\n--- Step 3: Selecting Best Path ---")
@@ -243,23 +272,40 @@ def main(prompt: str, api_config: dict = None):
         final_steps = review_and_fix_steps(prompt, raw_steps, api_config=api_config)
         llm_calls_used += 1
 
-        # ---- TREE BUILD (For Visualization) ----
-        strategy_node = tree.add_node(
-            text=final_strategy,
-            parent_id=root.id,
-            role="strategy"
+        selected_node_id = best_candidate.get("strategy_node_id")
+        if selected_node_id and selected_node_id in tree.nodes:
+            strategy_node = tree.get_node(selected_node_id)
+        else:
+            strategy_node = tree.add_node(
+                text=final_strategy,
+                parent_id=root.id,
+                role="strategy",
+                metadata={"stage": "candidate"}
+            )
+
+        strategy_node.metadata.update({
+            "selected": True,
+            "stage": "selected_path",
+        })
+
+        review_node = tree.add_node(
+            text="Final review and polish",
+            parent_id=strategy_node.id,
+            role="review",
+            metadata={"status": "finalized"}
         )
-        for step in final_steps:
+        for index, step in enumerate(final_steps, start=1):
             tree.add_node(
                 text=step,
-                parent_id=strategy_node.id,
-                role="subtask"
+                parent_id=review_node.id,
+                role="final_step",
+                metadata={"step_number": index, "status": "final"}
             )
 
     return {
         "final_answer": final_steps,
         "strategy_used": final_strategy,
         "llm_calls_used": llm_calls_used,
-        "tree": tree,
+        "tree": tree.to_dict(),
         "logs": stdout_buffer.getvalue()
     }
