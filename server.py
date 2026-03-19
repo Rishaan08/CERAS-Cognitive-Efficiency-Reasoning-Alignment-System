@@ -14,9 +14,11 @@ import logging
 import tempfile
 from pathlib import Path
 from datetime import datetime
+from collections import deque
+from uuid import uuid4
 
 import numpy as np
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
@@ -32,8 +34,44 @@ ASSET_DIR = BASE_DIR / "assets"
 sys.path.insert(0, str(SRC_DIR))
 
 # --------------- LOGGING ---------------
+LOG_BUFFER_SIZE = 500
+log_buffer = deque(maxlen=LOG_BUFFER_SIZE)
+log_buffer_lock = threading.Lock()
+
+
+class InMemoryLogHandler(logging.Handler):
+    def emit(self, record):
+        try:
+            entry = {
+                "timestamp": datetime.fromtimestamp(record.created).isoformat(),
+                "level": record.levelname,
+                "logger": record.name,
+                "message": record.getMessage(),
+            }
+            if record.exc_info:
+                formatter = self.formatter or logging.Formatter()
+                entry["exception"] = formatter.formatException(record.exc_info)
+            with log_buffer_lock:
+                log_buffer.append(entry)
+        except Exception:
+            self.handleError(record)
+
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ceras-server")
+memory_log_handler = InMemoryLogHandler()
+memory_log_handler.setLevel(logging.INFO)
+logger.addHandler(memory_log_handler)
+root_logger = logging.getLogger()
+handler_types = {type(handler) for handler in root_logger.handlers}
+if type(memory_log_handler) not in handler_types:
+    root_logger.addHandler(memory_log_handler)
+
+
+def _log_event(level: str, message: str, **extra):
+    payload = {"event": message}
+    payload.update(extra)
+    logger.log(getattr(logging, level.upper(), logging.INFO), json.dumps(payload, default=str))
 
 # --------------- APP ---------------
 app = FastAPI(title="CERAS API", version="2.0.0")
@@ -45,6 +83,50 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    trace_id = request.headers.get("x-trace-id") or str(uuid4())
+    start = time.time()
+
+    _log_event(
+        "info",
+        "request_started",
+        trace_id=trace_id,
+        method=request.method,
+        path=request.url.path,
+        query=str(request.url.query),
+        client=getattr(request.client, "host", None),
+    )
+
+    try:
+        response = await call_next(request)
+    except Exception as exc:
+        duration_ms = round((time.time() - start) * 1000, 2)
+        _log_event(
+            "error",
+            "request_failed",
+            trace_id=trace_id,
+            method=request.method,
+            path=request.url.path,
+            duration_ms=duration_ms,
+            error=str(exc),
+        )
+        raise
+
+    duration_ms = round((time.time() - start) * 1000, 2)
+    response.headers["X-Trace-Id"] = trace_id
+    _log_event(
+        "info",
+        "request_completed",
+        trace_id=trace_id,
+        method=request.method,
+        path=request.url.path,
+        status_code=response.status_code,
+        duration_ms=duration_ms,
+    )
+    return response
 
 # --------------- MODEL STATE ---------------
 model_state = {
@@ -86,6 +168,7 @@ def _load_models_background():
 
 @app.on_event("startup")
 def startup_event():
+    _log_event("info", "startup_models_loading_scheduled")
     thread = threading.Thread(target=_load_models_background, daemon=True)
     thread.start()
 
@@ -191,6 +274,13 @@ def _estimate_cost(prompt_tokens: int, completion_tokens: int, provider: str) ->
 @app.get("/health")
 @app.get("/api/health")
 def health():
+    _log_event(
+        "info",
+        "health_checked",
+        models_loaded=model_state["loaded"],
+        models_loading=model_state["loading"],
+        has_error=bool(model_state["error"]),
+    )
     return {
         "status": "ok",
         "models_loaded": model_state["loaded"],
@@ -204,15 +294,55 @@ def health():
 def get_logo():
     logo_path = ASSET_DIR / "ceras_logo.png"
     if logo_path.exists():
+        _log_event("info", "logo_served")
         return FileResponse(str(logo_path), media_type="image/png")
+    _log_event("warning", "logo_missing", path=str(logo_path))
     raise HTTPException(status_code=404, detail="Logo not found")
+
+
+@app.get("/api/logs")
+def get_logs(limit: int = 100, level: Optional[str] = None, contains: Optional[str] = None):
+    safe_limit = max(1, min(limit, 500))
+
+    with log_buffer_lock:
+        entries = list(log_buffer)
+
+    if level:
+        level_upper = level.upper()
+        entries = [entry for entry in entries if entry["level"] == level_upper]
+
+    if contains:
+        needle = contains.lower()
+        entries = [
+            entry for entry in entries
+            if needle in entry["message"].lower() or needle in entry["logger"].lower()
+        ]
+
+    sliced_entries = entries[-safe_limit:]
+    _log_event(
+        "info",
+        "logs_requested",
+        requested_limit=limit,
+        applied_limit=safe_limit,
+        filter_level=level,
+        contains=contains,
+        returned=len(sliced_entries),
+    )
+    return {
+        "count": len(sliced_entries),
+        "total_buffered": len(entries),
+        "buffer_capacity": LOG_BUFFER_SIZE,
+        "logs": sliced_entries,
+    }
 
 
 @app.post("/api/check-connection")
 def check_connection_endpoint(req: CheckConnectionRequest):
+    _log_event("info", "connection_check_started", provider=req.provider)
     try:
         from llm_utils import check_connection
         result = check_connection(req.provider, req.api_key)
+        _log_event("info", "connection_check_completed", provider=req.provider, connected=bool(result))
         return {"connected": result}
     except BaseException as e:
         logger.error(f"Connection check failed for {req.provider}: {e}")
@@ -222,6 +352,7 @@ def check_connection_endpoint(req: CheckConnectionRequest):
 @app.post("/api/run-session")
 def run_session(req: RunSessionRequest):
     if not model_state["loaded"]:
+        _log_event("warning", "run_session_blocked_models_loading")
         raise HTTPException(status_code=503, detail="Models are still loading. Please wait.")
 
     from pipeline_1 import main as run_infer
@@ -237,9 +368,26 @@ def run_session(req: RunSessionRequest):
         "verifier_model": req.verifier_model,
     }
 
+    _log_event(
+        "info",
+        "run_session_started",
+        main_provider=req.main_provider,
+        verifier_provider=req.verifier_provider,
+        main_model=req.main_model,
+        verifier_model=req.verifier_model,
+        prompt_chars=len(req.prompt or ""),
+    )
+
     t0 = time.time()
     result = run_infer(req.prompt, api_config=api_config)
     runtime = time.time() - t0
+    _log_event(
+        "info",
+        "run_session_pipeline_completed",
+        runtime_ms=round(runtime * 1000, 2),
+        llm_calls_used=result.get("llm_calls_used", 0),
+        strategy_used=result.get("strategy_used", ""),
+    )
 
     final_steps = result.get("final_answer", [])
     features = extract_ceras_features(req.prompt)
@@ -290,6 +438,18 @@ def run_session(req: RunSessionRequest):
     if not suggestions:
         suggestions.append("Excellent prompt! Maintains high cognitive efficiency.")
 
+    _log_event(
+        "info",
+        "run_session_completed",
+        runtime_ms=round(runtime * 1000, 2),
+        total_tokens=total_tokens,
+        llm_calls_used=result.get("llm_calls_used", 0),
+        cepm_score=round(cepm_score, 4),
+        cnn_score=round(cnn_score, 4),
+        fused_score=round(fused_score, 4),
+        readiness=readiness,
+    )
+
     return {
         "final_steps": final_steps if isinstance(final_steps, list) else [str(final_steps)],
         "strategy_used": result.get("strategy_used", ""),
@@ -325,6 +485,14 @@ def adaptive_response(req: AdaptiveResponseRequest):
     }
 
     try:
+        _log_event(
+            "info",
+            "adaptive_response_started",
+            main_provider=req.main_provider,
+            main_model=req.main_model,
+            steps_count=len(req.steps),
+            ce_score=round(req.ce_score, 4),
+        )
         response = generate_adaptive_response(
             req.prompt,
             req.steps,
@@ -332,8 +500,10 @@ def adaptive_response(req: AdaptiveResponseRequest):
             req.diagnostics,
             api_config=api_config,
         )
+        _log_event("info", "adaptive_response_completed", response_chars=len(response or ""))
         return {"response": response}
     except Exception as e:
+        _log_event("error", "adaptive_response_failed", error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -343,6 +513,12 @@ async def parse_file(file: UploadFile = File(...)):
     """Extract text from uploaded PDF, DOCX, TXT, or CSV files."""
     filename = (file.filename or "").lower()
     content = await file.read()
+    _log_event(
+        "info",
+        "file_parse_started",
+        filename=file.filename,
+        size_bytes=len(content),
+    )
 
     try:
         if filename.endswith(".pdf"):
@@ -370,12 +546,20 @@ async def parse_file(file: UploadFile = File(...)):
         if len(text) > 8000:
             text = text[:8000] + "\n... [truncated]"
 
+        _log_event(
+            "info",
+            "file_parse_completed",
+            filename=file.filename,
+            chars=len(text.strip()),
+        )
         return {"text": text.strip(), "filename": file.filename, "chars": len(text.strip())}
 
     except HTTPException:
+        _log_event("warning", "file_parse_rejected", filename=file.filename)
         raise
     except Exception as e:
         logger.error(f"File parsing error: {e}")
+        _log_event("error", "file_parse_failed", filename=file.filename, error=str(e))
         raise HTTPException(status_code=500, detail=f"Failed to parse file: {str(e)}")
 
 
@@ -394,6 +578,14 @@ def followup_chat(req: FollowUpRequest):
     }
 
     try:
+        _log_event(
+            "info",
+            "followup_started",
+            main_provider=req.main_provider,
+            main_model=req.main_model,
+            history_count=len(req.history),
+            message_chars=len(req.message or ""),
+        )
         response, prompt_tokens, completion_tokens = generate_socratic_followup(
             user_message=req.message,
             context=req.context,
@@ -402,6 +594,14 @@ def followup_chat(req: FollowUpRequest):
         )
         total_tokens = prompt_tokens + completion_tokens
         cost_usd = _estimate_cost(prompt_tokens, completion_tokens, req.main_provider)
+
+        _log_event(
+            "info",
+            "followup_completed",
+            total_tokens=total_tokens,
+            cost_usd=cost_usd,
+            response_chars=len(response or ""),
+        )
 
         return {
             "response": response,
@@ -412,6 +612,7 @@ def followup_chat(req: FollowUpRequest):
         }
     except Exception as e:
         logger.error(f"Follow-up error: {e}")
+        _log_event("error", "followup_failed", error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -430,6 +631,14 @@ def generate_plan(req: GeneratePlanRequest):
     }
 
     try:
+        _log_event(
+            "info",
+            "plan_generation_started",
+            main_provider=req.main_provider,
+            main_model=req.main_model,
+            steps_count=len(req.steps),
+            ce_score=round(req.ce_score, 4),
+        )
         plan, prompt_tokens, completion_tokens = generate_learning_plan(
             query=req.prompt,
             steps=req.steps,
@@ -440,6 +649,14 @@ def generate_plan(req: GeneratePlanRequest):
         total_tokens = prompt_tokens + completion_tokens
         cost_usd = _estimate_cost(prompt_tokens, completion_tokens, req.main_provider)
 
+        _log_event(
+            "info",
+            "plan_generation_completed",
+            total_tokens=total_tokens,
+            cost_usd=cost_usd,
+            plan_chars=len(plan or ""),
+        )
+
         return {
             "plan": plan,
             "prompt_tokens": prompt_tokens,
@@ -449,6 +666,7 @@ def generate_plan(req: GeneratePlanRequest):
         }
     except Exception as e:
         logger.error(f"Plan generation error: {e}")
+        _log_event("error", "plan_generation_failed", error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 
