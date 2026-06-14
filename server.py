@@ -2,6 +2,12 @@
 CERAS FastAPI Backend Server
 Wraps existing Python pipeline, ML models, and LLM utils as REST API endpoints.
 Models are loaded lazily in a background thread so the frontend loads instantly.
+
+Changes from original:
+- Added JWT auth system (register, login, /auth/me) replacing Supabase auth
+- Added get_current_user() dependency for protected endpoints
+- Added DB saving to /api/run-session, /api/followup, /api/generate-plan via db.py
+- db.py now uses asyncpg + Neon instead of Supabase client
 """
 
 import os
@@ -13,16 +19,28 @@ import threading
 import logging
 import tempfile
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import deque
 from uuid import uuid4
 
 import numpy as np
-from fastapi import FastAPI, HTTPException, UploadFile, File, Request
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
+
+# JWT
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+
+# DB
+from db import (
+    save_session_to_db,
+    save_followup_to_db,
+    save_learning_plan_to_db,
+)
 
 # --------------- PATH SETUP ---------------
 BASE_DIR = Path(__file__).resolve().parent
@@ -30,8 +48,15 @@ SRC_DIR = BASE_DIR / "src" / "ceras"
 ARTIFACT_DIR = BASE_DIR / "artifacts"
 ASSET_DIR = BASE_DIR / "assets"
 
-# Add src/ceras to path so we can import pipeline modules
 sys.path.insert(0, str(SRC_DIR))
+
+# --------------- JWT CONFIG ---------------
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+JWT_EXPIRY_MINUTES = int(os.getenv("JWT_EXPIRY_MINUTES", "10080"))  # 7 days
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+bearer_scheme = HTTPBearer(auto_error=False)
 
 # --------------- LOGGING ---------------
 LOG_BUFFER_SIZE = 500
@@ -71,14 +96,19 @@ if type(memory_log_handler) not in handler_types:
 def _log_event(level: str, message: str, **extra):
     payload = {"event": message}
     payload.update(extra)
-    logger.log(getattr(logging, level.upper(), logging.INFO), json.dumps(payload, default=str))
+    logger.log(
+        getattr(logging, level.upper(), logging.INFO), json.dumps(payload, default=str)
+    )
+
 
 # --------------- APP ---------------
 app = FastAPI(title="CERAS API", version="2.0.0")
 
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -128,6 +158,7 @@ async def log_requests(request: Request, call_next):
     )
     return response
 
+
 # --------------- MODEL STATE ---------------
 model_state = {
     "loaded": False,
@@ -143,7 +174,6 @@ model_state = {
 
 
 def _load_models_background():
-    """Load ML models in a background thread."""
     import joblib
     import tensorflow as tf
 
@@ -152,10 +182,16 @@ def _load_models_background():
     try:
         model_state["cepm_model"] = joblib.load(str(ARTIFACT_DIR / "cepm_lightgbm.pkl"))
         model_state["cepm_scaler"] = joblib.load(str(ARTIFACT_DIR / "cepm_scaler.pkl"))
-        model_state["cnn_model"] = tf.keras.models.load_model(str(ARTIFACT_DIR / "cnn_ce_model.keras"))
+        model_state["cnn_model"] = tf.keras.models.load_model(
+            str(ARTIFACT_DIR / "cnn_ce_model.keras")
+        )
         model_state["cnn_scaler"] = joblib.load(str(ARTIFACT_DIR / "cnn_scaler.pkl"))
-        model_state["cepm_features"] = np.load(str(ARTIFACT_DIR / "cepm_features.npy"), allow_pickle=True).tolist()
-        model_state["cnn_features"] = np.load(str(ARTIFACT_DIR / "cnn_features.npy"), allow_pickle=True).tolist()
+        model_state["cepm_features"] = np.load(
+            str(ARTIFACT_DIR / "cepm_features.npy"), allow_pickle=True
+        ).tolist()
+        model_state["cnn_features"] = np.load(
+            str(ARTIFACT_DIR / "cnn_features.npy"), allow_pickle=True
+        ).tolist()
         model_state["loaded"] = True
         model_state["error"] = None
         logger.info("✅ All ML models loaded successfully.")
@@ -173,6 +209,46 @@ def startup_event():
     thread.start()
 
 
+# --------------- JWT HELPERS ---------------
+def _hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+
+def _verify_password(plain: str, hashed: str) -> bool:
+    return pwd_context.verify(plain, hashed)
+
+
+def _create_token(user_id: str, email: str) -> str:
+    expire = datetime.utcnow() + timedelta(minutes=JWT_EXPIRY_MINUTES)
+    payload = {"sub": user_id, "email": email, "exp": expire}
+    return jwt.encode(payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+
+
+def _decode_token(token: str) -> dict:
+    return jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+
+
+# --------------- AUTH DEPENDENCY ---------------
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+) -> dict:
+    """
+    FastAPI dependency — verifies JWT token on every protected endpoint.
+    Use: def my_endpoint(current_user: dict = Depends(get_current_user))
+    """
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        payload = _decode_token(credentials.credentials)
+        user_id: str = payload.get("sub")
+        email: str = payload.get("email")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return {"id": user_id, "email": email}
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token expired or invalid")
+
+
 # --------------- FEATURE EXTRACTION ---------------
 def extract_ceras_features(prompt_text: str) -> dict:
     words = prompt_text.split()
@@ -180,7 +256,9 @@ def extract_ceras_features(prompt_text: str) -> dict:
     character_count = len(prompt_text)
     sentence_count = max(len(re.findall(r"[.!?]", prompt_text)), 1)
     unique_word_ratio = float(np.clip(len(set(words)) / (prompt_length + 1e-6), 0, 1))
-    concept_density = float(np.clip(sum(1 for w in words if len(w) > 6) / (prompt_length + 1e-6), 0, 1))
+    concept_density = float(
+        np.clip(sum(1 for w in words if len(w) > 6) / (prompt_length + 1e-6), 0, 1)
+    )
     keystrokes = int(np.clip(character_count, 1, 2000))
     prompt_quality = float(np.clip(prompt_length / 150, 0, 1))
 
@@ -210,6 +288,7 @@ class CheckConnectionRequest(BaseModel):
     provider: str
     api_key: str
 
+
 class RunSessionRequest(BaseModel):
     prompt: str
     main_provider: str = "Groq"
@@ -220,6 +299,9 @@ class RunSessionRequest(BaseModel):
     gemini_api_key: Optional[str] = ""
     openai_api_key: Optional[str] = ""
     formulation_time: Optional[float] = 0.0
+    # Optional typing analytics from frontend
+    typing_analytics: Optional[Dict[str, Any]] = None
+
 
 class AdaptiveResponseRequest(BaseModel):
     prompt: str
@@ -235,13 +317,15 @@ class AdaptiveResponseRequest(BaseModel):
 
 class FollowUpRequest(BaseModel):
     message: str
-    context: Dict[str, Any]  # {prompt, steps, ce_score}
-    history: List[Dict[str, str]] = []  # [{role, content}]
+    context: Dict[str, Any]
+    history: List[Dict[str, str]] = []
     main_provider: str = "Groq"
     main_model: Optional[str] = None
     groq_api_key: Optional[str] = ""
     gemini_api_key: Optional[str] = ""
     openai_api_key: Optional[str] = ""
+    # DB saving fields (optional — only saved if provided)
+    message_id: Optional[str] = None
 
 
 class GeneratePlanRequest(BaseModel):
@@ -254,22 +338,149 @@ class GeneratePlanRequest(BaseModel):
     groq_api_key: Optional[str] = ""
     gemini_api_key: Optional[str] = ""
     openai_api_key: Optional[str] = ""
+    # DB saving fields (optional)
+    message_id: Optional[str] = None
+
+
+# Auth request models
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    display_name: Optional[str] = None
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
 
 
 # --------------- TOKEN COST HELPER ---------------
-# Rates in USD per 1M tokens: (input_rate, output_rate)
 _COST_RATES = {
-    "Groq":   (0.59,  0.79),    # Llama 3.3-70B on Groq
-    "Gemini": (0.075, 0.30),    # Gemini 2.5 Flash
-    "OpenAI": (0.15,  0.60),    # GPT-4o-mini
+    "Groq": (0.59, 0.79),
+    "Gemini": (0.075, 0.30),
+    "OpenAI": (0.15, 0.60),
 }
+
 
 def _estimate_cost(prompt_tokens: int, completion_tokens: int, provider: str) -> float:
     inp_rate, out_rate = _COST_RATES.get(provider, (0.59, 0.79))
-    return round((prompt_tokens * inp_rate + completion_tokens * out_rate) / 1_000_000, 8)
+    return round(
+        (prompt_tokens * inp_rate + completion_tokens * out_rate) / 1_000_000, 8
+    )
 
 
-# --------------- ENDPOINTS ---------------
+# ================================================
+# AUTH ENDPOINTS (new — replaces Supabase auth)
+# ================================================
+
+
+@app.post("/api/auth/register")
+async def auth_register(req: RegisterRequest):
+    """Register a new user. Returns JWT token + user object."""
+    import asyncpg
+    from db import get_connection
+
+    conn = await get_connection()
+    try:
+        # Check if email already exists
+        existing = await conn.fetchrow(
+            "SELECT id FROM public.users WHERE email = $1", req.email
+        )
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+        # Hash password and insert user
+        password_hash = _hash_password(req.password)
+        user = await conn.fetchrow(
+            """
+            INSERT INTO public.users (email, password_hash, display_name)
+            VALUES ($1, $2, $3)
+            RETURNING id, email, display_name, created_at
+            """,
+            req.email,
+            password_hash,
+            req.display_name,
+        )
+
+        user_id = str(user["id"])
+        token = _create_token(user_id, req.email)
+
+        _log_event("info", "user_registered", user_id=user_id, email=req.email)
+
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "user": {
+                "id": user_id,
+                "email": user["email"],
+                "display_name": user["display_name"],
+                "created_at": str(user["created_at"]),
+            },
+        }
+    finally:
+        await conn.close()
+
+
+@app.post("/api/auth/login")
+async def auth_login(req: LoginRequest):
+    """Login with email + password. Returns JWT token + user object."""
+    from db import get_connection
+
+    conn = await get_connection()
+    try:
+        user = await conn.fetchrow(
+            "SELECT id, email, password_hash, display_name, created_at FROM public.users WHERE email = $1",
+            req.email,
+        )
+        if not user or not _verify_password(req.password, user["password_hash"]):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+
+        user_id = str(user["id"])
+        token = _create_token(user_id, req.email)
+
+        _log_event("info", "user_logged_in", user_id=user_id, email=req.email)
+
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "user": {
+                "id": user_id,
+                "email": user["email"],
+                "display_name": user["display_name"],
+                "created_at": str(user["created_at"]),
+            },
+        }
+    finally:
+        await conn.close()
+
+
+@app.get("/api/auth/me")
+async def auth_me(current_user: dict = Depends(get_current_user)):
+    """Return current user info from JWT token."""
+    from db import get_connection
+
+    conn = await get_connection()
+    try:
+        user = await conn.fetchrow(
+            "SELECT id, email, display_name, created_at FROM public.users WHERE id = $1",
+            current_user["id"],
+        )
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return {
+            "id": str(user["id"]),
+            "email": user["email"],
+            "display_name": user["display_name"],
+            "created_at": str(user["created_at"]),
+        }
+    finally:
+        await conn.close()
+
+
+# ================================================
+# EXISTING ENDPOINTS (unchanged logic, DB saving added)
+# ================================================
+
 
 @app.get("/health")
 @app.get("/api/health")
@@ -301,23 +512,21 @@ def get_logo():
 
 
 @app.get("/api/logs")
-def get_logs(limit: int = 100, level: Optional[str] = None, contains: Optional[str] = None):
+def get_logs(
+    limit: int = 100, level: Optional[str] = None, contains: Optional[str] = None
+):
     safe_limit = max(1, min(limit, 500))
-
     with log_buffer_lock:
         entries = list(log_buffer)
-
     if level:
-        level_upper = level.upper()
-        entries = [entry for entry in entries if entry["level"] == level_upper]
-
+        entries = [e for e in entries if e["level"] == level.upper()]
     if contains:
         needle = contains.lower()
         entries = [
-            entry for entry in entries
-            if needle in entry["message"].lower() or needle in entry["logger"].lower()
+            e
+            for e in entries
+            if needle in e["message"].lower() or needle in e["logger"].lower()
         ]
-
     sliced_entries = entries[-safe_limit:]
     _log_event(
         "info",
@@ -341,8 +550,14 @@ def check_connection_endpoint(req: CheckConnectionRequest):
     _log_event("info", "connection_check_started", provider=req.provider)
     try:
         from llm_utils import check_connection
+
         result = check_connection(req.provider, req.api_key)
-        _log_event("info", "connection_check_completed", provider=req.provider, connected=bool(result))
+        _log_event(
+            "info",
+            "connection_check_completed",
+            provider=req.provider,
+            connected=bool(result),
+        )
         return {"connected": result}
     except BaseException as e:
         logger.error(f"Connection check failed for {req.provider}: {e}")
@@ -350,10 +565,19 @@ def check_connection_endpoint(req: CheckConnectionRequest):
 
 
 @app.post("/api/run-session")
-def run_session(req: RunSessionRequest):
+async def run_session(
+    req: RunSessionRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Run CERAS ML pipeline on a prompt.
+    Added: saves session + metrics + typing analytics to Neon after pipeline completes.
+    """
     if not model_state["loaded"]:
         _log_event("warning", "run_session_blocked_models_loading")
-        raise HTTPException(status_code=503, detail="Models are still loading. Please wait.")
+        raise HTTPException(
+            status_code=503, detail="Models are still loading. Please wait."
+        )
 
     from pipeline_1 import main as run_infer
     from fusion import CERASFusion
@@ -376,33 +600,37 @@ def run_session(req: RunSessionRequest):
         main_model=req.main_model,
         verifier_model=req.verifier_model,
         prompt_chars=len(req.prompt or ""),
+        user_id=current_user["id"],
     )
 
     t0 = time.time()
     result = run_infer(req.prompt, api_config=api_config)
     runtime = time.time() - t0
-    _log_event(
-        "info",
-        "run_session_pipeline_completed",
-        runtime_ms=round(runtime * 1000, 2),
-        llm_calls_used=result.get("llm_calls_used", 0),
-        strategy_used=result.get("strategy_used", ""),
-    )
 
     final_steps = result.get("final_answer", [])
     features = extract_ceras_features(req.prompt)
 
     # CEPM Inference
-    cepm_input = np.array([features[f] for f in model_state["cepm_features"]]).reshape(1, -1)
+    cepm_input = np.array([features[f] for f in model_state["cepm_features"]]).reshape(
+        1, -1
+    )
     cepm_input_scaled = model_state["cepm_scaler"].transform(cepm_input)
-    cepm_score = float(np.clip(model_state["cepm_model"].predict(cepm_input_scaled)[0], 0, 1))
+    cepm_score = float(
+        np.clip(model_state["cepm_model"].predict(cepm_input_scaled)[0], 0, 1)
+    )
 
     # CNN Inference
-    cnn_input = np.array([features[f] for f in model_state["cnn_features"]]).reshape(1, -1)
+    cnn_input = np.array([features[f] for f in model_state["cnn_features"]]).reshape(
+        1, -1
+    )
     cnn_input = model_state["cnn_scaler"].transform(cnn_input)
     if len(model_state["cnn_model"].input_shape) == 3:
         cnn_input = cnn_input.reshape(cnn_input.shape[0], cnn_input.shape[1], 1)
-    cnn_score = float(np.clip(np.squeeze(model_state["cnn_model"].predict(cnn_input, verbose=0)), 0, 1))
+    cnn_score = float(
+        np.clip(
+            np.squeeze(model_state["cnn_model"].predict(cnn_input, verbose=0)), 0, 1
+        )
+    )
 
     # Fusion
     fusion_engine = CERASFusion()
@@ -411,7 +639,6 @@ def run_session(req: RunSessionRequest):
         cepm_scores=[cepm_score],
         cnn_scores=[cnn_score],
     )
-
     fused_score = float(fusion_df["fused_ce_score"].iloc[0])
     confidence = float(fusion_df["confidence"].iloc[0])
     diagnostics = fusion_df["diagnostics"].iloc[0]
@@ -428,15 +655,57 @@ def run_session(req: RunSessionRequest):
     if cepm_score > 0.75:
         strengths.append("Strong structural complexity and adequate length.")
     else:
-        suggestions.append("Try adding more specific constraints or context to increase structural density.")
+        suggestions.append(
+            "Try adding more specific constraints or context to increase structural density."
+        )
     if cnn_score > 0.75:
-        strengths.append("High semantic clarity; intent matches known high-performing patterns.")
+        strengths.append(
+            "High semantic clarity; intent matches known high-performing patterns."
+        )
     else:
-        suggestions.append("Clarify the core intent. Use precise domain terminology to improve semantic alignment.")
+        suggestions.append(
+            "Clarify the core intent. Use precise domain terminology to improve semantic alignment."
+        )
     if not strengths:
-        strengths.append("Prompt is functional but has room for optimization across all dimensions.")
+        strengths.append(
+            "Prompt is functional but has room for optimization across all dimensions."
+        )
     if not suggestions:
         suggestions.append("Excellent prompt! Maintains high cognitive efficiency.")
+
+    # ------------------------------------------------
+    # Save to Neon DB (non-blocking — don't fail the
+    # response if DB save fails)
+    # ------------------------------------------------
+    db_ids = {"session_id": None, "message_id": None}
+    try:
+        db_result = await save_session_to_db(
+            user_id=current_user["id"],
+            prompt=req.prompt,
+            result={
+                "final_steps": final_steps
+                if isinstance(final_steps, list)
+                else [str(final_steps)],
+                "strategy_used": result.get("strategy_used", ""),
+                "llm_calls_used": result.get("llm_calls_used", 0),
+                "cepm_score": cepm_score,
+                "cnn_score": cnn_score,
+                "fused_score": fused_score,
+                "confidence": confidence,
+                "readiness": readiness,
+                "formulation_time": req.formulation_time,
+                "runtime": runtime,
+                "total_tokens": total_tokens,
+                "features": features,
+            },
+            config=api_config,
+            typing_analytics=req.typing_analytics,
+        )
+        db_ids = db_result
+        _log_event("info", "run_session_saved_to_db", **db_ids)
+    except Exception as e:
+        logger.error(f"DB save failed (non-fatal): {e}")
+        _log_event("warning", "run_session_db_save_failed", error=str(e))
 
     _log_event(
         "info",
@@ -451,7 +720,9 @@ def run_session(req: RunSessionRequest):
     )
 
     return {
-        "final_steps": final_steps if isinstance(final_steps, list) else [str(final_steps)],
+        "final_steps": final_steps
+        if isinstance(final_steps, list)
+        else [str(final_steps)],
         "strategy_used": result.get("strategy_used", ""),
         "llm_calls_used": result.get("llm_calls_used", 0),
         "tree": result.get("tree"),
@@ -469,11 +740,17 @@ def run_session(req: RunSessionRequest):
         "readiness": readiness,
         "strengths": strengths,
         "suggestions": suggestions,
+        # Return DB IDs so frontend can use them for follow-up/plan saving
+        "session_id": db_ids.get("session_id"),
+        "message_id": db_ids.get("message_id"),
     }
 
 
 @app.post("/api/adaptive-response")
-def adaptive_response(req: AdaptiveResponseRequest):
+def adaptive_response(
+    req: AdaptiveResponseRequest,
+    current_user: dict = Depends(get_current_user),
+):
     from llm_utils import generate_adaptive_response
 
     api_config = {
@@ -501,36 +778,36 @@ def adaptive_response(req: AdaptiveResponseRequest):
             req.diagnostics,
             api_config=api_config,
         )
-        _log_event("info", "adaptive_response_completed", response_chars=len(response or ""))
+        _log_event(
+            "info", "adaptive_response_completed", response_chars=len(response or "")
+        )
         return {"response": response}
     except Exception as e:
         _log_event("error", "adaptive_response_failed", error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# --------------- NEW: FILE PARSING ---------------
 @app.post("/api/parse-file")
-async def parse_file(file: UploadFile = File(...)):
-    """Extract text from uploaded PDF, DOCX, TXT, or CSV files."""
+async def parse_file(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+):
     filename = (file.filename or "").lower()
     content = await file.read()
     _log_event(
-        "info",
-        "file_parse_started",
-        filename=file.filename,
-        size_bytes=len(content),
+        "info", "file_parse_started", filename=file.filename, size_bytes=len(content)
     )
 
     try:
         if filename.endswith(".pdf"):
-            import pypdf
-            import io
+            import pypdf, io
+
             reader = pypdf.PdfReader(io.BytesIO(content))
             text = "\n".join(page.extract_text() or "" for page in reader.pages)
 
         elif filename.endswith(".docx"):
-            import docx
-            import io
+            import docx, io
+
             doc = docx.Document(io.BytesIO(content))
             text = "\n".join(p.text for p in doc.paragraphs)
 
@@ -541,9 +818,10 @@ async def parse_file(file: UploadFile = File(...)):
             text = content.decode("utf-8", errors="replace")
 
         else:
-            raise HTTPException(status_code=400, detail=f"Unsupported file type: {filename}")
+            raise HTTPException(
+                status_code=400, detail=f"Unsupported file type: {filename}"
+            )
 
-        # Truncate to ~8000 chars to keep context manageable
         if len(text) > 8000:
             text = text[:8000] + "\n... [truncated]"
 
@@ -553,7 +831,11 @@ async def parse_file(file: UploadFile = File(...)):
             filename=file.filename,
             chars=len(text.strip()),
         )
-        return {"text": text.strip(), "filename": file.filename, "chars": len(text.strip())}
+        return {
+            "text": text.strip(),
+            "filename": file.filename,
+            "chars": len(text.strip()),
+        }
 
     except HTTPException:
         _log_event("warning", "file_parse_rejected", filename=file.filename)
@@ -564,9 +846,15 @@ async def parse_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Failed to parse file: {str(e)}")
 
 
-# --------------- NEW: SOCRATIC FOLLOW-UP ---------------
 @app.post("/api/followup")
-def followup_chat(req: FollowUpRequest):
+async def followup_chat(
+    req: FollowUpRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Socratic follow-up chat.
+    Added: saves user message + assistant response to followup_messages in Neon.
+    """
     from llm_utils import generate_socratic_followup
 
     api_config = {
@@ -596,6 +884,31 @@ def followup_chat(req: FollowUpRequest):
         total_tokens = prompt_tokens + completion_tokens
         cost_usd = _estimate_cost(prompt_tokens, completion_tokens, req.main_provider)
 
+        # Save to Neon if message_id provided
+        if req.message_id:
+            try:
+                # Save user message
+                await save_followup_to_db(
+                    message_id=req.message_id,
+                    user_id=current_user["id"],
+                    role="user",
+                    content=req.message,
+                )
+                # Save assistant response
+                await save_followup_to_db(
+                    message_id=req.message_id,
+                    user_id=current_user["id"],
+                    role="assistant",
+                    content=response,
+                    prompt_tokens=prompt_tokens,
+                    completion_tokens=completion_tokens,
+                    cost_usd=cost_usd,
+                )
+                _log_event("info", "followup_saved_to_db", message_id=req.message_id)
+            except Exception as e:
+                logger.error(f"Followup DB save failed (non-fatal): {e}")
+                _log_event("warning", "followup_db_save_failed", error=str(e))
+
         _log_event(
             "info",
             "followup_completed",
@@ -617,9 +930,15 @@ def followup_chat(req: FollowUpRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# --------------- NEW: LEARNING PLAN GENERATOR ---------------
 @app.post("/api/generate-plan")
-def generate_plan(req: GeneratePlanRequest):
+async def generate_plan(
+    req: GeneratePlanRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Learning plan generator.
+    Added: saves plan to learning_plans in Neon.
+    """
     from llm_utils import generate_learning_plan
 
     api_config = {
@@ -650,6 +969,22 @@ def generate_plan(req: GeneratePlanRequest):
         total_tokens = prompt_tokens + completion_tokens
         cost_usd = _estimate_cost(prompt_tokens, completion_tokens, req.main_provider)
 
+        # Save to Neon if message_id provided
+        if req.message_id:
+            try:
+                await save_learning_plan_to_db(
+                    message_id=req.message_id,
+                    user_id=current_user["id"],
+                    plan_text=plan,
+                    prompt_tokens=prompt_tokens,
+                    completion_tokens=completion_tokens,
+                    cost_usd=cost_usd,
+                )
+                _log_event("info", "plan_saved_to_db", message_id=req.message_id)
+            except Exception as e:
+                logger.error(f"Plan DB save failed (non-fatal): {e}")
+                _log_event("warning", "plan_db_save_failed", error=str(e))
+
         _log_event(
             "info",
             "plan_generation_completed",
@@ -673,4 +1008,7 @@ def generate_plan(req: GeneratePlanRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+    host = os.getenv("APP_HOST", "0.0.0.0")
+    port = int(os.getenv("APP_PORT", "8000"))
+    uvicorn.run(app, host=host, port=port)

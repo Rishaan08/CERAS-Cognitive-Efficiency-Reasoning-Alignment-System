@@ -1,3 +1,11 @@
+/**
+ * api.js — CERAS frontend API client
+ * Updated: replaced Supabase auth with JWT token headers on every request.
+ * Import authHeaders from auth.js instead of supabase.js.
+ */
+
+import { authHeaders } from './auth';
+
 const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 export async function checkHealth() {
@@ -8,7 +16,7 @@ export async function checkHealth() {
 export async function checkConnection(provider, apiKey) {
   const res = await fetch(`${API_BASE}/check-connection`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({ provider, api_key: apiKey }),
   });
   return res.json();
@@ -17,7 +25,7 @@ export async function checkConnection(provider, apiKey) {
 export async function runSession(payload) {
   const res = await fetch(`${API_BASE}/run-session`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -30,7 +38,7 @@ export async function runSession(payload) {
 export async function getAdaptiveResponse(payload) {
   const res = await fetch(`${API_BASE}/adaptive-response`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -43,8 +51,10 @@ export async function getAdaptiveResponse(payload) {
 export async function parseFile(file) {
   const formData = new FormData();
   formData.append('file', file);
+  const token = localStorage.getItem('ceras_token');
   const res = await fetch(`${API_BASE}/parse-file`, {
     method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: formData,
   });
   if (!res.ok) {
@@ -57,7 +67,7 @@ export async function parseFile(file) {
 export async function sendFollowUp(payload) {
   const res = await fetch(`${API_BASE}/followup`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -70,7 +80,7 @@ export async function sendFollowUp(payload) {
 export async function generatePlan(payload) {
   const res = await fetch(`${API_BASE}/generate-plan`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
