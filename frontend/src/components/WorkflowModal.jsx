@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { generatePlan } from '../api';
-import { supabase } from '../lib/supabase';
 import './WorkflowModal.css';
+
+// Supabase removed — learning plans are now saved by server.py
+// via save_learning_plan_to_db() after each /api/generate-plan call.
+// No frontend DB calls needed.
 
 export default function WorkflowModal({ result, prompt, config, onClose, onCostUpdate, sessionId, messageId, userId }) {
     const [plan, setPlan] = useState(null);
@@ -23,24 +26,12 @@ export default function WorkflowModal({ result, prompt, config, onClose, onCostU
                 groq_api_key: config.groq_api_key,
                 gemini_api_key: config.gemini_api_key,
                 openai_api_key: config.openai_api_key,
+                // Pass message_id so server.py saves to Neon
+                message_id: messageId || null,
             });
             setPlan(data.plan);
             if (onCostUpdate) {
                 onCostUpdate({ tokens: data.total_tokens, cost: data.cost_usd });
-            }
-            if (messageId && userId) {
-                try {
-                    await supabase.from('learning_plans').insert({
-                        message_id: messageId,
-                        user_id: userId,
-                        plan_text: data.plan,
-                        prompt_tokens: data.prompt_tokens ?? 0,
-                        completion_tokens: data.completion_tokens ?? 0,
-                        cost_usd: data.cost_usd ?? null,
-                    });
-                } catch (err) {
-                    console.error('Failed to save plan to Supabase:', err);
-                }
             }
         } catch (err) {
             setError(err.message);
@@ -85,10 +76,7 @@ export default function WorkflowModal({ result, prompt, config, onClose, onCostU
                             <p className="workflow-intro-sub">
                                 The plan includes phases, tasks, milestones, and resources tailored to your topic.
                             </p>
-                            <button
-                                className="workflow-generate-btn"
-                                onClick={handleGenerate}
-                            >
+                            <button className="workflow-generate-btn" onClick={handleGenerate}>
                                 ⚡ Generate Plan
                             </button>
                         </div>

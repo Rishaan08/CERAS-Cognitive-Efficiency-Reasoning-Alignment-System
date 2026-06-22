@@ -1,139 +1,30 @@
-import { supabase } from '../lib/supabase';
+/**
+ * saveSession.js — CERAS
+ * Supabase removed entirely.
+ * Session saving is now handled by server.py (db.py → Neon) inside /api/run-session.
+ * This file is now a thin wrapper — it just calls /api/run-session and returns
+ * the session_id + message_id that the backend already saved to Neon.
+ */
 
-// USD per 1M tokens (input, output) — match server.py
-const COST_RATES = {
-  Groq: [0.59, 0.79],
-  Gemini: [0.075, 0.3],
-  OpenAI: [0.15, 0.6],
-};
+import { authHeaders } from '../lib/auth';
 
-function estimateCost(promptTokens, completionTokens, provider) {
-  const [inRate, outRate] = COST_RATES[provider] || [0.59, 0.79];
-  return Math.round((promptTokens * inRate + completionTokens * outRate) / 1_000_000 * 1e8) / 1e8;
-}
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 /**
- * Save a complete session (chat + metrics + typing analytics) to Supabase.
- * Called after receiving results from the backend.
+ * Run session + save to Neon — all in one backend call.
+ * Returns { session_id, message_id } for use in follow-up and plan saving.
  */
 export async function saveSession({ userId, prompt, result, config, typingAnalytics }) {
-  if (!userId) return null;
-
-  try {
-    // 1. Create chat session
-    const { data: session, error: sessionErr } = await supabase
-      .from('chat_sessions')
-      .insert({
-        user_id: userId,
-        session_title: prompt.substring(0, 80),
-        main_provider: config.main_provider,
-        verifier_provider: config.verifier_provider,
-        main_model: config.main_model,
-        verifier_model: config.verifier_model,
-      })
-      .select()
-      .single();
-
-    if (sessionErr) throw sessionErr;
-
-    // 2. Create chat message
-    const { data: message, error: msgErr } = await supabase
-      .from('chat_messages')
-      .insert({
-        session_id: session.id,
-        user_id: userId,
-        prompt,
-        final_steps: result.final_steps || [],
-        strategy_used: result.strategy_used || '',
-        llm_calls_used: result.llm_calls_used || 0,
-      })
-      .select()
-      .single();
-
-    if (msgErr) throw msgErr;
-
-    // 3. Save session metrics (include cost_usd)
-    const features = result.features || {};
-    const totalTokens = result.total_tokens || 0;
-    const estPrompt = Math.round(totalTokens * 0.3);
-    const estCompletion = Math.round(totalTokens * 0.7);
-    const costUsd = totalTokens > 0 ? estimateCost(estPrompt, estCompletion, config.main_provider) : null;
-
-    const { error: metricsErr } = await supabase
-      .from('session_metrics')
-      .insert({
-        message_id: message.id,
-        user_id: userId,
-        cepm_score: result.cepm_score,
-        cnn_score: result.cnn_score,
-        fused_score: result.fused_score,
-        confidence: result.confidence,
-        readiness: result.readiness,
-        formulation_time: result.formulation_time,
-        runtime: result.runtime,
-        total_tokens: result.total_tokens,
-        est_prompt_tokens: estPrompt,
-        est_response_tokens: estCompletion,
-        cost_usd: costUsd,
-        prompt_length: features.prompt_length,
-        character_count: features.character_count,
-        sentence_count: features.sentence_count,
-        unique_word_ratio: features.unique_word_ratio,
-        concept_density: features.concept_density,
-        prompt_quality: features.prompt_quality,
-        keystrokes: features.keystrokes,
-        prompt_type: features.prompt_type,
-        typing_speed_wpm: typingAnalytics?.wpm || 0,
-        typing_speed_cpm: typingAnalytics?.cpm || 0,
-        backspace_count: typingAnalytics?.backspaceCount || 0,
-        pause_count: typingAnalytics?.pauseCount || 0,
-        avg_pause_duration: typingAnalytics?.avgPauseDuration || 0,
-        total_pauses_ms: typingAnalytics?.totalPauses || 0,
-        typing_duration_ms: typingAnalytics?.duration || 0,
-        burst_count: typingAnalytics?.burstCount || 0,
-        api_provider_main: config.main_provider,
-        api_provider_verifier: config.verifier_provider,
-        model_main: config.main_model,
-        model_verifier: config.verifier_model,
-      });
-
-    if (metricsErr) console.error('Metrics save error:', metricsErr);
-
-    // 4. Save typing analytics
-    if (typingAnalytics) {
-      const { error: typingErr } = await supabase
-        .from('typing_analytics')
-        .insert({
-          message_id: message.id,
-          user_id: userId,
-          wpm: typingAnalytics.wpm || 0,
-          cpm: typingAnalytics.cpm || 0,
-          backspace_count: typingAnalytics.backspaceCount || 0,
-          pause_count: typingAnalytics.pauseCount || 0,
-          avg_pause_ms: typingAnalytics.avgPauseDuration || 0,
-          total_pauses_ms: typingAnalytics.totalPauses || 0,
-          duration_ms: typingAnalytics.duration || 0,
-          burst_count: typingAnalytics.burstCount || 0,
-        });
-
-      if (typingErr) console.error('Typing analytics save error:', typingErr);
-    }
-
-    // 5. Log activity
-    await supabase.from('user_activity_log').insert({
-      user_id: userId,
-      action: 'run_session',
-      metadata: {
-        session_id: session.id,
-        provider: config.main_provider,
-        model: config.main_model,
-        fused_score: result.fused_score,
-      },
-    });
-
-    return { session, message };
-  } catch (err) {
-    console.error('Error saving session:', err);
+  // session_id and message_id are returned directly by /api/run-session
+  // after server.py saves everything to Neon via db.py.
+  // Nothing to do here — just return what the backend already gave us.
+  if (!result?.session_id || !result?.message_id) {
+    console.warn('No session_id/message_id in result — DB save may have failed on backend.');
     return null;
   }
+
+  return {
+    session: { id: result.session_id },
+    message: { id: result.message_id },
+  };
 }

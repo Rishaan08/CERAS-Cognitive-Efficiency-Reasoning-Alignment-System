@@ -16,8 +16,11 @@ import { useAuth } from './context/AuthContext';
 import { GROQ_MODELS } from './data/examples';
 import useTypingAnalytics from './hooks/useTypingAnalytics';
 import useVault from './hooks/useVault';
-import { saveSession } from './lib/saveSession';
 import LoginPage from './pages/LoginPage';
+
+// NOTE: saveSession import removed — server.py now saves everything
+// to Neon directly inside /api/run-session. session_id and message_id
+// come back in the runSession() response.
 
 export default function App() {
     const { user, loading: authLoading } = useAuth();
@@ -44,7 +47,7 @@ export default function App() {
     const [currentMessageId, setCurrentMessageId] = useState(null);
     const startTimeRef = useRef(Date.now());
 
-    const { analytics, onKeyDown, simulateFromPaste, reset: resetAnalytics } = useTypingAnalytics();
+    const { analytics, onKeyDown, registerPaste, simulateFromExample, reset: resetAnalytics } = useTypingAnalytics();
     const vault = useVault(user?.id);
 
     // Load saved API keys from vault on login
@@ -101,26 +104,39 @@ export default function App() {
                 gemini_api_key: config.gemini_api_key,
                 openai_api_key: config.openai_api_key,
                 formulation_time: formulationTime,
+                // ------------------------------------------------
+                // FIX: typing_analytics was never sent before.
+                // Map useTypingAnalytics() field names to what
+                // server.py / db.py expect.
+                // ------------------------------------------------
+                typing_analytics: {
+                    totalKeystrokes: analytics.totalKeystrokes,
+                    wpm: analytics.wpm,
+                    cpm: analytics.wpm ? Math.round(analytics.wpm * 5) : 0,
+                    deletions: analytics.deletions,
+                    deletionRatio: analytics.deletionRatio,
+                    hesitations: analytics.hesitations,
+                    longestPause: analytics.longestPause,
+                    currentPause: analytics.currentPause,
+                    sessionDuration: analytics.sessionDuration,
+                    avgKeystrokeInterval: analytics.avgKeystrokeInterval,
+                    firstInputDelay: analytics.firstInputDelay,
+                    copyPasteEvents: analytics.copyPasteEvents,
+                    interKeyDelayStd: analytics.interKeyDelayStd,
+                    burstCount: analytics.burstCount,
+                    burstTypingRatio: analytics.burstTypingRatio,
+                },
             });
             setResult(data);
 
-            // Save session to Supabase and capture ids for follow-up/report/plan
-            if (user) {
-                try {
-                    const saved = await saveSession({
-                        userId: user.id,
-                        prompt: prompt.trim(),
-                        result: data,
-                        config,
-                        typingAnalytics: analytics,
-                    });
-                    if (saved?.session?.id && saved?.message?.id) {
-                        setCurrentSessionId(saved.session.id);
-                        setCurrentMessageId(saved.message.id);
-                    }
-                } catch (err) {
-                    console.error('Session save failed:', err);
-                }
+            // ------------------------------------------------
+            // FIX: session_id / message_id now come directly from
+            // the /api/run-session response (server.py already
+            // saved everything to Neon). No second save call needed.
+            // ------------------------------------------------
+            if (user && data.session_id && data.message_id) {
+                setCurrentSessionId(data.session_id);
+                setCurrentMessageId(data.message_id);
             }
         } catch (err) {
             setResult({
@@ -160,7 +176,7 @@ export default function App() {
         setPrompt(text);
         setResult(null);
         setHasResult(false);
-        simulateFromPaste(text);
+        simulateFromExample(text);
     };
 
     const handleSelectSession = ({ prompt: p, result: r, config: c, sessionId, messageId }) => {
@@ -236,7 +252,7 @@ export default function App() {
                     modelsLoaded={modelsLoaded}
                     modelError={modelError}
                     onKeyDown={onKeyDown}
-                    onPaste={simulateFromPaste}
+                    onPaste={registerPaste}
                     onFileContent={(text) => {
                         const sep = prompt.trim() ? '\n\n---\n[File Content]:\n' : '';
                         setPrompt(prev => prev + sep + text.slice(0, 4000));

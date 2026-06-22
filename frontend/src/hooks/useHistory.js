@@ -1,5 +1,13 @@
+/**
+ * useHistory.js — CERAS
+ * Supabase removed. All operations now go through FastAPI endpoints.
+ * Endpoints added to server.py: /api/history, /api/history/delete/:id
+ */
+
 import { useCallback, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { authHeaders } from '../lib/auth';
+
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 export default function useHistory(userId) {
   const [sessions, setSessions] = useState([]);
@@ -10,39 +18,15 @@ export default function useHistory(userId) {
     if (!userId) return;
     setLoading(true);
     try {
-      let query = supabase
-        .from('chat_sessions')
-        .select(`
-          *,
-          chat_messages (
-            id, prompt, final_steps, strategy_used, llm_calls_used, created_at,
-            session_metrics (*)
-          )
-        `)
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(50);
+      const params = new URLSearchParams({ limit: 50 });
+      if (searchQuery.trim()) params.append('search', searchQuery.trim());
 
-      if (searchQuery.trim()) {
-        // Search within messages for prompt text
-        query = supabase
-          .from('chat_sessions')
-          .select(`
-            *,
-            chat_messages!inner (
-              id, prompt, final_steps, strategy_used, llm_calls_used, created_at,
-              session_metrics (*)
-            )
-          `)
-          .eq('user_id', userId)
-          .ilike('chat_messages.prompt', `%${searchQuery.trim()}%`)
-          .order('created_at', { ascending: false })
-          .limit(50);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      setSessions(data || []);
+      const res = await fetch(`${API_BASE}/history?${params}`, {
+        headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed to fetch history');
+      const data = await res.json();
+      setSessions(data.sessions || []);
     } catch (err) {
       console.error('Error fetching history:', err);
     } finally {
@@ -56,12 +40,11 @@ export default function useHistory(userId) {
 
   const deleteSession = async (sessionId) => {
     try {
-      const { error } = await supabase
-        .from('chat_sessions')
-        .delete()
-        .eq('id', sessionId)
-        .eq('user_id', userId);
-      if (error) throw error;
+      const res = await fetch(`${API_BASE}/history/delete/${sessionId}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed to delete session');
       setSessions(prev => prev.filter(s => s.id !== sessionId));
     } catch (err) {
       console.error('Error deleting session:', err);

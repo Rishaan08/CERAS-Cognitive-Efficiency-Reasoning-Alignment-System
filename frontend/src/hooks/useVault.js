@@ -1,5 +1,14 @@
+/**
+ * useVault.js — CERAS
+ * Supabase removed. All operations now go through FastAPI endpoints.
+ * Endpoints added to server.py: /api/vault/keys, /api/vault/save,
+ * /api/vault/delete/:id, /api/vault/verify/:id
+ */
+
 import { useCallback, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { authHeaders } from '../lib/auth';
+
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 export default function useVault(userId) {
   const [keys, setKeys] = useState([]);
@@ -9,14 +18,12 @@ export default function useVault(userId) {
     if (!userId) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('api_keys')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      setKeys(data || []);
+      const res = await fetch(`${API_BASE}/vault/keys`, {
+        headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed to fetch keys');
+      const data = await res.json();
+      setKeys(data.keys || []);
     } catch (err) {
       console.error('Error fetching keys:', err);
     } finally {
@@ -31,22 +38,13 @@ export default function useVault(userId) {
   const saveKey = async (provider, apiKey, label = 'default') => {
     if (!userId) return;
     try {
-      // Upsert: update if same provider+label exists, else insert
-      const { data, error } = await supabase
-        .from('api_keys')
-        .upsert(
-          {
-            user_id: userId,
-            provider,
-            api_key: apiKey,
-            key_label: label,
-            is_active: true,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'user_id,provider,key_label' }
-        )
-        .select();
-      if (error) throw error;
+      const res = await fetch(`${API_BASE}/vault/save`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ provider, api_key: apiKey, key_label: label }),
+      });
+      if (!res.ok) throw new Error('Failed to save key');
+      const data = await res.json();
       await fetchKeys();
       return data;
     } catch (err) {
@@ -57,12 +55,11 @@ export default function useVault(userId) {
 
   const deleteKey = async (keyId) => {
     try {
-      const { error } = await supabase
-        .from('api_keys')
-        .delete()
-        .eq('id', keyId)
-        .eq('user_id', userId);
-      if (error) throw error;
+      const res = await fetch(`${API_BASE}/vault/delete/${keyId}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed to delete key');
       setKeys(prev => prev.filter(k => k.id !== keyId));
     } catch (err) {
       console.error('Error deleting key:', err);
@@ -71,22 +68,18 @@ export default function useVault(userId) {
 
   const updateVerification = async (keyId, isValid) => {
     try {
-      const { error } = await supabase
-        .from('api_keys')
-        .update({
-          is_valid: isValid,
-          last_verified_at: new Date().toISOString(),
-        })
-        .eq('id', keyId)
-        .eq('user_id', userId);
-      if (error) throw error;
+      const res = await fetch(`${API_BASE}/vault/verify/${keyId}`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+        body: JSON.stringify({ is_valid: isValid }),
+      });
+      if (!res.ok) throw new Error('Failed to update verification');
       await fetchKeys();
     } catch (err) {
       console.error('Error updating verification:', err);
     }
   };
 
-  // Helper: get active key for a provider
   const getKeyForProvider = (provider) => {
     const found = keys.find(k => k.provider === provider && k.is_active);
     return found?.api_key || '';

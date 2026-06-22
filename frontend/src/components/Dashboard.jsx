@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { getAdaptiveResponse } from '../api';
-import { supabase } from '../lib/supabase';
+import { getAdaptiveResponse, saveReport } from '../api';
 import FollowUpChat from './FollowUpChat';
 import ReasoningTree from './ReasoningTree';
 import WorkflowModal from './WorkflowModal';
@@ -41,7 +40,7 @@ const readinessClass = r => {
     return 'low';
 };
 
-/* ---- Percentile estimate (simple heuristic) ---- */
+/* ---- Percentile estimate ---- */
 const getPercentile = (score) => {
     if (score >= 0.9) return 'Top 5%';
     if (score >= 0.8) return 'Top 10%';
@@ -57,7 +56,6 @@ export default function Dashboard({ result, prompt, config, hasResult, typingAna
     const [showWorkflow, setShowWorkflow] = useState(false);
     const [followupCost, setFollowupCost] = useState({ tokens: 0, cost: 0 });
     const [planCost, setPlanCost] = useState({ tokens: 0, cost: 0 });
-    // Animated fill: start from 0 and transition to actual score
     const [animatedScore, setAnimatedScore] = useState(0);
     const heroRef = useRef(null);
 
@@ -81,7 +79,6 @@ export default function Dashboard({ result, prompt, config, hasResult, typingAna
             .finally(() => setAdaptiveLoading(false));
     }, [result]);
 
-    // Animate score from 0 when result arrives
     useEffect(() => {
         if (result && result.fused_score != null) {
             setAnimatedScore(0);
@@ -104,19 +101,16 @@ export default function Dashboard({ result, prompt, config, hasResult, typingAna
     }
     if (!result) return null;
 
-    // Main ring (inner) — fused CE score
     const innerR = 82;
     const innerCirc = 2 * Math.PI * innerR;
     const innerOffset = innerCirc - (animatedScore * innerCirc);
 
-    // Outer ring — structural vs semantic dominance
     const outerR = 92;
     const outerCirc = 2 * Math.PI * outerR;
     const cepmRatio = result.cepm_score / (result.cepm_score + result.cnn_score + 0.001);
     const cepmArc = cepmRatio * outerCirc;
     const cnnArc = (1 - cepmRatio) * outerCirc;
 
-    // Delta from baseline (0.5)
     const baseline = 0.5;
     const delta = result.fused_score - baseline;
     const deltaSign = delta >= 0 ? '+' : '';
@@ -161,18 +155,20 @@ export default function Dashboard({ result, prompt, config, hasResult, typingAna
             adaptiveRes ? `Adaptive Response:\n${adaptiveRes}` : '',
         ];
         const reportContent = lines.join('\n');
-        if (sessionId && messageId && userId) {
+
+        // Save report to Neon via FastAPI (replaces supabase.from('session_reports').insert())
+        if (sessionId && messageId) {
             try {
-                await supabase.from('session_reports').insert({
+                await saveReport({
                     session_id: sessionId,
                     message_id: messageId,
-                    user_id: userId,
                     report_content: reportContent,
                 });
             } catch (err) {
-                console.error('Failed to save report to Supabase:', err);
+                console.error('Failed to save report:', err);
             }
         }
+
         const blob = new Blob([reportContent], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -191,57 +187,44 @@ export default function Dashboard({ result, prompt, config, hasResult, typingAna
                     <svg viewBox="0 0 200 200">
                         {/* Outer ring background */}
                         <circle className="ring-outer-bg" cx="100" cy="100" r={outerR} />
-                        {/* Outer ring: CEPM arc (blue) */}
+                        {/* Outer ring — CEPM segment */}
                         <circle
                             className="ring-outer-cepm"
                             cx="100" cy="100" r={outerR}
-                            style={{
-                                stroke: '#3b82f6',
-                                strokeDasharray: `${cepmArc} ${outerCirc - cepmArc}`,
-                                strokeDashoffset: 0,
-                                transform: 'rotate(-90deg)',
-                                transformOrigin: '100px 100px',
-                            }}
+                            stroke="#60a5fa"
+                            strokeDasharray={`${cepmArc} ${outerCirc}`}
                         />
-                        {/* Outer ring: CNN arc (pink) */}
+                        {/* Outer ring — CNN segment */}
                         <circle
                             className="ring-outer-cnn"
                             cx="100" cy="100" r={outerR}
-                            style={{
-                                stroke: '#ec4899',
-                                strokeDasharray: `${cnnArc} ${outerCirc - cnnArc}`,
-                                strokeDashoffset: -cepmArc,
-                                transform: 'rotate(-90deg)',
-                                transformOrigin: '100px 100px',
-                            }}
+                            stroke="#a78bfa"
+                            strokeDasharray={`${cnnArc} ${outerCirc}`}
+                            strokeDashoffset={-cepmArc}
                         />
 
                         {/* Inner ring background */}
                         <circle className="ring-bg" cx="100" cy="100" r={innerR} />
-                        {/* Inner ring: fused CE score (animated) */}
+                        {/* Inner ring — fused CE score */}
                         <circle
                             className="ring-fill"
                             cx="100" cy="100" r={innerR}
-                            style={{
-                                stroke: scoreColor(result.fused_score),
-                                strokeDasharray: innerCirc,
-                                strokeDashoffset: innerOffset,
-                                transform: 'rotate(-90deg)',
-                                transformOrigin: '100px 100px',
-                            }}
+                            stroke={scoreColor(result.fused_score)}
+                            style={{ color: scoreColor(result.fused_score) }}
+                            strokeDasharray={`${innerCirc}`}
+                            strokeDashoffset={innerOffset}
                         />
                     </svg>
+
                     <div className="hero-gauge-center">
                         <div className="hero-score-value" style={{ color: scoreColor(result.fused_score) }}>
-                            {(result.fused_score * 100).toFixed(0)}
+                            {(result.fused_score * 100).toFixed(0)}%
                         </div>
-                        <div className="hero-score-label">CE Score</div>
+                        <div className="hero-score-label">Fused CE Score</div>
                         <div className={`hero-score-delta ${delta >= 0 ? 'positive' : 'negative'}`}>
-                            {deltaSign}{(delta * 100).toFixed(0)} from baseline
+                            {deltaSign}{(delta * 100).toFixed(0)}% vs baseline
                         </div>
-                        <div className="hero-score-percentile">
-                            {getPercentile(result.fused_score)}
-                        </div>
+                        <div className="hero-score-percentile">{getPercentile(result.fused_score)}</div>
                     </div>
                 </div>
 
@@ -415,7 +398,6 @@ export default function Dashboard({ result, prompt, config, hasResult, typingAna
                 </button>
             </div>
 
-            {/* Cumulative follow-up cost */}
             {followupCost.tokens > 0 && (
                 <div className="dash-followup-cost">
                     Follow-up: {followupCost.tokens.toLocaleString()} tokens · ${followupCost.cost.toFixed(6)}

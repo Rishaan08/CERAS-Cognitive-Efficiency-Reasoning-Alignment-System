@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { sendFollowUp } from '../api';
-import { supabase } from '../lib/supabase';
 import './FollowUpChat.css';
+
+// Supabase removed — follow-up messages are now saved by server.py
+// via save_followup_to_db() after each /api/followup call.
+// No frontend DB calls needed.
 
 export default function FollowUpChat({ result, prompt, config, onCostUpdate, sessionId, messageId, userId }) {
     const [messages, setMessages] = useState([]);
@@ -39,6 +42,8 @@ export default function FollowUpChat({ result, prompt, config, onCostUpdate, ses
                 groq_api_key: config.groq_api_key,
                 gemini_api_key: config.gemini_api_key,
                 openai_api_key: config.openai_api_key,
+                // Pass message_id so server.py saves to Neon
+                message_id: messageId || null,
             });
 
             setMessages(prev => [...prev, {
@@ -54,33 +59,6 @@ export default function FollowUpChat({ result, prompt, config, onCostUpdate, ses
             setTotalCost(newTotalCost);
             if (onCostUpdate) onCostUpdate({ tokens: newTotalTokens, cost: newTotalCost });
 
-            // Persist follow-up messages to Supabase
-            if (messageId && userId) {
-                try {
-                    await supabase.from('followup_messages').insert([
-                        {
-                            message_id: messageId,
-                            user_id: userId,
-                            role: 'user',
-                            content: text,
-                            prompt_tokens: 0,
-                            completion_tokens: 0,
-                            cost_usd: null,
-                        },
-                        {
-                            message_id: messageId,
-                            user_id: userId,
-                            role: 'assistant',
-                            content: data.response,
-                            prompt_tokens: data.prompt_tokens ?? 0,
-                            completion_tokens: data.completion_tokens ?? 0,
-                            cost_usd: data.cost_usd ?? null,
-                        },
-                    ]);
-                } catch (err) {
-                    console.error('Failed to save follow-up to Supabase:', err);
-                }
-            }
         } catch (err) {
             setMessages(prev => [...prev, {
                 role: 'assistant',

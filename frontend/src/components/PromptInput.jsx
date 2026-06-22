@@ -22,10 +22,17 @@ export default function PromptInput({
         return '▶ Run Learning Session';
     };
 
+    // FIX: previously this only called onPaste(pastedText) if
+    // e.clipboardData.getData('text') returned a non-empty string —
+    // meaning registerPaste() in useTypingAnalytics.js never fired if
+    // clipboard text extraction failed for any reason (empty clipboard
+    // read, certain browser/security contexts, etc). registerPaste()
+    // takes no arguments — it just needs to know a paste event
+    // happened — so we now call it unconditionally on every paste,
+    // regardless of whether we can read the clipboard text itself.
     const handlePaste = (e) => {
-        const pastedText = e.clipboardData?.getData('text') || '';
-        if (pastedText && onPaste) {
-            setTimeout(() => onPaste(pastedText), 0);
+        if (onPaste) {
+            onPaste();
         }
     };
 

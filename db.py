@@ -14,8 +14,8 @@ async def get_connection() -> asyncpg.Connection:
     """Get a single async connection to Neon."""
     if not DATABASE_URL:
         raise RuntimeError("ASYNC_DATABASE_URL must be set in .env")
-    return await asyncpg.connect(DATABASE_URL)
-
+    url = DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")
+    return await asyncpg.connect(url)
 
 async def save_session_to_db(
     user_id: str,
@@ -54,7 +54,6 @@ async def save_session_to_db(
         # 2. Create chat message
         # ------------------------------------------------
         import json
-
         message_id = await conn.fetchval(
             """
             INSERT INTO public.chat_messages
@@ -101,8 +100,7 @@ async def save_session_to_db(
               $27, $28, $29, $30
             )
             """,
-            message_id,
-            user_id,
+            message_id, user_id,
             result.get("cepm_score"),
             result.get("cnn_score"),
             result.get("fused_score"),
@@ -111,22 +109,22 @@ async def save_session_to_db(
             result.get("formulation_time"),
             result.get("runtime"),
             result.get("total_tokens"),
-            features.get("prompt_length"),
-            features.get("character_count"),
-            features.get("sentence_count"),
-            features.get("unique_word_ratio"),
-            features.get("concept_density"),
-            features.get("prompt_quality"),
-            features.get("keystrokes"),
-            features.get("prompt_type"),
-            ta.get("wpm"),
-            ta.get("cpm"),
-            ta.get("backspaceCount"),
-            ta.get("pauseCount"),
-            ta.get("avgPauseDuration"),
-            ta.get("totalPauses"),
-            ta.get("duration"),
-            ta.get("burstCount"),
+            features.get("prompt_length") or 0,
+            features.get("character_count") or 0,
+            features.get("sentence_count") or 0,
+            features.get("unique_word_ratio") or 0,
+            features.get("concept_density") or 0,
+            features.get("prompt_quality") or 0,
+            features.get("keystrokes") or 0,
+            features.get("prompt_type") or 0,
+            ta.get("wpm") or 0,
+            ta.get("cpm") or 0,
+            ta.get("deletions") or 0,
+            ta.get("hesitations") or 0,
+            ta.get("longestPause") or 0,
+            (ta.get("hesitations") or 0) * (ta.get("longestPause") or 0),
+            (ta.get("sessionDuration") or 0) * 1000,
+            ta.get("burstCount") or 0,
             config.get("main_provider"),
             config.get("verifier_provider"),
             config.get("main_model"),
@@ -135,7 +133,6 @@ async def save_session_to_db(
 
         # ------------------------------------------------
         # 4. Save typing analytics (if provided)
-        # ------------------------------------------------
         if typing_analytics:
             await conn.execute(
                 """
@@ -145,16 +142,15 @@ async def save_session_to_db(
                   avg_pause_ms, total_pauses_ms, duration_ms, burst_count
                 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 """,
-                message_id,
-                user_id,
-                ta.get("wpm"),
-                ta.get("cpm"),
-                ta.get("backspaceCount"),
-                ta.get("pauseCount"),
-                ta.get("avgPauseDuration"),
-                ta.get("totalPauses"),
-                ta.get("duration"),
-                ta.get("burstCount"),
+                message_id, user_id,
+                ta.get("wpm") or 0,
+                ta.get("cpm") or 0,
+                ta.get("deletions") or 0,
+                ta.get("hesitations") or 0,
+                ta.get("longestPause") or 0,
+                (ta.get("hesitations") or 0) * (ta.get("longestPause") or 0),
+                (ta.get("sessionDuration") or 0) * 1000,
+                ta.get("burstCount") or 0,
             )
 
         return {"session_id": str(session_id), "message_id": str(message_id)}
@@ -182,13 +178,8 @@ async def save_followup_to_db(
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING id
             """,
-            message_id,
-            user_id,
-            role,
-            content,
-            prompt_tokens,
-            completion_tokens,
-            cost_usd,
+            message_id, user_id, role, content,
+            prompt_tokens, completion_tokens, cost_usd,
         )
         return str(followup_id)
     finally:
@@ -213,12 +204,8 @@ async def save_learning_plan_to_db(
             VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING id
             """,
-            message_id,
-            user_id,
-            plan_text,
-            prompt_tokens,
-            completion_tokens,
-            cost_usd,
+            message_id, user_id, plan_text,
+            prompt_tokens, completion_tokens, cost_usd,
         )
         return str(plan_id)
     finally:
@@ -226,7 +213,10 @@ async def save_learning_plan_to_db(
 
 
 async def save_ml_training_row(row: dict) -> str:
-    """Save a real user prompt's extracted features to ml_training_data."""
+    """Save a real user prompt's extracted features to ml_training_data.
+    cursor_movement_count and focus_loss_count were removed from the
+    schema — weak/no signal for CE prediction, wouldn't survive
+    MI/RFE feature selection, so not worth the storage cost."""
     conn = await get_connection()
     try:
         record_id = await conn.fetchval(
@@ -244,69 +234,42 @@ async def save_ml_training_row(row: dict) -> str:
               burst_typing_ratio, backspace_count, correction_rate, rewrite_ratio,
               delete_burst_count, error_rate, first_input_delay, finalization_time,
               avg_inter_key_delay, inter_key_delay_std, hesitation_ratio,
-              copy_paste_events, cursor_movement_count, focus_loss_count,
+              copy_paste_events,
               ce_score, prompt_quality, cepm_score, cnn_score, fused_score, input_mode
             ) VALUES (
               $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
               $11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
               $21,$22,$23,$24,$25,$26,$27,$28,$29,$30,
               $31,$32,$33,$34,$35,$36,$37,$38,$39,$40,
-              $41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52
+              $41,$42,$43,$44,$45,$46,$47,$48,$49,$50
             )
             RETURNING id
             """,
-            row.get("message_id"),
-            row.get("session_id"),
-            row.get("user_id"),
+            row.get("message_id"), row.get("session_id"), row.get("user_id"),
             row.get("prompt_text"),
-            row.get("prompt_length"),
-            row.get("character_count"),
-            row.get("sentence_count"),
-            row.get("avg_sentence_length"),
-            row.get("unique_word_ratio"),
-            row.get("multi_clause_count"),
-            row.get("cognitive_verb_count"),
-            row.get("lexical_diversity"),
-            row.get("readability_score"),
-            row.get("stopword_ratio"),
-            row.get("punctuation_density"),
-            row.get("named_entity_count"),
-            row.get("keyword_density"),
-            row.get("topic_consistency_score"),
-            row.get("coherence_score"),
-            row.get("prompt_type"),
-            row.get("concept_density"),
-            row.get("keystrokes"),
-            row.get("typing_speed_wpm"),
-            row.get("typing_speed_cpm"),
-            row.get("avg_key_latency"),
-            row.get("latency_std"),
-            row.get("pause_count"),
-            row.get("avg_pause_duration"),
-            row.get("total_pauses_ms"),
-            row.get("typing_duration_ms"),
-            row.get("idle_time"),
-            row.get("burst_count"),
-            row.get("burst_typing_ratio"),
-            row.get("backspace_count"),
-            row.get("correction_rate"),
-            row.get("rewrite_ratio"),
-            row.get("delete_burst_count"),
-            row.get("error_rate"),
-            row.get("first_input_delay"),
-            row.get("finalization_time"),
-            row.get("avg_inter_key_delay"),
-            row.get("inter_key_delay_std"),
-            row.get("hesitation_ratio"),
-            row.get("copy_paste_events"),
-            row.get("cursor_movement_count"),
-            row.get("focus_loss_count"),
-            row.get("ce_score"),
-            row.get("prompt_quality"),
-            row.get("cepm_score"),
-            row.get("cnn_score"),
-            row.get("fused_score"),
-            row.get("input_mode"),
+            row.get("prompt_length"), row.get("character_count"),
+            row.get("sentence_count"), row.get("avg_sentence_length"),
+            row.get("unique_word_ratio"), row.get("multi_clause_count"),
+            row.get("cognitive_verb_count"), row.get("lexical_diversity"),
+            row.get("readability_score"), row.get("stopword_ratio"),
+            row.get("punctuation_density"), row.get("named_entity_count"),
+            row.get("keyword_density"), row.get("topic_consistency_score"),
+            row.get("coherence_score"), row.get("prompt_type"),
+            row.get("concept_density"), row.get("keystrokes"),
+            row.get("typing_speed_wpm"), row.get("typing_speed_cpm"),
+            row.get("avg_key_latency"), row.get("latency_std"),
+            row.get("pause_count"), row.get("avg_pause_duration"),
+            row.get("total_pauses_ms"), row.get("typing_duration_ms"),
+            row.get("idle_time"), row.get("burst_count"),
+            row.get("burst_typing_ratio"), row.get("backspace_count"),
+            row.get("correction_rate"), row.get("rewrite_ratio"),
+            row.get("delete_burst_count"), row.get("error_rate"),
+            row.get("first_input_delay"), row.get("finalization_time"),
+            row.get("avg_inter_key_delay"), row.get("inter_key_delay_std"),
+            row.get("hesitation_ratio"), row.get("copy_paste_events"),
+            row.get("ce_score"), row.get("prompt_quality"),
+            row.get("cepm_score"), row.get("cnn_score"),
+            row.get("fused_score"), row.get("input_mode"),
         )
         return str(record_id)
     finally:

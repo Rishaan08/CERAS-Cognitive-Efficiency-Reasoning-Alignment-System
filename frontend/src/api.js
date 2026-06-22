@@ -4,15 +4,17 @@
  * Import authHeaders from auth.js instead of supabase.js.
  */
 
-import { authHeaders } from './auth';
+import { authHeaders } from './lib/auth';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
+// ------------------------------------------------
 export async function checkHealth() {
   const res = await fetch(`${API_BASE}/health`);
   return res.json();
 }
 
+// ------------------------------------------------
 export async function checkConnection(provider, apiKey) {
   const res = await fetch(`${API_BASE}/check-connection`, {
     method: 'POST',
@@ -22,6 +24,7 @@ export async function checkConnection(provider, apiKey) {
   return res.json();
 }
 
+// ------------------------------------------------
 export async function runSession(payload) {
   const res = await fetch(`${API_BASE}/run-session`, {
     method: 'POST',
@@ -35,6 +38,7 @@ export async function runSession(payload) {
   return res.json();
 }
 
+// ------------------------------------------------
 export async function getAdaptiveResponse(payload) {
   const res = await fetch(`${API_BASE}/adaptive-response`, {
     method: 'POST',
@@ -48,6 +52,7 @@ export async function getAdaptiveResponse(payload) {
   return res.json();
 }
 
+// ------------------------------------------------
 export async function parseFile(file) {
   const formData = new FormData();
   formData.append('file', file);
@@ -64,6 +69,7 @@ export async function parseFile(file) {
   return res.json();
 }
 
+// ------------------------------------------------
 export async function sendFollowUp(payload) {
   const res = await fetch(`${API_BASE}/followup`, {
     method: 'POST',
@@ -77,6 +83,21 @@ export async function sendFollowUp(payload) {
   return res.json();
 }
 
+// ------------------------------------------------
+export async function saveReport(payload) {
+  const res = await fetch(`${API_BASE}/save-report`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Save report failed' }));
+    throw new Error(err.detail || 'Save report failed');
+  }
+  return res.json();
+}
+
+// ------------------------------------------------
 export async function generatePlan(payload) {
   const res = await fetch(`${API_BASE}/generate-plan`, {
     method: 'POST',

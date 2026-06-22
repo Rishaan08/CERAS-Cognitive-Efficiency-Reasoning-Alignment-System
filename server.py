@@ -11,6 +11,10 @@ Changes from original:
 """
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import sys
 import time
 import re
@@ -24,7 +28,15 @@ from collections import deque
 from uuid import uuid4
 
 import numpy as np
-from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Depends
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    UploadFile,
+    File,
+    Request,
+    Depends,
+    BackgroundTasks,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -40,7 +52,15 @@ from db import (
     save_session_to_db,
     save_followup_to_db,
     save_learning_plan_to_db,
+    save_ml_training_row,
 )
+
+# NLP feature extraction (spaCy + textstat) — used for ml_training_data
+# NLP feature extraction (spaCy + textstat) — used for ml_training_data
+from nlp_features import extract_nlp_features
+
+# Independent ground-truth CE score formula (refined Eq.1 from IEEE paper)
+from ce_formula import compute_ce_score_label
 
 # --------------- PATH SETUP ---------------
 BASE_DIR = Path(__file__).resolve().parent
@@ -564,9 +584,155 @@ def check_connection_endpoint(req: CheckConnectionRequest):
         return {"connected": False, "error": str(e)}
 
 
+# ------------------------------------------------
+# Background task: save ml_training_data with full
+# NLP feature extraction (spaCy + textstat).
+# Runs AFTER the response has been sent to the user.
+# ------------------------------------------------
+async def _save_ml_training_background(
+    message_id,
+    session_id,
+    user_id,
+    prompt_text,
+    features,
+    typing_analytics,
+    formulation_time,
+    cepm_score,
+    cnn_score,
+    fused_score,
+):
+    try:
+        ta = typing_analytics or {}
+
+        avg_sentence_length = None
+        if features.get("sentence_count") and features.get("prompt_length"):
+            avg_sentence_length = features["prompt_length"] / max(
+                features["sentence_count"], 1
+            )
+
+        # ---- NLP features (spaCy + textstat) ----
+        nlp_feats = extract_nlp_features(prompt_text)
+
+        # ---- Independent ground-truth CE score (refined Eq.1) ----
+        # This is computed from raw features ONLY — never from
+        # cepm_score/cnn_score/fused_score — so it stays a genuinely
+        # independent label, not a copy of the model's own prediction.
+        ce_score_label = compute_ce_score_label(
+            prompt_length=features.get("prompt_length") or 0,
+            unique_word_ratio=features.get("unique_word_ratio") or 0,
+            keystrokes=ta.get("totalKeystrokes") or features.get("keystrokes") or 0,
+            character_count=features.get("character_count") or 0,
+            prompt_type=features.get("prompt_type") or 0,
+            prompt_text=prompt_text,
+        )
+
+        ml_row = {
+            "message_id": message_id,
+            "session_id": session_id,
+            "user_id": user_id,
+            "prompt_text": prompt_text,
+            # ---- Semantic Features (CNN) ----
+            "prompt_length": features.get("prompt_length") or 0,
+            "character_count": features.get("character_count") or 0,
+            "sentence_count": features.get("sentence_count") or 0,
+            "avg_sentence_length": avg_sentence_length or 0,
+            "unique_word_ratio": features.get("unique_word_ratio") or 0,
+            "multi_clause_count": nlp_feats.get("multi_clause_count") or 0,
+            "cognitive_verb_count": nlp_feats.get("cognitive_verb_count") or 0,
+            "lexical_diversity": nlp_feats.get("lexical_diversity")
+            or features.get("unique_word_ratio")
+            or 0,
+            "readability_score": nlp_feats.get("readability_score") or 0,
+            "stopword_ratio": nlp_feats.get("stopword_ratio") or 0,
+            "punctuation_density": nlp_feats.get("punctuation_density") or 0,
+            "named_entity_count": nlp_feats.get("named_entity_count") or 0,
+            "keyword_density": nlp_feats.get("keyword_density") or 0,
+            "topic_consistency_score": nlp_feats.get("topic_consistency_score") or 0,
+            "coherence_score": nlp_feats.get("coherence_score") or 0,
+            "prompt_type": features.get("prompt_type") or 0,
+            "concept_density": features.get("concept_density") or 0,
+            # ---- Behaviour Features (CEPM) — from useTypingAnalytics.js ----
+            "keystrokes": ta.get("totalKeystrokes") or features.get("keystrokes") or 0,
+            "typing_speed_wpm": ta.get("wpm") or 0,
+            "typing_speed_cpm": ta.get("cpm") or 0,
+            "avg_key_latency": ta.get("avgKeystrokeInterval") or 0,
+            "latency_std": ta.get("interKeyDelayStd") or 0,
+            "pause_count": ta.get("hesitations") or 0,
+            "avg_pause_duration": ta.get("longestPause") or 0,
+            "total_pauses_ms": (ta.get("hesitations") or 0)
+            * (ta.get("longestPause") or 0),
+            "typing_duration_ms": (ta.get("sessionDuration") or 0) * 1000,
+            "idle_time": ta.get("currentPause") or 0,
+            "burst_count": ta.get("burstCount") or 0,
+            "burst_typing_ratio": ta.get("burstTypingRatio") or 0,
+            "backspace_count": ta.get("deletions") or 0,
+            "correction_rate": ta.get("deletionRatio") or 0,
+            "rewrite_ratio": ta.get("deletionRatio") or 0,
+            "delete_burst_count": 0,
+            "error_rate": ta.get("deletionRatio") or 0,
+            # first_input_delay is ALWAYS measurable (time from focus to
+            # first keystroke/paste) — captured in useTypingAnalytics.js.
+            # Never null/0 in real usage; default only covers the
+            # edge case of a missing/old frontend payload.
+            "first_input_delay": ta.get("firstInputDelay") or 0,
+            "finalization_time": formulation_time or 0,
+            "avg_inter_key_delay": ta.get("avgKeystrokeInterval") or 0,
+            "inter_key_delay_std": ta.get("interKeyDelayStd") or 0,
+            "hesitation_ratio": (
+                ta.get("hesitations") / ta.get("totalKeystrokes")
+                if ta.get("hesitations") and ta.get("totalKeystrokes")
+                else 0
+            ),
+            # copy_paste_events: real count from useTypingAnalytics.js
+            # registerPaste(), incremented on the textarea's native
+            # paste event — 0 if the user typed everything themselves.
+            "copy_paste_events": ta.get("copyPasteEvents") or 0,
+            # cursor_movement_count and focus_loss_count were removed
+            # from the schema entirely — weak/no signal for CE
+            # prediction (wouldn't survive MI/RFE feature selection),
+            # so computing them would just be storage cost with no
+            # modeling benefit. See drop_unused_columns.sql.
+            # ---- Targets ----
+            # ce_score is the INDEPENDENT formula-based ground-truth label
+            # (NOT a copy of fused_score) — see compute_ce_score_label()
+            # above for why this distinction matters for model
+            # comparison/retraining. Disagreement with fused_score is
+            # EXPECTED right now: the deployed CEPM/CNN models were
+            # trained on labels from the OLD formula, not this refined
+            # one, so they're being compared against a target they've
+            # never seen. This is not a sign the model is "better" —
+            # it's a sign the model needs retraining on labels from
+            # the new formula before the comparison is meaningful.
+            "ce_score": ce_score_label,
+            "prompt_quality": features.get("prompt_quality") or 0,
+            # ---- Model Outputs ----
+            "cepm_score": cepm_score,
+            "cnn_score": cnn_score,
+            "fused_score": fused_score,
+            # input_mode: "paste" if the user pasted at least once
+            # during this prompt, "typed" otherwise. Uses the real
+            # copy_paste_events counter, not a fragile heuristic.
+            "input_mode": "paste" if (ta.get("copyPasteEvents") or 0) > 0 else "typed",
+        }
+
+        await save_ml_training_row(ml_row)
+        _log_event(
+            "info",
+            "ml_training_data_saved",
+            message_id=message_id,
+            ce_score_label=ce_score_label,
+            fused_score=round(fused_score, 4),
+            label_model_delta=round(ce_score_label - fused_score, 4),
+        )
+    except Exception as e:
+        logger.error(f"ML training data background save failed (non-fatal): {e}")
+        _log_event("warning", "ml_training_data_save_failed", error=str(e))
+
+
 @app.post("/api/run-session")
 async def run_session(
     req: RunSessionRequest,
+    background_tasks: BackgroundTasks,
     current_user: dict = Depends(get_current_user),
 ):
     """
@@ -673,10 +839,7 @@ async def run_session(
     if not suggestions:
         suggestions.append("Excellent prompt! Maintains high cognitive efficiency.")
 
-    # ------------------------------------------------
-    # Save to Neon DB (non-blocking — don't fail the
-    # response if DB save fails)
-    # ------------------------------------------------
+    # Save to Neon DB 
     db_ids = {"session_id": None, "message_id": None}
     try:
         db_result = await save_session_to_db(
@@ -706,6 +869,26 @@ async def run_session(
     except Exception as e:
         logger.error(f"DB save failed (non-fatal): {e}")
         _log_event("warning", "run_session_db_save_failed", error=str(e))
+
+    # ------------------------------------------------
+    # Save to ml_training_data — scheduled as a BACKGROUND TASK.
+    # NLP feature extraction (spaCy + textstat) takes 100-300ms;
+    # we don't want the user waiting on that after their response
+    # is already computed. This fires after the response is sent.
+    # ------------------------------------------------
+    background_tasks.add_task(
+        _save_ml_training_background,
+        message_id=db_ids.get("message_id"),
+        session_id=db_ids.get("session_id"),
+        user_id=current_user["id"],
+        prompt_text=req.prompt,
+        features=features,
+        typing_analytics=req.typing_analytics or {},
+        formulation_time=req.formulation_time,
+        cepm_score=cepm_score,
+        cnn_score=cnn_score,
+        fused_score=fused_score,
+    )
 
     _log_event(
         "info",
@@ -1004,6 +1187,234 @@ async def generate_plan(
         logger.error(f"Plan generation error: {e}")
         _log_event("error", "plan_generation_failed", error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ================================================
+# VAULT ENDPOINTS (replaces useVault.js Supabase calls)
+# ================================================
+
+
+class VaultSaveRequest(BaseModel):
+    provider: str
+    api_key: str
+    key_label: str = "default"
+
+
+class VaultVerifyRequest(BaseModel):
+    is_valid: bool
+
+
+@app.get("/api/vault/keys")
+async def vault_get_keys(current_user: dict = Depends(get_current_user)):
+    """Get all active API keys for the current user."""
+    from db import get_connection
+
+    conn = await get_connection()
+    try:
+        rows = await conn.fetch(
+            """
+            SELECT id, provider, key_label, is_active, is_valid, last_verified_at, created_at
+            FROM public.api_keys
+            WHERE user_id = $1 AND is_active = true
+            ORDER BY created_at DESC
+            """,
+            current_user["id"],
+        )
+        return {"keys": [dict(r) for r in rows]}
+    finally:
+        await conn.close()
+
+
+@app.post("/api/vault/save")
+async def vault_save_key(
+    req: VaultSaveRequest, current_user: dict = Depends(get_current_user)
+):
+    """Save or update an API key (upsert by user_id + provider + key_label)."""
+    from db import get_connection
+
+    conn = await get_connection()
+    try:
+        row = await conn.fetchrow(
+            """
+            INSERT INTO public.api_keys (user_id, provider, api_key, key_label, is_active)
+            VALUES ($1, $2, $3, $4, true)
+            ON CONFLICT (user_id, provider, key_label)
+            DO UPDATE SET api_key = EXCLUDED.api_key, is_active = true, updated_at = NOW()
+            RETURNING id, provider, key_label, is_active, created_at
+            """,
+            current_user["id"],
+            req.provider,
+            req.api_key,
+            req.key_label,
+        )
+        return {"key": dict(row)}
+    finally:
+        await conn.close()
+
+
+@app.delete("/api/vault/delete/{key_id}")
+async def vault_delete_key(key_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete an API key (only if it belongs to the current user)."""
+    from db import get_connection
+
+    conn = await get_connection()
+    try:
+        await conn.execute(
+            "DELETE FROM public.api_keys WHERE id = $1 AND user_id = $2",
+            key_id,
+            current_user["id"],
+        )
+        return {"deleted": True}
+    finally:
+        await conn.close()
+
+
+@app.patch("/api/vault/verify/{key_id}")
+async def vault_verify_key(
+    key_id: str, req: VaultVerifyRequest, current_user: dict = Depends(get_current_user)
+):
+    """Update verification status of an API key."""
+    from db import get_connection
+
+    conn = await get_connection()
+    try:
+        await conn.execute(
+            """
+            UPDATE public.api_keys
+            SET is_valid = $1, last_verified_at = NOW()
+            WHERE id = $2 AND user_id = $3
+            """,
+            req.is_valid,
+            key_id,
+            current_user["id"],
+        )
+        return {"updated": True}
+    finally:
+        await conn.close()
+
+
+# ================================================
+# HISTORY ENDPOINTS (replaces useHistory.js Supabase calls)
+# ================================================
+
+
+@app.get("/api/history")
+async def get_history(
+    limit: int = 50,
+    search: Optional[str] = None,
+    current_user: dict = Depends(get_current_user),
+):
+    """Get chat session history for the current user, with optional search."""
+    from db import get_connection
+
+    conn = await get_connection()
+    try:
+        if search:
+            rows = await conn.fetch(
+                """
+                SELECT
+                    cs.id, cs.session_title, cs.main_provider, cs.verifier_provider,
+                    cs.main_model, cs.verifier_model, cs.created_at,
+                    json_agg(json_build_object(
+                        'id', cm.id,
+                        'prompt', cm.prompt,
+                        'final_steps', cm.final_steps,
+                        'strategy_used', cm.strategy_used,
+                        'llm_calls_used', cm.llm_calls_used,
+                        'created_at', cm.created_at
+                    )) AS chat_messages
+                FROM public.chat_sessions cs
+                LEFT JOIN public.chat_messages cm ON cm.session_id = cs.id
+                WHERE cs.user_id = $1 AND cm.prompt ILIKE $2
+                GROUP BY cs.id
+                ORDER BY cs.created_at DESC
+                LIMIT $3
+                """,
+                current_user["id"],
+                f"%{search}%",
+                limit,
+            )
+        else:
+            rows = await conn.fetch(
+                """
+                SELECT
+                    cs.id, cs.session_title, cs.main_provider, cs.verifier_provider,
+                    cs.main_model, cs.verifier_model, cs.created_at,
+                    json_agg(json_build_object(
+                        'id', cm.id,
+                        'prompt', cm.prompt,
+                        'final_steps', cm.final_steps,
+                        'strategy_used', cm.strategy_used,
+                        'llm_calls_used', cm.llm_calls_used,
+                        'created_at', cm.created_at
+                    )) AS chat_messages
+                FROM public.chat_sessions cs
+                LEFT JOIN public.chat_messages cm ON cm.session_id = cs.id
+                WHERE cs.user_id = $1
+                GROUP BY cs.id
+                ORDER BY cs.created_at DESC
+                LIMIT $2
+                """,
+                current_user["id"],
+                limit,
+            )
+        return {"sessions": [dict(r) for r in rows]}
+    finally:
+        await conn.close()
+
+
+@app.delete("/api/history/delete/{session_id}")
+async def delete_session(
+    session_id: str, current_user: dict = Depends(get_current_user)
+):
+    """Delete a session (only if it belongs to the current user)."""
+    from db import get_connection
+
+    conn = await get_connection()
+    try:
+        await conn.execute(
+            "DELETE FROM public.chat_sessions WHERE id = $1 AND user_id = $2",
+            session_id,
+            current_user["id"],
+        )
+        return {"deleted": True}
+    finally:
+        await conn.close()
+
+
+# ================================================
+# SAVE REPORT ENDPOINT (replaces Dashboard.jsx Supabase call)
+# ================================================
+
+
+class SaveReportRequest(BaseModel):
+    session_id: str
+    message_id: str
+    report_content: str
+
+
+@app.post("/api/save-report")
+async def save_report(
+    req: SaveReportRequest, current_user: dict = Depends(get_current_user)
+):
+    """Save a session report to Neon."""
+    from db import get_connection
+
+    conn = await get_connection()
+    try:
+        await conn.execute(
+            """
+            INSERT INTO public.session_reports (session_id, message_id, user_id, report_content)
+            VALUES ($1, $2, $3, $4)
+            """,
+            req.session_id,
+            req.message_id,
+            current_user["id"],
+            req.report_content,
+        )
+        return {"saved": True}
+    finally:
+        await conn.close()
 
 
 if __name__ == "__main__":
