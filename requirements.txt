@@ -15,6 +15,10 @@ langchain-google-genai
 openai
 tiktoken
 
+# NLP feature extraction (ml_training_data ground-truth pipeline)
+spacy
+textstat
+
 # Backend
 fastapi
 uvicorn[standard]
@@ -24,8 +28,14 @@ requests
 sqlalchemy
 sqlmodel
 python-dotenv
-supabase
+
+# Auth / JWT
 python-jose[cryptography]
+passlib[bcrypt]
+bcrypt==4.0.1
+
+# Database (Neon PostgreSQL via asyncpg)
+asyncpg
 
 # Utilities
 pyyaml
@@ -39,4 +49,4 @@ uvloop; sys_platform != "win32"
 
 # File Processing
 pypdf
-python-docx
+python-docx
