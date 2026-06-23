@@ -144,8 +144,6 @@ Create `frontend/.env` if needed:
 
 ```env
 VITE_API_BASE=/api
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 Notes:
