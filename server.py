@@ -463,26 +463,12 @@ def health():
         models_loading=model_state["loading"],
         has_error=bool(model_state["error"]),
     )
-    # Diagnostic: list artifacts/ contents directly in the response.
-    # Lets us verify the model files actually exist on the deployed
-    # filesystem without needing shell access (not available on
-    # Render's free tier). Remove once model loading is confirmed working.
-    try:
-        artifacts_exist = ARTIFACT_DIR.exists()
-        artifacts_files = sorted(p.name for p in ARTIFACT_DIR.iterdir()) if artifacts_exist else []
-    except Exception as e:
-        artifacts_exist = False
-        artifacts_files = [f"ERROR listing artifacts: {e}"]
-
     return {
         "status": "ok",
         "models_loaded":  model_state["loaded"],
         "models_loading": model_state["loading"],
         "model_error":    model_state["error"],
         "timestamp":      time.time(),
-        "artifacts_dir_exists": artifacts_exist,
-        "artifacts_dir_path": str(ARTIFACT_DIR),
-        "artifacts_files": artifacts_files,
     }
 
 
@@ -668,7 +654,6 @@ async def _save_ml_training_background(
         logger.error(f"ML training data background save failed (non-fatal): {e}")
         _log_event("warning", "ml_training_data_save_failed", error=str(e))
 
-
 @app.post("/api/run-session")
 async def run_session(
     req: RunSessionRequest,
@@ -846,7 +831,6 @@ async def run_session(
         "message_id":     db_ids.get("message_id"),
     }
 
-
 @app.post("/api/adaptive-response")
 def adaptive_response(
     req: AdaptiveResponseRequest,
@@ -879,7 +863,6 @@ def adaptive_response(
     except Exception as e:
         _log_event("error", "adaptive_response_failed", error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/api/parse-file")
 async def parse_file(
@@ -923,7 +906,6 @@ async def parse_file(
         logger.error(f"File parsing error: {e}")
         _log_event("error", "file_parse_failed", filename=file.filename, error=str(e))
         raise HTTPException(status_code=500, detail=f"Failed to parse file: {str(e)}")
-
 
 @app.post("/api/followup")
 async def followup_chat(
@@ -1005,7 +987,6 @@ async def followup_chat(
         _log_event("error", "followup_failed", error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/generate-plan")
 async def generate_plan(
     req: GeneratePlanRequest,
@@ -1078,11 +1059,7 @@ async def generate_plan(
         _log_event("error", "plan_generation_failed", error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# ================================================
-# VAULT ENDPOINTS (replaces useVault.js Supabase calls)
-# ================================================
-
+# VAULT ENDPOINTS 
 class VaultSaveRequest(BaseModel):
     provider: str
     api_key: str
@@ -1110,7 +1087,6 @@ async def vault_get_keys(current_user: dict = Depends(get_current_user)):
     finally:
         await conn.close()
 
-
 @app.post("/api/vault/save")
 async def vault_save_key(req: VaultSaveRequest, current_user: dict = Depends(get_current_user)):
     """Save or update an API key (upsert by user_id + provider + key_label)."""
@@ -1131,7 +1107,6 @@ async def vault_save_key(req: VaultSaveRequest, current_user: dict = Depends(get
     finally:
         await conn.close()
 
-
 @app.delete("/api/vault/delete/{key_id}")
 async def vault_delete_key(key_id: str, current_user: dict = Depends(get_current_user)):
     """Delete an API key (only if it belongs to the current user)."""
@@ -1145,7 +1120,6 @@ async def vault_delete_key(key_id: str, current_user: dict = Depends(get_current
         return {"deleted": True}
     finally:
         await conn.close()
-
 
 @app.patch("/api/vault/verify/{key_id}")
 async def vault_verify_key(key_id: str, req: VaultVerifyRequest, current_user: dict = Depends(get_current_user)):
@@ -1165,10 +1139,7 @@ async def vault_verify_key(key_id: str, req: VaultVerifyRequest, current_user: d
     finally:
         await conn.close()
 
-
-# ================================================
-# HISTORY ENDPOINTS (replaces useHistory.js Supabase calls)
-# ================================================
+# HISTORY ENDPOINTS 
 @app.get("/api/history")
 async def get_history(
     limit: int = 50,
@@ -1228,7 +1199,6 @@ async def get_history(
         return {"sessions": [dict(r) for r in rows]}
     finally:
         await conn.close()
-
 
 @app.delete("/api/history/delete/{session_id}")
 async def delete_session(session_id: str, current_user: dict = Depends(get_current_user)):
